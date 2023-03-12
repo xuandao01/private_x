@@ -24,17 +24,17 @@ export default {
 
   // data() {
   //   return {
-  //     employees: [],
-  //     isShowPopup: false,
-  //     selectedEmployee: null,
-  //     showLoading: true,
-  //     lastKeyPress: null,
-  //     lastTimePress: null,
-  //     showToast: false,
-  //     toastKind: "success",
-  //     toastMess: "",
-  //     deleteDialog: false,
-  //     showData: true,
+      // employees: [],
+      // isShowPopup: false,
+      // selectedEmployee: null,
+      // showLoading: true,
+      // lastKeyPress: null,
+      // lastTimePress: null,
+      // showToast: false,
+      // toastKind: "success",
+      // toastMess: "",
+      // deleteDialog: false,
+      // showData: true,
   //   };
   // },
 };
