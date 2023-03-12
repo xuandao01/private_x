@@ -1,8 +1,8 @@
 @media only screen and (min-width: 1920px){ /* 1920 x 1080 */
     .popup .popup-main{
         width: 50%;
-        height: 75%;
-        top: 12.5%;
+        height: 80%;
+        top: 10%;
         left: 25%;
     }
 }

@@ -151,6 +151,28 @@
               />
             </div>
           </div>
+          <div class="inf-area">
+            <div class="inf-component">
+              <div class="text" :title="txtData.phoneNumberDetail">
+                {{ txtData.bankAccount }}
+              </div>
+              <input type="text" id="bankAcc" />
+            </div>
+            <div class="inf-component">
+              <div class="text" :title="txtData.landingPhoneDetail">
+                {{ txtData.bankName }}
+              </div>
+              <input type="text" id="bankname" />
+            </div>
+            <div class="inf-component">
+              <div class="text">{{ txtData.bankBranch }}</div>
+              <input
+                type="text"
+                class="pop-input"
+                id="bankBranch"
+              />
+            </div>
+          </div>
         </div>
       </div>
       <!-- Content footer -->

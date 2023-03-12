@@ -90,6 +90,7 @@ export default {
     animation-name: showToast;
     animation-duration: 1s;
     animation-fill-mode: forwards;
+    z-index: 99999;
 }
 
 .success-toast, .info-toast, .error-toast, .info-toast{

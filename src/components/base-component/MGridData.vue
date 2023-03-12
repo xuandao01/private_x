@@ -12,6 +12,7 @@
           </tr>
         </thead>
         <tbody ref="tableBody">
+          <MEmployeeLoading></MEmployeeLoading>
           <tr v-for="(item, index) in gridData" :key="index">
             <td v-for="(value, index) in data.modelName" :key="index">
               {{ item[value] }}
@@ -24,11 +25,12 @@
   </div>
 </template>
 <script>
+import MEmployeeLoading from '../unit-components/MEmployeeLoading.vue';
 import MContextMenu from './MContextMenu.vue';
 export default {
   name: "MGridData",
   components:{
-    MContextMenu
+    MContextMenu, MEmployeeLoading
   },
   /**
    * Lấy dữ liệu từ api và đổ vào data

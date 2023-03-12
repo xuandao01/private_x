@@ -6,7 +6,7 @@
       <div class="content-button">
         <!-- Button thêm mới nhân viên -->
         <button class="btn-add" id="add_employee">
-          <div class="text">Thêm mới nhân viên</div>
+          <div class="text" @click="showNewPopup">Thêm mới nhân viên</div>
         </button>
       </div>
     </div>
@@ -14,17 +14,10 @@
     <div class="content-main">
       <div class="content-main__header">
         <div class="input-component">
-          <input
-            type="text"
-            class="search"
-            placeholder="Tìm theo mã, tên nhân viên"
-          />
+          <input type="text" class="search" placeholder="Tìm theo mã, tên nhân viên"/>
           <div class="icon search-icon"></div>
         </div>
-        <div
-          title="Tải lại"
-          class="icon reload-icon"
-        ></div>
+        <div title="Tải lại" class="icon reload-icon"></div>
       </div>
     <div class="content-main__data">
         <MGridData
@@ -41,8 +34,7 @@
       </div>
       <div class="content-main__footer">
         <div class="part1">
-          Tổng số: <b id="numberOfRecord"> 1</b> bản
-          ghi
+          Tổng số: <b id="numberOfRecord"> 1</b> bản ghi
         </div>
         <div class="part2">
           <div>
@@ -68,13 +60,6 @@
                 <div class="dropdown-icon icon"></div>
               </div>
             </div>
-            <!-- <select class="combobox">
-                            <option value="">10 bản ghi trên 1 trang</option>
-                            <option value="" selected = "true">20 bản ghi trên 1 trang</option>
-                            <option value="">30 bản ghi trên 1 trang</option>
-                            <option value="">50 bản ghi trên 1 trang</option>
-                            <option value="">100 bản ghi trên 1 trang</option>
-                        </select> -->
           </div>
           <div class="page-number">
             <div class="previous">Trước</div>

@@ -38,6 +38,9 @@ let resources =  {
             phoneNumberDetail: "Điện thoại di động",
             landingPhone: "ĐT cố định",
             landingPhoneDetail: "Điện thoại cố định",
+            bankAccount: "Số tài khoản ngân hàng",
+            bankName: "Tên ngân hàng",
+            bankBranch: "Chi nhánh tk ngân hàng"
             
         },
         dialogMessage:{

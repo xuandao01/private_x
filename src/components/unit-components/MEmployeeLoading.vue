@@ -1,5 +1,5 @@
 <template>
-  <tr v-for="n in 1" :key="n">
+  <tr v-for="n in 3" :key="n">
     <td v-for="n in 12" :key="n">
       <div></div>
     </td>
