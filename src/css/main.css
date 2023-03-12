@@ -1,0 +1,46 @@
+@import url(../css/components/button.css);
+@import url(../css/components/footer.css);
+@import url(../css/components/header.css);
+@import url(../css/components/content.css);
+@import url(../css/components/menu.css);
+@import url(../css/components/icon.css);
+@import url(../css/components/table.css);
+@import url(../css/components/popup.css);
+@import url(../css/components/dialog.css);
+@import url(../css/components/animation.css);
+@import url(../css/components/toast.css);
+@import url(../css/components/dropdown.css);
+@import url(../css/components/input.css);
+@import url(../css/components/combobox.css);
+@import url(../css/components/tooltip.css);
+@import url(../css/components/responsive.css);
+@import url(../css/components/loading.css);
+@import url(../css/components/grid-data.css);
+body{
+    margin: 0px;
+    background-color: #E0E0E0;
+}
+@font-face {
+    font-family: notosans;
+    src: url("../assets/fonts/notosans-regular.2cb88a13.woff2");
+}
+*{
+    font-family: notosans;
+}
+
+.align-center{
+    text-align: center;
+    padding: 0 ;
+}
+
+::-webkit-scrollbar {
+    width: 0.5em;
+    height: 0.5em;
+    z-index: 99999;
+}
+::-webkit-scrollbar-track-piece {
+    background-color: #fff;
+}
+::-webkit-scrollbar-thumb {
+    background-color: #E6E6E6;
+}

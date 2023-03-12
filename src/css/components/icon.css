@@ -1,0 +1,140 @@
+.icon{
+    height: 24px;
+    width: 24px;
+    margin: 3px 0px 0px 3px;
+}
+
+.dashboard{
+    background: url('/src/assets/img/Sprites.64af8f61.svg') no-repeat -33px -1630px;
+}
+
+.money{
+    background: url('/src/assets/img/Sprites.64af8f61.svg') no-repeat -78px -1631px;
+}
+
+.s-money{
+    background: url('/src/assets/img/Sprites.64af8f61.svg') no-repeat -121px -1633px;
+}
+
+.buy{
+    background: url('/src/assets/img/Sprites.64af8f61.svg') no-repeat -165px -1632px;
+}
+
+.sell{
+    background: url('/src/assets/img/Sprites.64af8f61.svg') no-repeat -206px -1631px;
+}
+
+.order{
+    background: url('/src/assets/img/Sprites.64af8f61.svg') no-repeat -254px -1632px;
+}
+
+.tools{
+    background: url('/src/assets/img/Sprites.64af8f61.svg') no-repeat -339px -1633px;
+}
+
+.asset{
+    background: url('/src/assets/img/Sprites.64af8f61.svg') no-repeat -382px -1632px;
+}
+
+.report{
+    background: url('/src/assets/img/Sprites.64af8f61.svg') no-repeat -552px -1636px;
+}
+
+.price{
+    background: url('/src/assets/img/Sprites.64af8f61.svg') no-repeat -471px -1633px;
+}
+
+.option-icon{
+    background: url('/src/assets/img/Sprites.64af8f61.svg') no-repeat -847px -35px;
+
+}
+
+.dropdown-icon{
+    margin-top: 6px;
+    background: url('/src/assets/img/Sprites.64af8f61.svg') no-repeat -1129px -365px;
+    border: unset;
+}
+
+.dropdown-icon-2{
+    margin-top: 8px;
+    background: url('/src/assets/img/Sprites.64af8f61.svg') no-repeat -1078px -38px;
+}
+
+.notification-icon{
+    margin-top: 0px;
+    background: url('/src/assets/img/Sprites.64af8f61.svg') no-repeat -788px -30px;
+}
+
+.avatar-icon{
+    margin-top: 0px;
+    height: 32px;
+    width: 32px;
+    border-radius: 100%;
+    background: url('/src/assets/img/Sprites.64af8f61.svg') no-repeat -352px -894px;
+}
+
+.search-icon{
+    background: url('/src/assets/img/Sprites.64af8f61.svg') no-repeat -425px -33px;
+    margin: 9px;
+}
+
+.reload-icon{
+    margin-right: 12px;
+    background: url('/src/assets/img/Sprites.64af8f61.svg') no-repeat -425px -201px;
+}
+
+.edit-icon{
+    background: url('/src/assets/img/Sprites.64af8f61.svg') no-repeat -897px -360px;
+    height: 15px;
+    width: 15px;
+    margin-left: 5px;
+}
+
+.help-icon{
+    margin-top: 11px;
+    background: url('/src/assets/img/Sprites.64af8f61.svg') no-repeat -732px -31px;
+}
+
+.reload-icon:hover, .notification-icon{
+    cursor: pointer;
+}
+
+.help-icon:hover{
+    cursor: pointer;
+}
+
+.close-icon{
+    margin-top: 12px;
+    background: url('/src/assets/img/Sprites.64af8f61.svg') no-repeat -147px -147px;
+}
+
+.dialog-icon{
+    background: url('/src/assets/img/Sprites.64af8f61.svg') no-repeat -832px -462px;
+    position: relative;
+    left: -10px;
+    top: 3px
+}
+.dialog-delete-icon{
+    background: url('/src/assets/img/Sprites.64af8f61.svg') no-repeat -598px -463px;
+    height: 36px;
+    width: 37px;
+}
+
+.dialog-success-icon{
+    background: url('/src/assets/img/Sprites.64af8f61.svg') no-repeat -1602px -258px;
+}
+
+.dialog-warning-icon{
+    background: url('/src/assets/icons/warning.png');
+    background-size: 24px 24px;
+}
+
+.dialog-error-icon{
+    background: url('/src/assets/icons/icons8-cancel-48.png');
+    background-size: 24px 24px;
+}
+
+.dialog-info-icon{
+    background: url('/src/assets/icons/information.png');
+    background-size: 24px 24px;
+}

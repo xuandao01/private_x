@@ -1,0 +1,61 @@
+input{
+    font-size: 16px;
+}
+
+input[type = "radio"]{
+    color: green;
+}
+
+.search{
+    font-size: 14px;
+}
+
+.input-component{
+    height: 30px;
+    width: 250px;
+    position: relative;
+}
+
+.content-main__header input{
+    height: 100%;
+    width: 100%;
+    border: solid #EBEBEB 1px;
+    border-radius: 4px;
+    padding-left: 7px;
+    margin: 0px;
+}
+
+.content-main__header input::placeholder{
+    font-size: 14px;
+    font-style: italic;
+    line-height: 10px;
+}
+
+.content-main__header input:focus{
+    outline-color: #50B83C;
+}
+
+.content-main__header .search-icon{
+    position: absolute;
+    top: -2px;
+    right: -12px;
+}
+
+.popup-checkbox {
+    height: 20px;
+    width: 20px;
+}
+
+.com1, .com2 {
+    position: relative;
+}
+
+.unit, .position, .issue-place{
+    width: 100%;
+    position: relative;
+}
+
+.dob, .issue-date{
+    position: relative;
+}
+

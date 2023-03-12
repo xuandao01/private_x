@@ -1,0 +1,108 @@
+.content{
+    width: calc(100% - 200px);
+    height: calc(100vh - 68px);
+    float: left;
+    box-sizing: border-box;
+    background-color:#E0E0E0;
+}
+
+.content-header{
+    display: flex;
+    margin: 20px 32px;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.content-title{
+    height: 24px;
+    font-weight: 600;
+    font-size: 20px;
+    color: #2F2F2F;
+}
+
+.content-button{
+    height: 36px;
+}
+
+.content-main{
+    height: calc(100% - 76px - 68px);
+    width: calc(100% - 200px - 64px);
+    background-color: #ffffff;
+    box-sizing: border-box;
+    position: absolute;
+    left: 232px;
+}
+
+.content-main__header{
+    height: 68px;
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    column-gap: 24px;
+}
+
+.content-main__data{
+    height: calc(100% - 68px);
+    width: 100%;
+    position: relative;
+    overflow-x: auto;
+}
+
+.content-main__footer .part1{
+    height: 24px;
+    width: 15%;
+    font-size: 14px;
+}
+
+.content-main__footer .part2{
+    height: 24px;
+    width: 30%;
+    position: absolute;
+    right: 0px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    column-gap: 8px;
+}
+
+.content-main__footer .combobox{
+    height: 26px;
+    width: 175px;
+    border: solid #E6E6E6 1px;
+}
+
+.combobox:hover{
+    background-color: #F6F6F6;
+    border: solid #E6E6E6 1px;
+}
+
+.part2 .page-number{
+    display: flex;
+    column-gap: 8px;
+    font-size: 14px;
+}
+
+.part2 .page-number .number{
+    display: flex;
+    align-items: center;
+    text-align: center;
+}
+
+.part2 .page-number .number .num{
+    height: 18px;
+    width: 18px;
+    margin: auto;
+}
+
+.part2 .page-number .number .num:hover, .next:hover, .previous:hover{
+    background-color: #E6E6E6;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+
+
+
+
+
