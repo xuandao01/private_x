@@ -1,4 +1,5 @@
 // Component tạo ra một input datepicker
+// Props gồm title: Tiêu đề, modelValue: Dữ liệu binding
 // Author: Xuân Đào(05/03/2023)
 <template>
   <div class="text">{{ title }}</div>
@@ -19,6 +20,10 @@ export default {
       type: String,
       required: false,
     },
+    modelValue: {
+      type: Date,
+      required: false,
+    }
   },
   data() {
     return {
@@ -26,6 +31,14 @@ export default {
       datePicked: null,
       inValid: false,
     };
+  },
+  created(){
+    this.value = this.modelValue;
+  },
+  watch:{
+    value: function(newVal){
+      this.$emit("update:modelValue", newVal);
+    }
   },
   methods: {
     validate() {
@@ -47,5 +60,8 @@ export default {
 }
 .input-err {
   border-color: #e81e1e !important;
+}
+.text{
+  font-weight: 600;
 }
 </style>

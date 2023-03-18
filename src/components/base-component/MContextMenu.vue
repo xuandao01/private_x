@@ -1,7 +1,9 @@
+// Component tạo context menu
+
 <template>
   <div ref="main" class="edit-menu">
     <div class="edit-menu__item item1">Nhân bản</div>
-    <div class="edit-menu__item item2 deleteRecord" @click="deleteEmployee">Xóa</div>
+    <div class="edit-menu__item item2 deleteRecord" @click="deleteAction">Xóa</div>
     <div class="edit-menu__item item3">Ngừng sử dụng</div>
   </div>
 </template>
@@ -18,6 +20,9 @@ export default {
     setPosition(x, y){
       this.$refs.main.style.right = x + "px";
       this.$refs.main.style.top = y + "px";
+    },
+    deleteAction(){
+      this.$emit("deleteAction");
     }
   },
   data() {

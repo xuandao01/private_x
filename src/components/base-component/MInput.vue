@@ -2,7 +2,7 @@
 // Author: Xuân Đào(05/03/2023)
 <template>
   <div class="inf-component com1">
-    <div class="text">
+    <div class="bold-text">
       <span>{{ inputTitle }}</span>
       <a v-if="required"> *</a>
     </div>
@@ -29,6 +29,11 @@ export default {
       required: false,
     },
     required: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    canFocus: {
       type: Boolean,
       required: false,
       default: false,

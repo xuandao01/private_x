@@ -22,7 +22,7 @@
             <div class="icon help-icon"></div>
           </div>
           <div class="close" title="Đóng (ESC)">
-            <button id="btn-close" class="close" @click="this.closePopup()">
+            <button id="btn-close" ref="closeBtn" class="close" @click="this.closePopup()">
               <div class="icon close-icon"></div>
             </button>
           </div>
@@ -38,6 +38,7 @@
                 :inputTitle="txtData.code"
                 :required="true"
                 v-model:modelValue="employee.EmployeeCode"
+                :canFocus="true"
               />
               <MInput
                 ref="inpEmployeeFullName"
@@ -51,9 +52,10 @@
               <div class="inf-component unit">
                 <MCombobox
                   ref="inpDepartment"
-                  name="Phòng ban"
+                  title="Phòng ban"
                   :isRequired="true"
                   api="https://apidemo.laptrinhweb.edu.vn/api/v1/Departments"
+                  v-model="employee.DepartmentName"
                 />
               </div>
             </div>
@@ -72,12 +74,16 @@
           <div class="right-side">
             <div class="inf-area">
               <div class="inf-component dob" style="width: 170px">
-                <MDatePicker :title="txtData.dob"></MDatePicker>
+                <MDatePicker :title="txtData.dob" v-model="this.employee.DateOfBirth"></MDatePicker>
               </div>
-              <div class="inf-component com2">
+              <div class="inf-component com2 gender-field">
                 <div class="text">{{ txtData.gender }}</div>
                 <div class="gender" id="gender">
-                  <input
+                  <MRadioButton 
+                  :data="['Nam', 'Nữ', 'Khác']"
+                  v-model="employee.GenderName"
+                  ></MRadioButton>
+                  <!-- <input
                     type="radio"
                     checked="true"
                     name="gender"
@@ -88,67 +94,62 @@
                   <input type="radio" name="gender" id="female" value="Nữ" />
                   <label for="male">Nữ</label>
                   <input type="radio" name="gender" id="other" value="Khác" />
-                  <label for="male">Khác</label>
+                  <label for="male">Khác</label> -->
                 </div>
               </div>
             </div>
             <div class="inf-area">
               <div class="inf-component" style="flex: 1">
-                <div class="text" :title="txtData.identityDetail">
-                  {{ txtData.identity }}
-                </div>
-                <input
-                  type="text"
-                  id="personalId"
-                  v-model="employee.IdentityNumber"
+                <MInput
+                  class="position-name"
+                  :inputTitle="txtData.identity"
+                  v-model:modelValue="employee.IdentityNumber"
+                  ref="inpPosition"
                 />
               </div>
               <div class="inf-component issue-date" style="width: 170px">
-                <div class="text">{{ txtData.dateOfIssue }}</div>
-                <input
-                  type="date"
-                  id="dateOfIssued"
-                  class="pop-input date-time"
-                />
+                <MDatePicker :title="txtData.dateOfIssue" v-model="this.employee.identityDate"></MDatePicker>
               </div>
             </div>
             <div class="inf-area">
-              <div class="inf-component issue-place">
-                <div class="text">{{ txtData.issuedBy }}</div>
-                <input type="text" id="issuedBy" />
-              </div>
+              <MInput
+                  class="position-name"
+                  :inputTitle="txtData.issuedBy"
+                  ref="inpPosition"
+                />
             </div>
           </div>
         </div>
         <!-- contact-inf -->
         <div class="contact-info">
           <div class="inf-area">
-            <div class="inf-component first-item" style="flex: 1">
-              <div class="text">{{ txtData.address }}</div>
-              <input type="text" id="address" />
-            </div>
+            <MInput
+                  class="position-name"
+                  :inputTitle="txtData.address"
+                  ref="inpPosition"
+                />
           </div>
           <div class="inf-area">
             <div class="inf-component">
-              <div class="text" :title="txtData.phoneNumberDetail">
-                {{ txtData.phoneNumber }}
-              </div>
-              <input type="text" id="phoneNumber" />
+              <MInput
+                  class="position-name"
+                  :inputTitle="txtData.phoneNumber"
+                  ref="inpPosition"
+                />
             </div>
             <div class="inf-component">
-              <div class="text" :title="txtData.landingPhoneDetail">
-                {{ txtData.landingPhone }}
-              </div>
-              <input type="text" id="landlinePhone" />
+              <MInput
+                  class="position-name"
+                  :inputTitle="txtData.landingPhone"
+                  ref="inpPosition"
+                />
             </div>
             <div class="inf-component">
-              <div class="text">Email</div>
-              <input
-                type="text"
-                placeholder="Example@gmail.com"
-                class="pop-input"
-                id="emailField"
-              />
+              <MInput
+                  class="position-name"
+                  inputTitle="Email"
+                  ref="inpPosition"
+                />
             </div>
           </div>
           <div class="inf-area">
@@ -188,7 +189,7 @@
           </div>
         </div>
         <div class="btn btn-close">
-          <button @focus="cancelOnFocus" id="cancel" class="optionalBtn">
+          <button @keydown="cancelOnKeyDown" id="cancel" class="optionalBtn">
             {{ txtBtn.cancel }}
           </button>
         </div>
@@ -209,6 +210,9 @@ import MCombobox from "../base-component/MCombobox.vue";
 import MDatePicker from "../base-component/MDatePicker.vue";
 import ConfirmDialog from "./MConfirmDialog.vue";
 import resources from "../../js/resources.js";
+import { toastControl } from "@/store/toast";
+import { ToastType } from "../base-component/MToastItem.vue";
+import MRadioButton from "../base-component/MRadioButton.vue";
 
 export default {
   name: "employee-detail",
@@ -217,6 +221,13 @@ export default {
     MInput,
     MDatePicker,
     MCombobox,
+    MRadioButton
+  },
+  setup(){
+    const ToastControl = toastControl();
+    return {
+      ToastControl
+    }
   },
   created() {
     this.employee = this.employeeSelected;
@@ -260,10 +271,12 @@ export default {
   },
 
   watch: {
-    // employee(newVal, oldVal) {
-    //   console.log("new: ", newVal);
-    //   console.log("old: ", oldVal);
-    // },
+    // employee: {
+    //   handler: function(newVal){
+    //     console.log("Data change: ", newVal.DateOfBirth);
+    //   },
+    //   deep: true
+    // }
   },
 
   beforeMount() {
@@ -279,6 +292,8 @@ export default {
       };
     } else {
       this.employee.DateOfBirth = this.dateFormater;
+      if (this.employee.GenderName === "Không xác định") this.employee.GenderName = "Khác"
+      console.log(this.employee.DateOfBirth);
     }
     this.CURRENT_DATA = Object.assign({}, this.employee);
   },
@@ -361,10 +376,9 @@ export default {
      *
      * Author: Xuân Đào (05/03/2023)
      */
-    cancelOnFocus() {
-      if (this.keyPressed == 9) {
-        this.$refs.inpEmployeeCode.focus();
-      }
+     cancelOnKeyDown() {
+      if(event.keyCode == 9)
+        this.$refs.closeBtn.focus();
     },
 
     /**
@@ -451,7 +465,7 @@ export default {
         const employeeCode = this.$refs.inpEmployeeCode.value;
         const employeeFullName = this.$refs.inpEmployeeFullName.value;
         const department = this.$refs.inpDepartment.getValue();
-        const position = this.$refs.inpPosition.value;
+        const position = this.$refs.inpPosition.value ? this.$refs.inpPosition.value : "";
         let departmentId = "";
         let positionId = "";
         for (const depart of this.departments) {
@@ -479,11 +493,11 @@ export default {
         console.log(res);
         this.$emit("hidePopup");
         if (res.status === 200 || res.status === 201) {
-          this.$emit("enableToast", "success", "Thêm mới thành công");
+          this.ToastControl.showToastMsg(ToastType.Success, "Thêm mới thành công!");
           this.$emit("refreshData");
         } else {
           console.log(res.value.userMsg);
-          this.$emit("enableToast", "error", res.value.userMsg);
+          this.ToastControl.showToastMsg(ToastType.Error, res.value.userMsg);
         }
         } else {
           //
@@ -564,5 +578,9 @@ a {
 }
 .position-name {
   width: 100%;
+}
+
+div[class = "text"]{
+  font-weight: 600;
 }
 </style>

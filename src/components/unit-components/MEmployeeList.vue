@@ -1,12 +1,12 @@
 <template>
-  <div class="content">
+  <div class="content" ref="content">
     <!-- Phần hiển thị nội dung của bảng -->
     <div class="content-header">
       <div class="content-title">Nhân viên</div>
       <div class="content-button">
         <!-- Button thêm mới nhân viên -->
-        <button class="btn-add" id="add_employee">
-          <div class="text" @click="showNewPopup">Thêm mới nhân viên</div>
+        <button class="btn-add" id="add_employee" @click="showNewPopup">
+          <div class="text">Thêm mới nhân viên</div>
         </button>
       </div>
     </div>
@@ -14,27 +14,105 @@
     <div class="content-main">
       <div class="content-main__header">
         <div class="input-component">
-          <input type="text" class="search" placeholder="Tìm theo mã, tên nhân viên"/>
+          <input
+            type="text"
+            class="search"
+            placeholder="Tìm theo mã, tên nhân viên"
+          />
           <div class="icon search-icon"></div>
         </div>
-        <div title="Tải lại" class="icon reload-icon"></div>
+        <div @click="renewData" title="Tải lại" class="icon reload-icon"></div>
       </div>
-    <div class="content-main__data">
+      <div class="content-main__data">
         <MGridData
+          ref="gridData"
           api="https://apidemo.laptrinhweb.edu.vn/api/v1/Employees"
-          :data="{
-            colName:['','Mã nhân viên', 'Tên nhân viên', 'Giới tính', 'Ngày sinh', 'Số CMND', 'Chức danh', 'Tên đơn vị', 'Số tài khoản', 'Tên Ngân hàng', 'Chi nhánh tài khoản ngân hàng','Chức năng'],
-            modelName:['','EmployeeCode', 'FullName', 'GenderName', 'DateOfBirth', 'IdentityNumber', 'PositionName', 'DepartmentName', '', '', '',''],
-            colType:['checkbox','text', 'text', 'text', 'date', 'text', 'text', 'text','text','text','text','option'],
-            colWidth:['40','200', '250', '150', '200', '200', '200', '300','200','200','300','150'],
-          }"
+          :data="[
+            {
+              title: 'Mã nhân viên',
+              dataField: 'EmployeeCode',
+              dataType: 'text',
+              colWidth: '150',
+            },
+            {
+              title: 'Tên nhân viên',
+              dataField: 'FullName',
+              dataType: 'text',
+              colWidth: '300',
+            },
+            {
+              title: 'Giới tính',
+              dataField: 'GenderName',
+              dataType: 'text',
+              colWidth: '150',
+            },
+            {
+              title: 'Ngày sinh',
+              dataField: 'DateOfBirth',
+              dataType: 'date',
+              colWidth: '200',
+            },
+            {
+              title: 'Số CMND',
+              dataField: 'IdentityNumber',
+              dataType: 'text',
+              colWidth: '200',
+            },
+            {
+              title: 'Ngày cấp',
+              dataField: 'IdentityDate',
+              dataType: 'date',
+              colWidth: '200',
+            },
+            {
+              title: 'Nơi cấp',
+              dataField: 'IdentityPlace',
+              dataType: 'text',
+              colWidth: '200',
+            },
+            {
+              title: 'Chức danh',
+              dataField: 'PositionName',
+              dataType: 'text',
+              colWidth: '200',
+            },
+            {
+              title: 'Tên đơn vị',
+              dataField: 'DepartmentName',
+              dataType: 'text',
+              colWidth: '300',
+            },
+            {
+              title: 'Số tài khoản',
+              dataField: '',
+              dataType: 'text',
+              colWidth: '200',
+            },
+            {
+              title: 'Tên ngân hàng',
+              dataField: '',
+              dataType: 'text',
+              colWidth: '200',
+            },
+            {
+              title: 'Chi nhánh tài khoàn ngân hàng',
+              dataField: '',
+              dataType: 'text',
+              colWidth: '300',
+            },
+          ]"
           :isFixedStart="true"
           :isFixedEnd="true"
+          @deleteRc="this.deleteRecord"
+          @dbClicked="editOnDbClick"
+          :muiltiple-select="true"
+          :editable="true"
         ></MGridData>
       </div>
       <div class="content-main__footer">
         <div class="part1">
-          Tổng số: <b id="numberOfRecord"> 1</b> bản ghi
+          Tổng số: <b id="numberOfRecord"> {{ this.employees.length }}</b> bản
+          ghi
         </div>
         <div class="part2">
           <div>
@@ -74,50 +152,60 @@
           </div>
         </div>
       </div>
-
     </div>
-      <EmployeeDetail
+    <MEmployeeDetail
       ref="empDetail"
       v-if="isShowPopup"
       @hidePopup="closePopup"
       :employeeSelected="selectedEmployee"
       @enableToast="showToastMessage"
       @refreshData="reloadData"
-    ></EmployeeDetail>
-    <MToastItem
-      :kindOfToast="this.toastKind"
-      :toastMess="this.toastMess"
-      v-if="showToast"
-    ></MToastItem>
+    ></MEmployeeDetail>
     <MDeleteConfirmDialog
       v-if="deleteDialog"
       @hideDeleteDialog="this.closeDeleteDialog()"
       @hideAndDelete="this.closeAndDelete()"
       :empName="this.selectedEmployee.EmployeeCode"
     ></MDeleteConfirmDialog>
-</div>
+  </div>
 </template>
 <script>
-import MGridData from '../base-component/MGridData.vue'
-import EmployeeDetail from "./MEmployeeDetail.vue";
-// import MEmployeeLoading from "../components/unit-components/MEmployeeLoading.vue";
-import MToastItem from "../base-component/MToastItem.vue";
+import MGridData from "../base-component/MGridData.vue";
+// import { ToastType } from '../base-component/MToastItem.vue';
 import MDeleteConfirmDialog from "./MConfirmDeleteDialog.vue";
+import { toastControl } from '@/store/toast'
+import MEmployeeDetail from "./MEmployeeDetail.vue";
+import { ToastType } from '../base-component/MToastItem.vue';
 export default {
-    components: {
-        MGridData,
-        EmployeeDetail,
-        // MEmployeeLoading,
-        MToastItem,
-        MDeleteConfirmDialog,
-    },
-    created() {
-    this.reloadData();
+  // inject:['showToastMsg'],
+  setup(){
+    const ToastControl = toastControl();
+    return {
+      ToastControl
+    }
+  },
+  components: {
+    MGridData,
+    MDeleteConfirmDialog,
+    MEmployeeDetail,
+  },
+  created() {
+    fetch("https://apidemo.laptrinhweb.edu.vn/api/v1/Employees")
+      .then((res) => res.json())
+      .then((data) => {
+        this.employees = data;
+      });
     window.addEventListener("keydown", this.handleKeyDown);
   },
 
   unmounted() {
     window.removeEventListener("keydown", this.handleKeyDown);
+  },
+
+  watch:{
+    data: function(newVal){
+      console.log(newVal);
+    }
   },
 
   methods: {
@@ -136,11 +224,10 @@ export default {
     },
     /**
      * Hàm hiển thị popup thêm nhân viên
-     * Author: Xuân Đào (02/03/2023)
+     * @author Xuân Đào 02.03.2023
      */
     showPopup() {
       this.isShowPopup = true;
-      this.$refs.empDetail.actions = 1;
     },
 
     /**
@@ -148,6 +235,7 @@ export default {
      * Author: Xuân Đào (02/03/2023)
      */
     showNewPopup() {
+      // this.showToastMsg(ToastType.Success, "Thêm mới thành công !");
       this.selectedEmployee = null;
       this.isShowPopup = true;
     },
@@ -156,36 +244,18 @@ export default {
      * Hàm làm mới dữ liệu
      */
     reloadData() {
-      this.showLoadingPage();
-      fetch("https://apidemo.laptrinhweb.edu.vn/api/v1/Employees")
-        .then((res) => res.json())
-        .then((data) => {
-          setTimeout(() => {
-            this.employees = data;
-            this.hideLoading();
-          }, 1000);
-        });
+      this.$refs.gridData.loadData();
     },
 
-    reloadDataNoneLoading() {
-      fetch("https://apidemo.laptrinhweb.edu.vn/api/v1/Employees")
-        .then((res) => res.json())
-        .then((data) => {
-          setTimeout(() => {
-            this.employees = data;
-          }, 1000);
-        });
+    renewData() {
+      this.$refs.gridData.refreshData();
     },
 
-    refreshData() {
-      (this.showData = false), this.showLoadingPage();
+    reloadDataWithoutLoading() {
       fetch("https://apidemo.laptrinhweb.edu.vn/api/v1/Employees")
         .then((res) => res.json())
         .then((data) => {
-          setTimeout(() => {
-            this.employees = data;
-            (this.showData = true), this.hideLoading();
-          }, 1000);
+          this.employees = data;
         });
     },
 
@@ -205,24 +275,6 @@ export default {
     editOnDbClick(employee) {
       this.selectedEmployee = employee;
       this.showPopup();
-    },
-
-    /**
-     * Hàm remove loading page
-     *
-     * Author: Xuân Đào
-     */
-    hideLoading() {
-      this.showLoading = false;
-    },
-
-    /**
-     * Hàm show loading page
-     *
-     * Author: Xuân Đào
-     */
-    showLoadingPage() {
-      this.showLoading = true;
     },
 
     /**
@@ -280,6 +332,7 @@ export default {
     deleteRecord(employee) {
       this.showDeleteDialog();
       this.selectedEmployee = employee;
+      console.log("a");
     },
     /**
      * Hàm hiển thị xác nhận xóa
@@ -314,8 +367,8 @@ export default {
         };
         const res = await fetch(apiString, options);
         if (res.status === 200) {
-          this.showToastMessage("success", "Xóa thành công!");
-          this.reloadDataNoneLoading();
+          this.ToastControl.showToastMsg(ToastType.Success, "Xoá thành công!");
+          this.renewData();
         }
       } catch (err) {
         console.log(err);
@@ -331,14 +384,13 @@ export default {
       lastKeyPress: null,
       lastTimePress: null,
       showToast: false,
-      toastKind: "success",
+      // toastKind: ToastType.Success,
       toastMess: "",
       deleteDialog: false,
       showData: true,
-    }
+    };
   },
-}
+};
 </script>
 <style scoped>
-    
 </style>

@@ -8,7 +8,7 @@
                     <div class="dialog-delete-icon"></div>
                     <div class="dialog-message">
                         <div class="dialog-message__title">
-                            <div class="title">{{ txtData.confirmDelete + this.empName + " không ?" }} </div>
+                            <div class="title">{{ `${txtData.confirmDelete} <${this.empName}> không ?` }} </div>
                         </div>
                     </div>
                 </div>
@@ -67,7 +67,7 @@ export default {
   width: 100%;
   background-color: rgba(82, 82, 82, 0.5);
   position: fixed;
-  z-index: 3;
+  z-index: 33;
 }
 
 .dialog-content {

@@ -1,7 +1,7 @@
 <template>
-        <button>
-            {{ value }}
-        </button>
+        <div>
+            <button :class="kind">{{ value }}</button>
+        </div>
 </template>
 <script>
 export default {

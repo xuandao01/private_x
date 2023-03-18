@@ -16,16 +16,45 @@
 @import url(../css/components/responsive.css);
 @import url(../css/components/loading.css);
 @import url(../css/components/grid-data.css);
+@import url(../css/components/router.css);
 body{
     margin: 0px;
     background-color: #E0E0E0;
 }
 @font-face {
-    font-family: notosans;
+    font-family: Notosans;
     src: url("../assets/fonts/notosans-regular.2cb88a13.woff2");
 }
+@font-face {
+    font-family: Roboto;
+    src: url("../assets/fonts/Roboto/Roboto-Regular.ttf");
+}
+@font-face {
+    font-family: Opens-san;
+    src: url("../assets/fonts/Open_Sans/static/OpenSans/OpenSans-Regular.ttf");
+}
+@font-face {
+    font-family: Opens-san-bold;
+    src: url("../assets/fonts/Open_Sans/static/OpenSans/OpenSans-Bold.ttf");
+}
+@font-face {
+    font-family: Opens-san-semi-bold;
+    src: url("../assets/fonts/Open_Sans/static/OpenSans/OpenSans-SemiBold.ttf");
+}
+@font-face {
+    font-family: Opens-san-medium;
+    src: url("../assets/fonts/Open_Sans/static/OpenSans/OpenSans-Medium.ttf");
+}
 *{
-    font-family: notosans;
+    font-family: Opens-san;
+}
+
+.bold-text{
+    font-family: Opens-san-bold;
+}
+
+a{
+    text-decoration: none;
 }
 
 .align-center{

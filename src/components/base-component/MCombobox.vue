@@ -1,9 +1,9 @@
-// Component tạo ra một autocomplete combobox
+// Component tạo ra một autocomplete combobox từ api
 // Author: Xuân Đào(05/03/2023)
 <template>
   <div class="m-combobox">
     <div class="m-txt">
-      <div class="m-context">{{ name }}</div>
+      <div class="m-context">{{ title }}</div>
       <span class="required" v-if="isRequired">*</span>
     </div>
     <div class="m-main">
@@ -13,11 +13,12 @@
         @focus="onFocus"
         @input="onInput"
         type="text"
-        :placeholder="name"
+        :placeholder="title"
+        v-model="value"
       />
       <input @click="btnClick" type="button" class="dropdown-icon" />
     </div>
-    <div class="errMess" v-if="isError">{{ name }} không được trống</div>
+    <div class="errMess" v-if="isError">{{ title }} không được trống</div>
     <div ref="itemList" v-show="isShow" class="m-item-list">
       <div
         @click="itemOnClick"
@@ -39,15 +40,18 @@ export default {
       isShow: false,
       selectedIndex: null,
       isError: false,
+      value: null,
     };
   },
   props: {
+    // Dữ liệu cho combobox
     api: {
       type: String,
       required: true,
       default: "https://apidemo.laptrinhweb.edu.vn/api/v1/Departments",
     },
-    name: {
+    // Title của combobox
+    title: {
       type: String,
       required: false,
     },
@@ -56,13 +60,19 @@ export default {
       required: false,
       default: false,
     },
+    modelValue: {
+      type: [String, Number, Array, Object, Boolean],
+      required: false,
+    }
   },
+  emits:["update:modeValue"],
   created() {
     fetch(this.api)
       .then((res) => res.json())
       .then((result) => {
         this.data = result;
       });
+    this.value = this.modelValue;
   },
   methods: {
     setFocus(){
@@ -75,6 +85,9 @@ export default {
      */
     onFocus() {
       this.isShow = true;
+      for (let i = 0; i < this.$refs.itemList.children.length; i++) {
+          this.$refs.itemList.children[i].style.display = "block";
+        }
       window.addEventListener("keydown", this.handleEvent);
     },
     /**
@@ -153,6 +166,8 @@ export default {
       );
       this.$refs.inpValue.value =
         this.$refs.itemList.children[this.selectedIndex].textContent;
+        this.value = this.$refs.itemList.children[this.selectedIndex].textContent;
+        this.$emit("update:modelValue", this.$refs.itemList.children[this.selectedIndex].textContent);
     },
 
     /**
@@ -213,6 +228,7 @@ export default {
         for (let i = 0; i < list.length; i++) {
           list[i].style.display = "block";
         }
+        
       }
     },
 
@@ -324,5 +340,9 @@ input[type="text"] {
 }
 .input-err{
     border-color: #e81e1e;
+}
+.m-context{
+  font-family: Opens-san-bold;
+  font-weight: 600;
 }
 </style>

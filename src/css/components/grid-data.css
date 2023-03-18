@@ -19,12 +19,12 @@ tr .fix-end{
 }
 
 .edit-icon{
-    border: solid #fff 1px;
+    border: solid transparent 1px;
     margin-top: 2px;
 }
 
 .edit-icon:focus{
-    border-color: #0075c0;
+    border-color: #0075c0 !important;
     outline: unset;
 }
 
@@ -33,13 +33,13 @@ tr{
 }
 
 tr:hover{
-    background-color: #fafafa !important;
+    background-color: #f4faff !important;
     z-index: 0;
 }
 
 tr:hover td:first-child, tr:hover td:last-child{
-    background-color: #fafafa !important;
-    z-index: 5;
+    background-color: #f4faff !important;
+    z-index: 3;
 } 
 
 th{
@@ -49,6 +49,7 @@ th{
     position: sticky;
     top: -1px;
     z-index: 2;
+    font-family: Opens-san-bold;
 }
 th:first-child, th:last-child{
     z-index: 5;
@@ -56,6 +57,7 @@ th:first-child, th:last-child{
 
 td{
     padding-left: 12px;
+    position: relative;
 }
 
 .checkbox{
@@ -102,4 +104,9 @@ border: solid #e0e0e0 1px;
     font-size: 12px;
     background-color: #FFF;
     z-index: 6;
+}
+
+.tr-selected, .tr-selected td:first-child, .tr-selected td:last-child{
+    background-color: #e5f3ff;
+    z-index: 3;
 }

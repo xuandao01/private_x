@@ -1,7 +1,7 @@
 .menu{
     height: 100vh;
     width: 200px;
-    background-color: #041434;
+    background-color: #393a3d;
     float: left;
 }
 
@@ -9,7 +9,6 @@
     height: 44px;
     width: 176px;
     box-sizing: border-box;
-    margin-left: 10px;
     display: flex;
     align-items: center;
     column-gap: 20px;
@@ -39,6 +38,7 @@
     align-items: center;
     column-gap: 15px;
     color: #fff;
+    font-size: 13px;
 }
 
 .menu-item:hover, .menu-logo__option img:hover{
@@ -63,6 +63,9 @@
 
 .menu-item__context{
     text-overflow: ellipsis;
+    font-weight: 500;
     white-space: nowrap;
+    font-family: Opens-san-medium !important;
+    font-size: 15px;
     overflow: hidden;
 }

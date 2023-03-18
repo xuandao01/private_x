@@ -14,14 +14,14 @@
                 </div>
             </div>
             <!-- Phần hiển thị danh sách các option trong menu chính -->
-            <div class="menu-item">
+            <router-link to="/" class="menu-item">
                 <!-- Phần hiển thị icon -->
                 <div class="menu-item__icon">
                     <div class="icon dashboard"></div>
                 </div>
                 <!-- Phần hiển thị text -->
                 <div class="menu-item__context">{{ data[0] }}</div>
-            </div>
+            </router-link>
             <div class="menu-item">
                 <div class="menu-item__icon">
                     <div class="icon money"></div>
@@ -77,6 +77,12 @@
                 </div>
                 <div class="menu-item__context">{{ data[9] }}</div>
             </div>
+            <router-link to="/employee" class="menu-item">
+                <div class="menu-item__icon">
+                    <div class="icon user-group"></div>
+                </div>
+                <div class="menu-item__context">Nhân viên</div>
+            </router-link>
         </div>
     </div>
 </template>

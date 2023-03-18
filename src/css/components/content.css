@@ -15,9 +15,10 @@
 
 .content-title{
     height: 24px;
-    font-weight: 600;
-    font-size: 20px;
-    color: #2F2F2F;
+    font-weight: 900;
+    font-family: Opens-san-bold;
+    font-size: 24px;
+    color: #111;
 }
 
 .content-button{

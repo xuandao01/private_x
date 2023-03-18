@@ -138,3 +138,9 @@
     background: url('/src/assets/icons/information.png');
     background-size: 24px 24px;
 }
+
+.user-group{
+    background-size: 24px 24px;
+    background-image: url('/src/assets/icons/icons8-user-groups-60.png');
+    margin-top: 0;
+}

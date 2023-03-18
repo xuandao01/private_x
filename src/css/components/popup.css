@@ -26,7 +26,7 @@
 .popup-main__header{
     height: 54px;
     width: calc(100% - 48px);
-    margin: 22px 24px;
+    margin: 12px 24px;
     box-sizing: border-box;
     display: flex;
     flex-wrap: nowrap !important;
@@ -187,6 +187,10 @@
     margin-top: 24px;
 }
 
+.contact-info{
+    margin-top: 12px;
+}
+
 .inf-component input:hover, .inf-component select:hover{
     background-color: #F8F8F8;
     border: solid #EBEBEB 1px;
@@ -216,4 +220,8 @@
 
 .is-supplier{
     margin: 2px 0px 0px 45px;
+}
+
+.gender-field{
+    margin-left: 15px;
 }

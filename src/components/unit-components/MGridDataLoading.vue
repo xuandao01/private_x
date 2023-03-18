@@ -1,7 +1,7 @@
 <template>
-  <tr v-for="n in 3" :key="n">
+  <tr v-for="n in 1" :key="n">
     <td v-for="n in 12" :key="n">
-      <div></div>
+      <div class="loading"></div>
     </td>
   </tr>
 </template>
@@ -9,11 +9,14 @@
 export default {};
 </script>
 <style scoped>
-div {
+.loading {
   height: 50%;
   width: 75%;
-  margin-left: 12%;
   background-color: #e0e0e0;
+  top: 25%;
+  z-index: 99;
+  left: 12.5%;
+  position: absolute;
   background: linear-gradient(
       90deg,
       rgba(255, 255, 255, 0) 40%,
