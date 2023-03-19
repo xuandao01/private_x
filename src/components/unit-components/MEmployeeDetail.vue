@@ -56,6 +56,7 @@
                   :isRequired="true"
                   api="https://apidemo.laptrinhweb.edu.vn/api/v1/Departments"
                   v-model="employee.DepartmentName"
+                  modelName="DepartmentName"
                 />
               </div>
             </div>

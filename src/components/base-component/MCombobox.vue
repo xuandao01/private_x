@@ -26,7 +26,7 @@
         v-for="(item, index) in this.data"
         :key="index"
       >
-        <span> {{ item.DepartmentName }} </span>
+        <span> {{ item[modelName] }} </span>
       </div>
     </div>
   </div>
@@ -62,6 +62,10 @@ export default {
     },
     modelValue: {
       type: [String, Number, Array, Object, Boolean],
+      required: false,
+    },
+    modelName: {
+      type: String,
       required: false,
     }
   },

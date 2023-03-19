@@ -67,41 +67,6 @@
     column-gap: 8px;
 }
 
-.content-main__footer .combobox{
-    height: 26px;
-    width: 175px;
-    border: solid #E6E6E6 1px;
-}
-
-.combobox:hover{
-    background-color: #F6F6F6;
-    border: solid #E6E6E6 1px;
-}
-
-.part2 .page-number{
-    display: flex;
-    column-gap: 8px;
-    font-size: 14px;
-}
-
-.part2 .page-number .number{
-    display: flex;
-    align-items: center;
-    text-align: center;
-}
-
-.part2 .page-number .number .num{
-    height: 18px;
-    width: 18px;
-    margin: auto;
-}
-
-.part2 .page-number .number .num:hover, .next:hover, .previous:hover{
-    background-color: #E6E6E6;
-    cursor: pointer;
-    border-radius: 4px;
-}
-
 
 
 

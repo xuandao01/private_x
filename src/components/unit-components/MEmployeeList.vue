@@ -26,7 +26,7 @@
       <div class="content-main__data">
         <MGridData
           ref="gridData"
-          api="https://apidemo.laptrinhweb.edu.vn/api/v1/Employees"
+          api="https://localhost:7006/api/Employees/Filter?pageSize=20&pageNumber=1"
           :data="[
             {
               title: 'Mã nhân viên',
@@ -110,47 +110,7 @@
         ></MGridData>
       </div>
       <div class="content-main__footer">
-        <div class="part1">
-          Tổng số: <b id="numberOfRecord"> {{ this.employees.length }}</b> bản
-          ghi
-        </div>
-        <div class="part2">
-          <div>
-            <div class="combobox" id="combobox-paging">
-              <div
-                class="combobox-text"
-                tabindex="1"
-                @click="showHide"
-                id="combobox-selected"
-              >
-                20 bản ghi 1 trang
-              </div>
-              <div class="combobox-itemList" id="comboboxOption">
-                <div class="combobox-itemList__container">
-                  <div class="combobox-item">10 bản ghi 1 trang</div>
-                  <div class="combobox-item">20 bản ghi 1 trang</div>
-                  <div class="combobox-item">30 bản ghi 1 trang</div>
-                  <div class="combobox-item">50 bản ghi 1 trang</div>
-                  <div class="combobox-item">100 bản ghi 1 trang</div>
-                </div>
-              </div>
-              <div class="combo-icon">
-                <div class="dropdown-icon icon"></div>
-              </div>
-            </div>
-          </div>
-          <div class="page-number">
-            <div class="previous">Trước</div>
-            <div class="number">
-              <div class="num page-seleted">1</div>
-              <div class="num">2</div>
-              <div class="num">3</div>
-              <div class="num">...</div>
-              <div class="num final">12</div>
-            </div>
-            <div class="next">Sau</div>
-          </div>
-        </div>
+        <MPagination></MPagination>
       </div>
     </div>
     <MEmployeeDetail
@@ -176,6 +136,7 @@ import MDeleteConfirmDialog from "./MConfirmDeleteDialog.vue";
 import { toastControl } from '@/store/toast'
 import MEmployeeDetail from "./MEmployeeDetail.vue";
 import { ToastType } from '../base-component/MToastItem.vue';
+import MPagination from "../base-component/MPagination.vue";
 export default {
   // inject:['showToastMsg'],
   setup(){
@@ -188,6 +149,7 @@ export default {
     MGridData,
     MDeleteConfirmDialog,
     MEmployeeDetail,
+    MPagination
   },
   created() {
     fetch("https://apidemo.laptrinhweb.edu.vn/api/v1/Employees")
