@@ -57,3 +57,19 @@
         background-position-x: -20%;
     }
 }
+
+@keyframes searchGrow {
+    to {
+        width: 250px;
+    }
+}
+
+@keyframes searchCollase {
+    from{
+        width: 250px;
+    }
+
+    to {
+        width: 100px;
+    }
+}

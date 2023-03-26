@@ -12,6 +12,7 @@ import TheContent from './layout/TheContent.vue'
 import TheHeader from './layout/TheHeader.vue'
 import TheMenu from './layout/TheMenu.vue'
 import MToastItem from '../src/components/base-component/MToastItem.vue'
+import resources from './js/resources'
 import { toastControl } from './store/toast.js'
 
 export default {
@@ -26,7 +27,7 @@ export default {
   setup(){
     const ToastControl = toastControl();
     return {
-      ToastControl
+      ToastControl,
     }
   },
 
@@ -36,6 +37,7 @@ export default {
   
   data() {
     return {
+      res: resources,
       isShow: false,
     }
   },

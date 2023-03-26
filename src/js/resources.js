@@ -45,6 +45,7 @@ let resources =  {
         },
         dialogMessage:{
             confirmDelete: "Bạn có muốn xóa nhân viên ",
+            confirmMultipleDelete: "Dữ liệu sẽ bị xóa vĩnh viễn, bạn có muốn xóa không ?",
             confirmChange: "Dữ liệu đã thay đổi, bạn có muốn cất không ?"
         },
         btnAction:{
@@ -55,6 +56,10 @@ let resources =  {
             yes: "Có",
             close: "Đóng",
             no: "Không"
+        },
+        actionMultiple: {
+            title: 'Thực hiện hàng loạt',
+            deleteAction: 'Xóa hàng loạt',
         }
     },
 

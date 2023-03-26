@@ -1,0 +1,121 @@
+<template>
+    <div :class="{'focused': showAction, 'disable': !enable }" @blur="comboOnBlur" @click="comboOnClick" class="action-multiple" tabindex="0">
+          <div class="action-multiple__text">{{ res.vi.actionMultiple.title }}</div>
+          <div class="action-multiple__icon"></div>
+          <div class="action-multiple__action" v-show="showAction">
+            <div class="multiple_delete" @click="multipleDelete" >{{ res.vi.actionMultiple.deleteAction }}</div>
+          </div>
+        </div>
+</template>
+<script>
+import resources from '@/js/resources';
+
+export default {
+
+    props:{
+        data:{
+            type: Array,
+            required: true,
+        },
+
+        enable: {
+          type: Boolean,
+          required: false,
+          default: false,
+        },
+    },
+
+    data() {
+        return {
+            showAction: false,
+            res: resources
+        }
+    },
+
+    methods: {
+        comboOnClick(){
+          if (this.enable)
+            this.showAction = true;
+        },
+
+        comboOnBlur(){
+          this.showAction = false;
+        },
+
+        multipleDelete(){
+          this.$emit('delete');
+          this.showAction = false;
+        }
+    },
+}
+</script>
+<style scoped>
+     .action-multiple{
+    position: absolute;
+    left: 22px;
+    width: 200px;
+    border: solid #222 1px;
+    border-radius: 4px;
+  }
+
+  .action-multiple__text{
+    height: 30px;
+    line-height: 30px;
+    padding-left: 8px;
+    font-family: opens-san-bold;
+    font-weight: 600;
+  }
+
+  .action-multiple__action{
+    top: 32px;
+    right: 0;
+    position: absolute;
+    z-index: 99;
+    background-color: #fff;
+    border: solid #e0e0e0 1px;
+  } 
+
+  .action-multiple:hover{
+    background-color: #e0e0e0;
+    cursor: default;
+  }
+  .action-multiple__action div {
+    padding: 8px 12px;
+  }
+
+  .action-multiple__action div:hover{
+    background-color: #f0f0f0;
+    cursor: pointer;
+    color:#50B83C;
+  }
+
+  .action-multiple__icon{
+    height: 24px;
+    width: 24px;
+    background-color: red;
+    position: absolute;
+    background: url('@/assets/img/Sprites.64af8f61.svg') no-repeat -364px -356px;
+    right: 8px;
+    top: 2px;
+  }
+
+  .focused{
+    outline: solid #d0d0d0 2px;
+  }
+
+  .disable{
+    border-color: #757575;
+    color: #757575;
+    user-select: none;
+  }
+
+  .disable:hover{
+    border-color: #757575;
+    color: #757575;
+    background-color: inherit;
+  }
+
+  .disable .action-multiple__icon{
+    background: url('@/assets/img/Sprites.64af8f61.svg') no-repeat -1746px -307px;
+  }
+</style>

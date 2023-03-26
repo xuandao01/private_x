@@ -8,15 +8,15 @@
                     <div class="dialog-delete-icon"></div>
                     <div class="dialog-message">
                         <div class="dialog-message__title">
-                            <div class="title">{{ `${txtData.confirmDelete} <${this.empName}> không ?` }} </div>
+                            <div class="title">{{ messagse }} </div>
                         </div>
                     </div>
                 </div>
                 <div class="mess-line"></div>
                 <div class="dialog-bottom">
-                    <button class="btn-optional" id="cancelBtn" @click="this.closeConfirmDialog()">{{ txtBtn.no }}</button>
+                    <button ref="leftBtn" class="btn-optional" id="cancelBtn" @click="this.closeConfirmDialog()">{{ txtBtn.no }}</button>
                     <div class="btn-group">
-                        <button class="btn-default" id="confirmBtn" @click="this.closeAndDelete()" >{{ txtBtn.yes }}</button>
+                        <button ref="rightBtn" class="btn-default" id="confirmBtn" @click="this.closeAndDelete()" >{{ txtBtn.yes }}</button>
                     </div>
                 </div>
             </div>
@@ -28,12 +28,19 @@ import resources from '@/js/resources';
 export default {
     name: "DeleteConfirmDialog",
     props: {
-        empName: {
+        messagse: {
             type: String, 
             required: true,
             default: "",
         }
     },
+
+    mounted(){
+      this.$nextTick(() => {
+        this.$refs.leftBtn.focus();
+      })
+    },
+
     methods:{
         /**
          * Hàm đóng confirm dialog
@@ -63,11 +70,13 @@ export default {
 </script>
 <style scoped>
 .dialog {
-  height: 100vh;
+  height: 100%;
   width: 100%;
   background-color: rgba(82, 82, 82, 0.5);
   position: fixed;
-  z-index: 33;
+  z-index: 999;
+  top: 0;
+  left: 0;
 }
 
 .dialog-content {
@@ -75,8 +84,8 @@ export default {
   width: 550px;
   background-color: #fff;
   position: absolute;
-  top: calc((80% - 176px) / 2);
-  left: calc((90% - 550px) / 2);
+  top: calc((100% - 176px) / 2);
+  left: calc((100% - 550px) / 2);
   border-radius: 4px;
 }
 

@@ -43,7 +43,7 @@ tr:hover td:first-child, tr:hover td:last-child{
 } 
 
 th{
-    background-color: #F5F5F5 !important;
+    background-color: #f4f5f6 !important;
     text-align: left;
     padding-left: 12px;
     position: sticky;
@@ -80,6 +80,10 @@ td{
     border-collapse: collapse;
     position: relative;
     width: 100%;
+}
+
+.grid-table tbody{
+    height: 100px;
 }
 
 tr {

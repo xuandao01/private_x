@@ -2,7 +2,7 @@
 // Props gồm title: Tiêu đề, modelValue: Dữ liệu binding
 // Author: Xuân Đào(05/03/2023)
 <template>
-  <div class="text">{{ title }}</div>
+  <div class="title">{{ title }}</div>
   <input
     type="date"
     class="pop-input date-time"
@@ -61,7 +61,9 @@ export default {
 .input-err {
   border-color: #e81e1e !important;
 }
-.text{
+.title{
   font-weight: 600;
+  font-family: opens-san-bold;
 }
+
 </style>

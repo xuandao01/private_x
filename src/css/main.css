@@ -26,6 +26,10 @@ body{
     src: url("../assets/fonts/notosans-regular.2cb88a13.woff2");
 }
 @font-face {
+    font-family: Notosans-semibold;
+    src: url("../assets/fonts/notosans-semibold.df3e6dc4.woff2");
+}
+@font-face {
     font-family: Roboto;
     src: url("../assets/fonts/Roboto/Roboto-Regular.ttf");
 }
@@ -45,8 +49,12 @@ body{
     font-family: Opens-san-medium;
     src: url("../assets/fonts/Open_Sans/static/OpenSans/OpenSans-Medium.ttf");
 }
+@font-face {
+    font-family: OpenSans_Condensed;
+    src: url("../assets/fonts/Open_Sans/static/OpenSans_Condensed/OpenSans_Condensed-Regular.ttf");
+}
 *{
-    font-family: Opens-san;
+    font-family: Opens-san-medium;
 }
 
 .bold-text{

@@ -40,7 +40,10 @@
     display: flex;
     justify-content: flex-end;
     align-items: center;
-    column-gap: 24px;
+}
+
+.export-excel-icon{
+    margin-left: 22px;
 }
 
 .content-main__data{

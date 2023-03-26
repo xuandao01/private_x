@@ -19,10 +19,13 @@ export default {
      */
     setPosition(x, y){
       this.$refs.main.style.right = x + "px";
+      y = y > 800 ? y -= 154 : y;
       this.$refs.main.style.top = y + "px";
     },
+
     deleteAction(){
-      this.$emit("deleteAction");
+      this.$emit("deleteEvent");
+      console.log("context");
     }
   },
   data() {

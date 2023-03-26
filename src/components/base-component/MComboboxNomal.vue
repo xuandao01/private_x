@@ -9,7 +9,7 @@
     @keydown="comboboxOnKeyDown"
   >
     <input type="text" class="selected" v-model="comboboxData[selected]" />
-    <div class="icon dropdown-icon"></div>
+    <div class="icon dropdown-icon" @click="iconOnClick"></div>
     <div class="combo-item-list" v-show="showData">
       <div
         :class="{ 'seleted-item': selected == index }"
@@ -54,6 +54,7 @@ export default {
   methods: {
     itemOnClick(index) {
       this.selected = index;
+      this.$emit("changeVal", index);
       this.showData = false;
     },
 
@@ -73,6 +74,9 @@ export default {
         else this.selected++;
       }
     },
+    iconOnClick(){
+      this.showData = true;
+    },
   },
 };
 </script>
@@ -87,7 +91,7 @@ input {
 .combobox-nomal {
   font-size: 14px;
   height: 32px;
-  width: 200px;
+  width: 220px;
   color: #1f1f1f;
   display: flex;
   align-items: center;

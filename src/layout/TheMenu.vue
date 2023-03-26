@@ -10,7 +10,9 @@
                     <div class="toggle-icon"></div>
                 </div>
                 <div class="menu-logo__component">
-                    <div class="logo-icon"></div>
+                    <div class="logo-icon">
+                        <img src="@/assets/img/Logo_Module_TiengViet_White.66947422.svg" alt="">
+                    </div>
                 </div>
             </div>
             <!-- Phần hiển thị danh sách các option trong menu chính -->
@@ -116,9 +118,13 @@ export default {
         margin-left: 24px;
     }
     .logo-icon{
-        background-image: url("/src/assets/img/Logo_Module_TiengViet_White.66947422.png");
-        background-size: 94px 32px;
+        /* background-image: url("/src/assets/img/Logo_Module_TiengViet_White.66947422.png");
+        background-size: 94px 32px; */
         height: 32px;
         width: 94px;
+    }
+
+    .toggle-icon:hover, .logo-icon:hover{
+        cursor: pointer;
     }
 </style>

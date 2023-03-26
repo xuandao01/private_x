@@ -124,6 +124,15 @@
     background: url('/src/assets/img/Sprites.64af8f61.svg') no-repeat -1602px -258px;
 }
 
+.export-excel-icon{
+    background: url('/src/assets/img/Sprites.64af8f61.svg') no-repeat -705px -200px;
+}
+
+.ui-setting{
+    background: url('/src/assets/img/Sprites.64af8f61.svg') no-repeat -90px -199px;
+    margin: 1px 22px 0px 12px;
+}
+
 .dialog-warning-icon{
     background: url('/src/assets/icons/warning.png');
     background-size: 24px 24px;

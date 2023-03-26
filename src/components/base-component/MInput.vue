@@ -2,8 +2,8 @@
 // Author: Xuân Đào(05/03/2023)
 <template>
   <div class="inf-component com1">
-    <div class="bold-text">
-      <span>{{ inputTitle }}</span>
+    <div >
+      <span class="bold-text">{{ inputTitle }}</span>
       <a v-if="required"> *</a>
     </div>
     <input
@@ -114,5 +114,10 @@ a {
 }
 .input-err{
     border-color: #E81E1E !important;
+}
+
+.bold-text{
+  font-family: opens-san-bold !important;
+  font-weight: 600;
 }
 </style>

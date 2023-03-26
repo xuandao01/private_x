@@ -12,8 +12,27 @@ input[type = "radio"]{
 
 .input-component{
     height: 30px;
-    width: 250px;
-    position: relative;
+    width: 100px;
+    position: absolute;
+    margin-right: 28px;
+    right: 120px;
+}
+
+.input-component input{
+    position: absolute;
+    right: -10px;
+}
+
+.input-component input:focus{
+    animation-name: searchGrow;
+    animation-duration: 0.5s;
+    animation-fill-mode: forwards;
+}
+
+.unfocus{
+    animation-name: searchCollase;
+    animation-duration: 0.5s;
+    animation-fill-mode: forwards;
 }
 
 .content-main__header input{
