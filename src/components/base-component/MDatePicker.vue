@@ -41,6 +41,11 @@ export default {
     }
   },
   methods: {
+    /**
+     * Hàm validate dữ liệu hợp lệ 
+     * 
+     * @author Xuân Đào (04/04/2023)
+     */
     validate() {
       const value = this.$refs.mInput.value;
       if (value && new Date(value) <= new Date()) {
@@ -57,6 +62,7 @@ export default {
 <style scoped>
 .errMes {
   color: red;
+  font-size: 13px;
 }
 .input-err {
   border-color: #e81e1e !important;
@@ -64,6 +70,7 @@ export default {
 .title{
   font-weight: 600;
   font-family: opens-san-bold;
+  font-size: 13px;
 }
 
 </style>

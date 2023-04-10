@@ -26,11 +26,13 @@
 <script>
 export default {
   props: {
+    // Dữ liệu cho combobox
     data: {
       type: Array,
       required: true,
     },
 
+    // Item được chọn của combobox
     defaultValue: {
       type: Number,
       required: false,
@@ -52,19 +54,40 @@ export default {
   },
 
   methods: {
+    /**
+     * Xự kiện click vào item trong combobox
+     * 
+     * @author Xuân Đào (04/04/2023)
+     */
     itemOnClick(index) {
       this.selected = index;
       this.$emit("changeVal", index);
       this.showData = false;
     },
 
+    /**
+     * Xự kiện focus vào input trong combobox
+     * 
+     * @author Xuân Đào (04/04/2023)
+     */
     comboboxOnFocus() {
       this.showData = true;
     },
 
+    /**
+     * Xự kiện unfocus khỏi input trong combobox
+     * 
+     * @author Xuân Đào (04/04/2023)
+     */
     comboboxOnBlur() {
       this.showData = false;
     },
+
+    /**
+     * Xự kiện bàn phím trong combobox
+     * 
+     * @author Xuân Đào (04/04/2023)
+     */
     comboboxOnKeyDown() {
       if (event.key == "ArrowUp") {
         if (this.selected == 0) this.selected = this.comboboxData.length - 1;
@@ -74,6 +97,12 @@ export default {
         else this.selected++;
       }
     },
+
+    /**
+     * Xự kiện chuột trong combobox
+     * 
+     * @author Xuân Đào (04/04/2023)
+     */
     iconOnClick(){
       this.showData = true;
     },
@@ -83,14 +112,14 @@ export default {
 <style scoped>
 input {
   border: unset;
-  font-size: 14px;
+  font-size: 13px;
   outline: unset;
   background-color: unset;
   pointer-events: none;
 }
 .combobox-nomal {
   font-size: 14px;
-  height: 32px;
+  height: 26px;
   width: 220px;
   color: #1f1f1f;
   display: flex;
@@ -113,7 +142,7 @@ input {
 .combo-item-list {
   width: 100%;
   position: absolute;
-  bottom: 36px;
+  bottom: 30px;
   background-color: #fff;
   border: solid #b0b0b0 1px;
 }

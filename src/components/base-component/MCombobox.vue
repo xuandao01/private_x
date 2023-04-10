@@ -13,7 +13,6 @@
         @focus="onFocus"
         @input="onInput"
         type="text"
-        :placeholder="title"
         v-model="value"
       />
       <input @click="btnClick" type="button" class="dropdown-icon" />
@@ -48,22 +47,24 @@ export default {
     api: {
       type: String,
       required: true,
-      default: "https://apidemo.laptrinhweb.edu.vn/api/v1/Departments",
     },
     // Title của combobox
     title: {
       type: String,
       required: false,
     },
+    // Có được để trống combobox không
     isRequired: {
       type: Boolean,
       required: false,
       default: false,
     },
+    // Dữ liệu binding 2 chiều 
     modelValue: {
       type: [String, Number, Array, Object, Boolean],
       required: false,
     },
+    // Dữ liệu mapping api
     modelName: {
       type: String,
       required: false,
@@ -79,6 +80,11 @@ export default {
     this.value = this.modelValue;
   },
   methods: {
+    /**
+     * Set focus vào input
+     * 
+     * @author Xuân Đào (04/04/2023)
+     */
     setFocus(){
       this.$refs.inpValue.focus();
     },
@@ -263,6 +269,22 @@ export default {
         str = str.replace(/ + /g," ");
         str = str.trim();
         return str;
+    },
+
+    getSelectedId(modelValue){
+      if (!this.selectedIndex){
+        for (let i = 0; i< this.data.length; i++){
+          const keys = Object.keys(this.data[i]);
+          for (const key of keys) {
+            if (this.data[i][`${key}`] == this.value) return this.data[i][`${modelValue}`];
+          }
+        }
+      }
+      return this.data[this.selectedIndex][`${modelValue}`];
+    },
+
+    getInputName(){
+      return this.title;
     }
   },
 };
@@ -271,6 +293,7 @@ export default {
 .m-txt {
   display: flex;
   column-gap: 4px;
+  font-size: 13px;
 }
 .required {
   color: #e81e1e;
@@ -284,8 +307,8 @@ export default {
 .m-main {
   width: 100%;
   display: flex;
-  border: solid 1px #e0e0e0;
-  border-radius: 4px;
+  border: solid 1px #b0b0b0;
+  border-radius: 2px;
   position: relative;
 }
 input {
@@ -306,28 +329,31 @@ input[type="text"] {
   width: calc(100% - 36px);
 }
 .dropdown-icon {
-  margin: 0px;
+  height: 24px;
+  width: 24px;
   position: absolute;
-  right: -8px;
-  top: 14px;
+  background: url('@/assets/img/Sprites.64af8f61.svg') no-repeat -364px -356px;
+  right: -6px;
+  top: -4px;
 }
 .m-item-list {
   position: absolute;
   width: 100%;
   z-index: 2;
-  top: 70px;
+  top: 55px;
   display: flex;
   border: solid #e0e0e0 1px;
   flex-direction: column;
   box-shadow: -1px 0px 1px 1px rgba(0, 0, 0, 0.05);
 }
 .m-item {
-  height: 28px;
+  height: 32px;
   width: calc(100% - 12px);
+  font-size: 13px;
   background-color: #fff;
   color: #000;
-  padding-top: 6px;
   padding-left: 12px;
+  line-height: 32px;
 }
 
 .m-item:hover {
@@ -341,6 +367,7 @@ input[type="text"] {
 }
 .errMess{
   color: red;
+  font-size: 13px;
 }
 .input-err{
     border-color: #e81e1e;

@@ -54,7 +54,9 @@ body{
     src: url("../assets/fonts/Open_Sans/static/OpenSans_Condensed/OpenSans_Condensed-Regular.ttf");
 }
 *{
-    font-family: Opens-san-medium;
+    font-family: Notosans;
+    margin: 0;
+    padding: 0;
 }
 
 .bold-text{

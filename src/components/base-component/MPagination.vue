@@ -8,9 +8,9 @@
                 :data="[
                     '10 bản ghi trên 1 trang',
                     '20 bản ghi trên 1 trang',
+                    '30 bản ghi trên 1 trang',
                     '50 bản ghi trên 1 trang',
                     '100 bản ghi trên 1 trang',
-                    '200 bản ghi trên 1 trang',
                 ]"
                 :defaultValue="1"
                 @changeVal="updateVal"
@@ -35,6 +35,7 @@ export default {
     components: { MComboboxNomal },
 
     props: {
+      //Tổng số bản ghi
         totalRecord: {
             type: Number,
             required: true,
@@ -47,6 +48,7 @@ export default {
     },
 
     computed:{
+      // Tính tổng số trang
       totalPage(){
         if (this.totalRecord % this.pageSize == 0) {
           return Math.round(this.totalRecord/this.pageSize);
@@ -57,6 +59,7 @@ export default {
         }
       },
 
+      // Tính giá trị của slot page 1
       slot1(){
         if (this.totalPage <= 5) return 1;
         if (this.currentPage < 2) return this.currentPage;
@@ -64,14 +67,17 @@ export default {
         else return this.currentPage-1;
       },
 
+      // Tính giá trị của slot page 2
       slot2(){
         return this.slot1 + 1;
       },
 
+      // Tính giá trị của slot page 3
       slot3(){
         return this.slot2 + 1;
       },
 
+      // Tính giá trị của slot page 4
       slot4(){
         if (this.totalPage <= 5) return 4;
         else if (this.slot3 + 2 === this.totalPage) return this.totalPage - 1;
@@ -94,7 +100,11 @@ export default {
     },
 
     methods: {
-
+    /**
+     * Quay lại trang trước
+     *
+     * @author  Xuân Đào (12/03/2023)
+     */
       previousPage(){
         if (this.currentPage > 1) {
           this.currentPage--;
@@ -102,6 +112,11 @@ export default {
         }
       },
 
+    /**
+     * Tới trang tiếp theo
+     *
+     * @author  Xuân Đào (12/03/2023)
+     */
       nextPage(){
         if (this.currentPage < this.totalPage) {
           this.currentPage++;
@@ -109,6 +124,11 @@ export default {
         }
       },
 
+    /**
+     * Cập nhật dữ liệu khi api thay đổi
+     *
+     * @author  Xuân Đào (12/03/2023)
+     */
       updateVal(newVal){
         this.defaultValue = newVal;
         switch(newVal){
@@ -121,15 +141,15 @@ export default {
             break;
           }
           case 2:{
-            this.pageSize = 50;
+            this.pageSize = 30;
             break;
           }
           case 3:{
-            this.pageSize = 100;
+            this.pageSize = 50;
             break;
           }
           case 4:{
-            this.pageSize = 200;
+            this.pageSize = 100;
             break;
           }
         }
@@ -137,6 +157,11 @@ export default {
         this.$emit("updateAPI", this.pageSize, this.currentPage)
       },
 
+    /**
+     * Đi tới page được chỉ định
+     *
+     * @author  Xuân Đào (12/03/2023)
+     */
       pageNumberOnClick(){
         if (!isNaN(Number(event.target.textContent))){
           this.currentPage = Number(event.target.textContent);
@@ -144,6 +169,11 @@ export default {
         }
       },
 
+    /**
+     * Reset page được chọn
+     *
+     * @author  Xuân Đào (12/03/2023)
+     */
       resetSelected(){
         this.$emit("updateAPI", this.pageSize, this.currentPage)
         setTimeout(() => {
@@ -160,13 +190,14 @@ export default {
     .page-number{
       display: flex;
       margin-right: 12px;
+      align-items: center;
       margin-left: 12px;
       column-gap: 4px;
     }
     .page-number div{
       height: 22px;
       min-width: 22px;
-      line-height: 28px;
+      line-height: 22px;
       text-align: center;
       cursor: pointer;
       user-select: none;
@@ -179,5 +210,10 @@ export default {
 
     .disabled{
       color: #b0b0b0;
+      cursor: not-allowed;
+    }
+
+    .disabled:hover{
+      cursor: not-allowed;
     }
 </style>

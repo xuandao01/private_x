@@ -6,21 +6,23 @@
     position: fixed;
     top: 0px;
     left: 0px;
+    box-sizing: border-box;
     animation-name: showAni;
     animation-duration: 1s;
     animation-fill-mode: forwards;
 }
 
 .popup .popup-main{
-    height: 90%;
-    width: 60%;
+    height: 620px;
+    width: 1000px;
     background-color: #fff;
     position: fixed;
     z-index: 2;
-    top: 5%;
-    left: 20%;
+    top: calc((100% - 620px)/2);
+    left: calc((100% - 1000px)/2);
     border-radius: 4px;
     overflow-y: auto;
+    box-sizing: border-box;
 }
 
 .popup-main__header{
@@ -55,6 +57,8 @@
 .popup-main__header .btn-group{
     display: flex;
     column-gap: 8px;
+    margin-top: -20px;
+    margin-right: -10px;
 }
 
 .popup-main__context{
@@ -79,7 +83,7 @@
 }
 
 .popup-main__footer .btn-close{
-    height: 36px;
+    height: 26px;
     width: 80px;
 }
 
@@ -90,11 +94,12 @@
 }
 
 .popup-main__footer button{
-    height: 36px;
-    min-width: 80px;
-    border: #E0E0E0 1px solid;
+    height: 26px;
+    min-width: 60px;
+    border: #b0b0b0 1px solid;
     background-color: unset;
     border-radius: 4px;
+    font-family: opens-san-bold;
 }
 
 .required{
@@ -102,15 +107,15 @@
 }
 
 .btn-saveAndAdd button{
-    height: 36px;
+    height: 26px;
     width: 116px;
     border: none;
-    background-color: #50B83C;
+    background-color: #2ca01c;
     color: #fff;    
 }
 
 .btn-saveAndAdd button:hover{
-    background-color: #57C841;
+    background-color: #50B83C;
     cursor:pointer;
 }
 
@@ -142,11 +147,12 @@
 }
 
 .inf-component input, .inf-component .input{
-    height: 36px;
-    border: solid #E0E0E0 1px;
-    border-radius: 4px;
+    height: 26px;
+    border: solid #b0b0b0 1px;
+    border-radius: 2px;
+    font-size: 13px;
     outline: unset;
-    padding: 8px 16px;
+    padding: 0px 0px 0px 12px;
     box-sizing: border-box;
 }
 

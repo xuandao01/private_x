@@ -79,11 +79,29 @@
                 </div>
                 <div class="menu-item__context">{{ data[9] }}</div>
             </div>
+            <div class="menu-item">
+                <div class="menu-item__icon">
+                    <div class="icon tax"></div>
+                </div>
+                <div class="menu-item__context">{{ data[10] }}</div>
+            </div>
+            <div class="menu-item">
+                <div class="menu-item__icon">
+                    <div class="icon synthetic"></div>
+                </div>
+                <div class="menu-item__context">{{ data[11] }}</div>
+            </div>
+            <div class="menu-item">
+                <div class="menu-item__icon">
+                    <div class="icon budget"></div>
+                </div>
+                <div class="menu-item__context">{{ data[12] }}</div>
+            </div>
             <router-link to="/employee" class="menu-item">
                 <div class="menu-item__icon">
                     <div class="icon user-group"></div>
                 </div>
-                <div class="menu-item__context">Nhân viên</div>
+                <div class="menu-item__context">{{ data[13] }}</div>
             </router-link>
         </div>
     </div>
@@ -91,6 +109,9 @@
 <script>
 import resources from '../js/resources.js'
 export default {
+
+    name: "TheMenu",
+
     components: {
 
     },
@@ -104,7 +125,7 @@ export default {
 <style>
     .menu {
         height: 100vh;
-        width: 200px;
+        width: 178px;
         background-color: #041434;
         float: left;
         box-sizing: border-box;
@@ -112,9 +133,9 @@ export default {
 
     .toggle-icon{
         background-image: url("/src/assets/icons/toggle.png");
-        background-size: 24px 24px;
-        height: 24px;
-        width: 24px;
+        background-size: 20px 20px;
+        height: 20px;
+        width: 20px;
         margin-left: 24px;
     }
     .logo-icon{

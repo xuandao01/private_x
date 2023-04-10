@@ -1,5 +1,5 @@
 .content{
-    width: calc(100% - 200px);
+    width: calc(100% - 178px);
     height: calc(100vh - 68px);
     float: left;
     box-sizing: border-box;
@@ -8,13 +8,15 @@
 
 .content-header{
     display: flex;
-    margin: 20px 32px;
+    align-items: center;
+    margin: 20px 22px;
     flex-direction: row;
     justify-content: space-between;
 }
 
 .content-title{
-    height: 24px;
+    height: 36px;
+    line-height: 36px;
     font-weight: 900;
     font-family: Opens-san-bold;
     font-size: 24px;
@@ -22,28 +24,24 @@
 }
 
 .content-button{
-    height: 36px;
+    height: 28px;
 }
 
 .content-main{
-    height: calc(100% - 76px - 68px);
-    width: calc(100% - 200px - 64px);
+    height: calc(100% - 76px - 48px);
+    width: calc(100% - 178px - 44px);
     background-color: #ffffff;
     box-sizing: border-box;
     position: absolute;
-    left: 232px;
+    left: calc(178px + 22px);
 }
 
 .content-main__header{
-    height: 68px;
+    height: 44px;
     width: 100%;
     display: flex;
     justify-content: flex-end;
     align-items: center;
-}
-
-.export-excel-icon{
-    margin-left: 22px;
 }
 
 .content-main__data{
@@ -54,9 +52,11 @@
 }
 
 .content-main__footer .part1{
+
     height: 24px;
-    width: 15%;
-    font-size: 14px;
+    width: 25%;
+    font-size: 12px;
+    line-height: 24px;
 }
 
 .content-main__footer .part2{

@@ -16,6 +16,7 @@
         <div class="dialog-bottom">
           <button
             class="btn-optional"
+            ref="btn1"
             id="cancelBtn"
             @click="this.closeConfirmDialog()"
           >
@@ -24,6 +25,7 @@
           <div class="btn-group">
             <button
               class="btn-optional"
+              ref="btn2"
               id="closeBtn"
               @click="this.closeAndUndo()"
             >
@@ -32,9 +34,10 @@
             <button
               class="btn-default"
               id="confirmBtn"
+              ref="btn3"
               @click="this.closeAndSave()"
             >
-              {{ txtBtn.confirm }}
+              {{ txtBtn.yes }}
             </button>
           </div>
         </div>
@@ -46,7 +49,30 @@
 import resources from "@/js/resources";
 export default {
   name: "ConfirmDialog",
+
+  mounted(){
+    this.$refs.btn3.focus();
+    this.btnList.push(this.$refs.btn1);
+    this.btnList.push(this.$refs.btn2);
+    this.btnList.push(this.$refs.btn3);
+    window.addEventListener("keydown", this.handleOnKeyDown)
+  },
+
+  unmounted(){
+    window.removeEventListener("keydown", this.handleOnKeyDown)
+  },
+
   methods: {
+
+    handleOnKeyDown(){
+      if(event.code === "Tab"){
+        event.preventDefault();
+        if (this.currentFocus == 2) this.currentFocus = 0;
+        else this.currentFocus++;
+        this.btnList[this.currentFocus].focus();
+      }
+    },
+
     /**
      * Hàm đóng confirm dialog
      *
@@ -78,6 +104,8 @@ export default {
     return {
       txtData: resources.vi.dialogMessage,
       txtBtn: resources.vi.btnAction,
+      btnList: [],
+      currentFocus: 2,
     };
   },
 };
@@ -92,17 +120,17 @@ export default {
 }
 
 .dialog-content {
-  height: 176px;
+  height: 156px;
   width: 550px;
   background-color: #fff;
   position: absolute;
-  top: calc((100% - 176px) / 2);
+  top: calc((100% - 156px) / 2);
   left: calc((100% - 550px) / 2);
   border-radius: 4px;
 }
 
 .dialog-main {
-  height: 136px;
+  height: 116px;
   width: 510px;
   position: absolute;
   margin: 20px;
@@ -165,7 +193,7 @@ export default {
 .dialog-bottom button {
   height: 28px;
   padding: 4px 16px;
-  font-weight: 600;
+  font-family: Notosans-semibold;
 }
 
 .dialog-bottom .btn-optional {
@@ -185,4 +213,5 @@ export default {
 .dialog-bottom button:last-child {
   margin-left: 10px;
 }
+
 </style>

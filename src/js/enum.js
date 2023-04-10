@@ -1,17 +1,6 @@
-vi = {
-    genderName:{
-        0: Nữ,
-        1: Nam,
-        2: Khác
-    }
+export const GenderCode = {
+    Female: 0,
+    Male: 1,
+    Other: 2,
+    Unknow: 3,
 }
-
-en = {
-    genderName:{
-        0: Female,
-        1: Male,
-        2: Other
-    }
-}
-
-export {vi, en};

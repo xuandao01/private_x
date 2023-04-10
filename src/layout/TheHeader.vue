@@ -17,7 +17,7 @@
     <!-- Phần hiển thị thông báo và các thông tin của người dùng -->
     <div class="header-rightside">
       <div class="header-rightside__notification">
-        <div title="Thông báo" class="icon notification-icon"></div>
+        <div title="Thông báo" class="icon notification-icon" @click="notificationClick"></div>
       </div>
       <div class="header-rightside__account">
         <div class="avatar">
@@ -29,27 +29,40 @@
         </div>
       </div>
     </div>
+    <MSingleActionDialog ref="dialog"></MSingleActionDialog>
   </div>
 </template>
 <script>
 import resources from "../js/resources.js";
 import MIcon from "../components/base-component/MIcon.vue";
+import MSingleActionDialog, { dialogType } from "@/components/unit-components/MSingleActionDialog.vue";
 export default {
+
+  name: "TheHeader",
+
   components:{
-    MIcon
+    MIcon, MSingleActionDialog
   },
+
+  methods:{
+    notificationClick(){
+      this.$refs.dialog.showDialogOn(dialogType.info, this.res.vi.common.developing, this.res.vi.btnAction.close);
+    }
+  },
+
   data() {
     return {
       companyName: resources.vi.companyName[0],
       username: resources.vi.username[0],
+      res: resources
     };
   },
 };
 </script>
 <style scoped>
 .header {
-  height: 68px;
-  width: calc(100% - 200px);
+  height: 48px;
+  width: calc(100% - 178px);
   float: left;
   display: flex;
   background-color: #fff;
@@ -69,7 +82,8 @@ export default {
 }
 
 .header-leftside__context {
-  height: 24px;
+  height: 19px;
+  font-size: 14px;
   flex: 1;
   display: flex;
   column-gap: 4px;
@@ -77,6 +91,12 @@ export default {
 
 .header-leftside__context .text {
   height: 100%;
+  min-width: 100px;
+  width: 60%;
+  max-width: 250px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 .header-leftside__context .dropdown {

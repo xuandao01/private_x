@@ -59,7 +59,9 @@
 }
 
 .header-rightside__account .username{
-    height: 24px;
+    height: 23px;
+    line-height: 23px;
+    font-size: 14px;
 }
 
 .header-rightside__account .action{

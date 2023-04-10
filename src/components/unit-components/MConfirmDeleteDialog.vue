@@ -16,7 +16,7 @@
                 <div class="dialog-bottom">
                     <button ref="leftBtn" class="btn-optional" id="cancelBtn" @click="this.closeConfirmDialog()">{{ txtBtn.no }}</button>
                     <div class="btn-group">
-                        <button ref="rightBtn" class="btn-default" id="confirmBtn" @click="this.closeAndDelete()" >{{ txtBtn.yes }}</button>
+                        <button ref="rightBtn" class="btn-default" id="confirmBtn" @click="this.closeAndDelete" >{{ txtBtn.yes }}</button>
                     </div>
                 </div>
             </div>
@@ -25,9 +25,16 @@
 </template>
 <script>
 import resources from '@/js/resources';
+
+export const deleteType = {
+  singleDelete: 1,
+  multipleDelete: 2,
+}
+
 export default {
     name: "DeleteConfirmDialog",
     props: {
+      // Thông báo của dialog
         messagse: {
             type: String, 
             required: true,
@@ -57,13 +64,14 @@ export default {
          * Author: Xuân Đào (05/03/2023)
          */
         closeAndDelete(){
-            this.$emit("hideAndDelete");
+            this.$emit("hideAndDelete", this.deleteType);
         }
     },
     data() {
         return {
             txtData: resources.vi.dialogMessage,
-            txtBtn: resources.vi.btnAction
+            txtBtn: resources.vi.btnAction,
+            deleteType: 0,
         }
     },
 }
@@ -80,18 +88,18 @@ export default {
 }
 
 .dialog-content {
-  height: 176px;
-  width: 550px;
+  height: 156px;
+  width: 500px;
   background-color: #fff;
   position: absolute;
-  top: calc((100% - 176px) / 2);
-  left: calc((100% - 550px) / 2);
+  top: calc((100% - 156px) / 2);
+  left: calc((100% - 500px) / 2);
   border-radius: 4px;
 }
 
 .dialog-main {
-  height: 136px;
-  width: 510px;
+  height: 116px;
+  width: 460px;
   position: absolute;
   margin: 20px;
 }
@@ -120,7 +128,7 @@ export default {
 
 .dialog-message__title {
   height: 26px;
-  font-size: 16px;
+  font-size: 14px;
   width: 100%;
   font-weight: 400;
   display: flex;
@@ -128,6 +136,10 @@ export default {
   justify-content: space-between;
   position: relative;
   left: -10px;
+}
+
+.dialog-message__title .title{
+  font-size: 13px;
 }
 
 .dialog-message__title .icon {
@@ -153,7 +165,7 @@ export default {
 .dialog-bottom button {
   height: 28px;
   padding: 4px 16px;
-  font-weight: 600;
+  font-family: Notosans-semibold;
 }
 
 .dialog-bottom .btn-optional {
@@ -167,6 +179,12 @@ export default {
 
 .dialog-bottom .btn-optional:hover {
   background-color: #e0e0e0;
+  cursor: pointer;
+}
+
+.dialog-bottom .btn-optional:focus {
+  border: solid 1px #e0e0e0;
+  background-color: #f0f0f0;
   cursor: pointer;
 }
 

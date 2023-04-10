@@ -2,11 +2,11 @@
   <div class="content" ref="content">
     <!-- Phần hiển thị nội dung của bảng -->
     <div class="content-header">
-      <div class="content-title">Nhân viên</div>
+      <div class="content-title">{{ this.res.vi.employeeList.title }}</div>
       <div class="content-button">
         <!-- Button thêm mới nhân viên -->
         <button class="btn-add" id="add_employee" @click="showNewPopup">
-          <div class="text">Thêm mới nhân viên</div>
+          <div class="text">{{ this.res.vi.employeeList.createButton }}</div>
         </button>
       </div>
     </div>
@@ -14,15 +14,16 @@
     <div class="content-main">
       <div class="content-main__header">
         <MActionMultiple
-        :enable="enableMultipleEditor"
-        @delete="multipleDelete"
+          :enable="enableMultipleEditor"
+          @delete="multipleDelete"
         ></MActionMultiple>
-        <MSearchBar
-        @onSearch="this.searchOnInput"
-        ></MSearchBar>
+        <MSearchBar @onSearch="this.searchOnInput"></MSearchBar>
         <div @click="renewData" title="Tải lại" class="icon reload-icon"></div>
-        <div title="Xuất dữ liệu ra excel" class="icon export-excel-icon"></div>
-        <div title="Cài đặt giao diện" class="icon ui-setting"></div>
+        <div
+          title="Xuất dữ liệu ra excel"
+          @click="excelExport"
+          class="icon export-excel-icon"
+        ></div>
       </div>
       <div class="content-main__data">
         <MGridData
@@ -30,104 +31,107 @@
           :api="this.APIString"
           :data="[
             {
-              title: 'Mã nhân viên',
-              tooltip: 'Mã nhân viên',
+              title: res.vi.employeeList.EmployeeCodeTitle,
+              tooltip: res.vi.employeeList.EmployeeCodeTitle,
               dataField: 'EmployeeCode',
               dataType: 'text',
               colWidth: '150',
             },
             {
-              title: 'Tên nhân viên',
-              tooltip: 'Tên nhân viên',
+              title: res.vi.employeeList.EmployeeFullNameTitle,
+              tooltip: res.vi.employeeList.EmployeeFullNameTitle,
               dataField: 'FullName',
               dataType: 'text',
               colWidth: '300',
             },
             {
-              title: 'Giới tính',
-              tooltip: 'Giới tính',
+              title: res.vi.employeeDetail.gender,
+              tooltip: res.vi.employeeDetail.gender,
               dataField: 'GenderName',
               dataType: 'text',
               colWidth: '150',
             },
             {
-              title: 'Ngày sinh',
-              tooltip: 'Ngày sinh',
+              title: res.vi.employeeDetail.dob,
+              tooltip: res.vi.employeeDetail.dob,
               dataField: 'DateOfBirth',
               dataType: 'date',
               colWidth: '200',
             },
             {
-              title: 'Số CMND',
-              tooltip: 'Số chứng minh nhân dân',
+              title: res.vi.employeeDetail.identity,
+              tooltip: res.vi.employeeDetail.identityDetail,
               dataField: 'IdentityNumber',
               dataType: 'text',
               colWidth: '200',
             },
             {
-              title: 'Ngày cấp',
-              tooltip: 'Ngày cấp',
+              title: res.vi.employeeDetail.dateOfIssue,
+              tooltip: res.vi.employeeDetail.dateOfIssue,
               dataField: 'IdentityDate',
               dataType: 'date',
               colWidth: '200',
             },
             {
-              title: 'Nơi cấp',
-              tooltip: 'Nơi cấp',
+              title: res.vi.employeeDetail.issuedBy,
+              tooltip: res.vi.employeeDetail.issuedBy,
               dataField: 'IdentityPlace',
               dataType: 'text',
               colWidth: '200',
             },
             {
-              title: 'Chức danh',
-              tooltip: 'Chức danh',
+              title: res.vi.employeeDetail.position,
+              tooltip: res.vi.employeeDetail.position,
               dataField: 'PositionName',
               dataType: 'text',
               colWidth: '200',
             },
             {
-              title: 'Tên đơn vị',
-              tooltip: 'Tên đơn vị',
+              title: res.vi.employeeDetail.department,
+              tooltip: res.vi.employeeDetail.department,
               dataField: 'DepartmentName',
               dataType: 'text',
               colWidth: '300',
             },
             {
-              title: 'Số tài khoản',
-              tooltip: 'Số tài khoản',
-              dataField: '',
+              title: res.vi.employeeDetail.bankAccount,
+              tooltip: res.vi.employeeDetail.bankAccount,
+              dataField: 'BankAccount',
               dataType: 'text',
               colWidth: '200',
             },
             {
-              title: 'Tên ngân hàng',
-              tooltip: 'Tên ngân hàng',
-              dataField: '',
+              title: res.vi.employeeDetail.bankName,
+              tooltip: res.vi.employeeDetail.bankName,
+              dataField: 'BankName',
               dataType: 'text',
               colWidth: '200',
             },
             {
-              title: 'Chi nhánh TK ngân hàng',
-              tooltip: 'Chi nhánh tài khoàn ngân hàng',
-              dataField: '',
+              title:  res.vi.employeeDetail.bankBranch,
+              tooltip: res.vi.employeeDetail.bankBranchDetail,
+              dataField: 'BankBranch',
               dataType: 'text',
               colWidth: '300',
             },
           ]"
           :isFixedStart="true"
           :isFixedEnd="true"
-          @deleteRc="this.deleteRecord"
+          @deleteRc="deleteRecord"
           @dbClicked="editOnDbClick"
           @refresh="updateTotal"
           @selectMultiple="selectMultiple"
+          @duplicateData="duplicateEmployee"
           :muiltiple-select="true"
           :editable="true"
+          :key="gridKey"
         ></MGridData>
       </div>
       <div class="content-main__footer">
         <MPagination
-        :totalRecord="this.totalRecord"
-        @updateAPI="updateAPIString"
+          :totalRecord="this.totalRecord"
+          @updateAPI="updateAPIString"
+          ref="paging"
         ></MPagination>
       </div>
     </div>
@@ -135,37 +139,53 @@
       ref="empDetail"
       v-if="isShowPopup"
       @hidePopup="closePopup"
-      :employeeSelected="selectedEmployee"
+      :employeeSelected="this.selectedEmployee"
       @enableToast="showToastMessage"
       @refreshData="reloadData"
+      @updateData="updateGridData"
+      @reloadPopup="reloadEmployeeDetail"
+      :action="this.action"
+      :title="this.popupTitle"
+      :key="popupKey"
     ></MEmployeeDetail>
     <MDeleteConfirmDialog
+      ref="confirmDelete"
       v-if="deleteDialog"
-      @hideDeleteDialog="this.closeDeleteDialog()"
-      @hideAndDelete="this.closeAndDelete()"
-      :empName="this.selectedEmployee.EmployeeCode"
+      @hideDeleteDialog="closeDeleteDialog"
+      @hideAndDelete="closeAndDelete"
       :messagse="deleteMessage"
     ></MDeleteConfirmDialog>
+    <MSingleActionDialog
+    ref="singleDialog"
+    ></MSingleActionDialog>
+    <MCircleLoader v-if="showLoader"></MCircleLoader>
   </div>
 </template>
 <script>
 import MGridData from "../base-component/MGridData.vue";
 // import { ToastType } from '../base-component/MToastItem.vue';
-import MDeleteConfirmDialog from "./MConfirmDeleteDialog.vue";
-import { toastControl } from '@/store/toast'
-import MEmployeeDetail from "./MEmployeeDetail.vue";
-import { ToastType } from '../base-component/MToastItem.vue';
+import MDeleteConfirmDialog, { deleteType } from "./MConfirmDeleteDialog.vue";
+import { toastControl } from "@/store/toast";
+import MEmployeeDetail, { formAction } from "./MEmployeeDetail.vue";
+import { ToastType } from "../base-component/MToastItem.vue";
 import MPagination from "../base-component/MPagination.vue";
-import MSearchBar from '../base-component/MSearchBar.vue';
-import MActionMultiple from '../base-component/MActionMultiple.vue';
+import MSearchBar from "../base-component/MSearchBar.vue";
+import MActionMultiple from "../base-component/MActionMultiple.vue";
 import resources from "@/js/resources";
+import MSingleActionDialog, { dialogType } from "./MSingleActionDialog.vue";
+import MCircleLoader from "../base-component/MCircleLoader.vue";
+import { loader } from '@/store/loader';
+
 export default {
+  name: "MEmployeeList",
   // inject:['showToastMsg'],
-  setup(){
+  // Set up toast message
+  setup() {
     const ToastControl = toastControl();
+    const Loader = loader();
     return {
-      ToastControl
-    }
+      ToastControl, Loader
+    };
   },
   components: {
     MGridData,
@@ -173,7 +193,9 @@ export default {
     MEmployeeDetail,
     MPagination,
     MSearchBar,
-    MActionMultiple
+    MActionMultiple,
+    MSingleActionDialog,
+    MCircleLoader
   },
   created() {
     // fetch("https://apidemo.laptrinhweb.edu.vn/api/v1/Employees")
@@ -181,7 +203,8 @@ export default {
     //   .then((data) => {
     //     this.employees = data;
     //   });
-    this.APIString = "https://localhost:7006/api/Employees/Filter?pageSize=20&pageNumber=1&keyWord=";
+    this.APIString =
+      `${this.res.endpoint}Employees/Filter?pageSize=20&pageNumber=1&keyWord=`;
     window.addEventListener("keydown", this.handleKeyDown);
   },
 
@@ -189,26 +212,36 @@ export default {
     window.removeEventListener("keydown", this.handleKeyDown);
   },
 
-  watch:{
-    enableMultipleEditor(newVal){
-      console.log(newVal);
-    }
-  },
+  watch: {},
 
   methods: {
 
-    multipleDelete(){
-      this.deleteMessage = this.res.vi.dialogMessage.confirmMultipleDelete;
-      this.showDeleteDialog();
-     },
-    
-    selectMultiple(num){
+    /**
+     * Xóa hàng loạt bản ghi
+     * 
+     * @author Xuân Đào (14/03/2023)
+     */
+    multipleDelete() {
+      this.deleteRecord(null, deleteType.multipleDelete);
+    },
+
+    /**
+     * Check số lượng bản ghi được chọn
+     * 
+     * @author Xuân Đào (14/03/2023)
+     */
+    selectMultiple(num) {
       if (num > 1) this.enableMultipleEditor = true;
       else this.enableMultipleEditor = false;
     },
 
-    updateAPIString(pageSize, pageNumber){
-      this.APIString = `https://localhost:7006/api/Employees/Filter?pageSize=${pageSize}&pageNumber=${pageNumber}&keyWord=${this.keyWord}`;
+    /**
+     * Cập nhật api phân trang
+     * 
+     * @author Xuân Đào (14/03/2023)
+     */
+    updateAPIString(pageSize, pageNumber) {
+      this.APIString = `${this.res.endpoint}Employees/Filter?pageSize=${pageSize}&pageNumber=${pageNumber}&keyWord=${this.keyWord}`;
       this.$refs.gridData.refreshData(this.APIString);
       this.currentPage = pageNumber;
       this.pageSize = pageSize;
@@ -219,7 +252,7 @@ export default {
      * @param {*} total tổng số bản ghi
      * @author Xuân Đào (20/03/2023)
      */
-    updateTotal(total){
+    updateTotal(total) {
       this.totalRecord = total;
     },
 
@@ -231,9 +264,11 @@ export default {
      */
     formatDate(data) {
       const dateVal = new Date(data);
-      const date = dateVal.getDate();
-      const month = dateVal.getMonth() + 1;
+      let date = dateVal.getDate();
+      let month = dateVal.getMonth() + 1;
       const fyear = dateVal.getFullYear();
+      date = date < 10 ? "0" + date : date;
+      month = month < 10 ? "0" + month : month;
       return `${date}/${month}/${fyear}`;
     },
     /**
@@ -248,9 +283,20 @@ export default {
      * Hàm hiển thị popup thêm nhân viên
      * Author: Xuân Đào (02/03/2023)
      */
-    showNewPopup() {
-      // this.showToastMsg(ToastType.Success, "Thêm mới thành công !");
-      this.selectedEmployee = null;
+    async showNewPopup() {
+      this.action = formAction.createRecord;
+      const data = await fetch(`${this.res.endpoint}Employees/NewEmployeeCode`);
+      const newCode = await data.text();
+      this.selectedEmployee = {
+        EmployeeCode: newCode,
+        FullName: "",
+        GenderName: "",
+        DepartmentName: "",
+        PositionName: "",
+        DateOfBirth: "",
+        IdentityNumber: "",
+      }
+      this.popupTitle = this.res.vi.employeeDetail.createTitle;
       this.isShowPopup = true;
     },
 
@@ -258,19 +304,12 @@ export default {
      * Hàm làm mới dữ liệu
      */
     reloadData() {
-      this.$refs.gridData.loadData();
+      this.renewData();
     },
 
     renewData() {
+      this.gridKey++;      
       this.$refs.gridData.refreshData(this.APIString);
-    },
-
-    reloadDataWithoutLoading() {
-      fetch("https://apidemo.laptrinhweb.edu.vn/api/v1/Employees")
-        .then((res) => res.json())
-        .then((data) => {
-          this.employees = data;
-        });
     },
 
     /**
@@ -288,6 +327,8 @@ export default {
      */
     editOnDbClick(employee) {
       this.selectedEmployee = employee;
+      this.action = formAction.updateRecord;
+      this.popupTitle = this.res.vi.employeeDetail.updateTitle;
       this.showPopup();
     },
 
@@ -308,20 +349,33 @@ export default {
      * Hàm xử lý phím tắt
      */
     handleKeyDown(event) {
-      if (!this.lastKeyPress) {
-        this.lastKeyPress = event.keyCode;
-        this.lastTimePress = new Date();
-      } else {
-        if (new Date() - this.lastTimePress < 1000) {
-          if (this.lastKeyPress == 17 && event.keyCode == 49) {
-            // ctrl + 1
-            event.preventDefault();
-            this.showPopup();
-          }
-        } else {
-          this.lastKeyPress = event.keyCode;
-          this.lastTimePress = new Date();
+      if (event.ctrlKey && event.key === '1'){
+        event.preventDefault();
+        this.showNewPopup();
+      }
+
+      if (event.ctrlKey && event.key === 'd'){
+        event.preventDefault();
+        if (this.$refs.gridData.selectedData) {
+          this.deleteRecord(this.$refs.gridData.selectedData, deleteType.singleDelete);
         }
+      }
+      
+      if (event.ctrlKey && event.key === 'm'){
+        event.preventDefault();
+        if(this.$refs.gridData.selectedMultiple.length > 0){
+          this.deleteRecord(null, deleteType.multipleDelete);
+        }
+      }
+
+      if (event.ctrlKey && event.key === 'r') {
+        event.preventDefault();
+        this.reloadData();
+      }
+
+      if (event.ctrlKey && event.key === 'e') {
+        event.preventDefault();
+        this.excelExport();
       }
     },
 
@@ -342,18 +396,25 @@ export default {
      *
      * Author: Xuân Đào (07/03/2023)
      */
-    deleteRecord(employee) {
-      this.showDeleteDialog();
-      this.selectedEmployee = employee;
-      this.deleteMessage = `${this.res.vi.dialogMessage.confirmDelete} <${this.selectedEmployee.EmployeeCode}> không ?`;
+    deleteRecord(employee, type) {
+      if (type === deleteType.singleDelete) {
+        this.selectedEmployee = employee;
+        this.deleteMessage = `${this.res.vi.dialogMessage.confirmDelete} <${this.selectedEmployee.EmployeeCode}> không ?`;
+      } else if (type === deleteType.multipleDelete) {
+        this.deleteMessage = this.res.vi.dialogMessage.confirmMultipleDelete;
+      }
+      this.showDeleteDialog(type);
     },
     /**
      * Hàm hiển thị xác nhận xóa
      *
      * Author: Xuân Đào (08/03/2023)
      */
-    showDeleteDialog() {
+    showDeleteDialog(deleteType) {
       this.deleteDialog = true;
+      setTimeout(() => {
+        this.$refs.confirmDelete.deleteType = deleteType;
+      }, 100);
     },
 
     /**
@@ -368,33 +429,128 @@ export default {
     /**
      * Ẩn popup và xóa record
      */
-    async closeAndDelete() {
+    async closeAndDelete(type) {
       this.closeDeleteDialog();
-      this.$refs.gridData.deleteSelectedRow();
       try {
-        const apiString =
-        "https://localhost:7006/api/Employees/" +
-        this.selectedEmployee.EmployeeId;
-        const options = {
-          method: "DELETE",
-          headers: { "Content-Type": "application/json" },
-        };
-        const res = await fetch(apiString, options);
-        if (res.status === 200) {
-          this.ToastControl.showToastMsg(ToastType.Success, "Xoá thành công!");
+        if (type === deleteType.singleDelete) {
+          this.$refs.gridData.deleteSelectedRow();
+          const apiString = `${this.res.endpoint}Employees/${this.selectedEmployee.EmployeeId}`;
+          const options = {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+          };
+          const res = await fetch(apiString, options);
+          if (res.status === 200) {
+            let data = await res.json();
+            console.log(data);
+            /*eslint-disable no-debugger */
+            debugger
+            this.ToastControl.showToastMsg(ToastType.Success,data['Message']);
+          }
+        } else if (type === deleteType.multipleDelete) {
+          let dataList = this.$refs.gridData.selectedMultiple
+          let idList = dataList[0].EmployeeId;
+          for (let i=1;i<dataList.length;i++){
+            idList += `,${dataList[i].EmployeeId}`;
+          }
+          const apiString = `${this.res.endpoint}Employees/DeleteMultiple`;
+          const options = {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(idList),
+          };
+          const res = await fetch(apiString, options);
+          const data = await res.json();
+          console.log(data);
+          if (res.status === 200) {
+            this.ToastControl.showToastMsg(ToastType.Success, data['Message']);
+            this.$refs.gridData.deleteSelectedMultipleRow();
+            this.totalRecord -= this.$refs.gridData.selectedMultipleRow.length;
+            this.selectMultiple(0);
+            const rowLeft = this.$refs.gridData.getRemainingRow();
+            if (rowLeft == 0) {
+              this.reloadData();
+            }
+          }
         }
       } catch (err) {
         console.log(err);
       }
     },
 
-    searchOnInput(key){
-      this.keyWord = key;
-      if (this.keyWord.length > 0) {
-        this.updateAPIString(this.pageSize, this.currentPage)
-        this.$refs.gridData.refreshData(this.APIString);
-      }
+    /**
+     * Filter khi nhập tìm kiếm
+     * 
+     * @author Xuân Đào (23/03/2023)
+     */
+    searchOnInput(key) {
+      this.keyWord = key ? key:"";
+        this.updateAPIString(this.pageSize, this.currentPage);
     },
+
+    /**
+     * Xuất dữ liệu hiện tại ra excel
+     * 
+     * @author Xuân Đào (23/03/2023)
+     */
+    async excelExport() {
+      this.Loader.showLoader();
+      let api = `${this.res.endpoint}Employees/ExcelExport?widthList=${this.$refs.gridData.widthList.toString()}`;
+      if (this.keyWord)
+        api = `${this.res.endpoint}Employees/ExcelExport?widthList=${this.$refs.gridData.widthList.toString()}&keyWord=${this.keyWord}`;
+      fetch(api)
+        .then((res) => res.blob())
+        .then((data) => {
+          var a = document.createElement("a");
+          a.href = window.URL.createObjectURL(data);
+          a.download = "Danh_sach_nhan_vien-" + Date.now().toString();
+          a.click();
+          a.remove();
+          this.Loader.closeLoader();
+        })
+        .catch(err => {
+          console.log(err);
+        })
+      // const res = await (await fetch("https://localhost:7006/api/Employees/ExcelExport")).blob();
+      // const link = window.URL.createObjectURL(res);
+      // console.log(link);
+      // new JsFileDownloader({url: link});
+    },
+
+    async duplicateEmployee(employee){
+      this.action = formAction.duplicateRecord;
+      this.selectedEmployee = employee;
+      const newCode = await fetch(`${this.res.endpoint}Employees/NewEmployeeCode`);
+      const data = await newCode.text();
+      this.selectedEmployee.EmployeeCode = data;
+      this.popupTitle = this.res.vi.employeeDetail.createTitle;
+      this.isShowPopup = true;
+    },
+
+    /**
+     * Reload lại grid data
+     *
+     * @author  Xuân Đào (12/03/2023)
+     */
+    updateGridData(employee){
+     this.$refs.gridData.gridData.push(employee);
+     this.gridKey++;
+    },
+
+    /**
+     * Hiển thị thông báo tính năng đang được phát triển
+     *
+     * @author  Xuân Đào (12/03/2023)
+     */
+    showDeveloping(){
+      this.$refs.singleDialog.showDialogOn(dialogType.info, resources.vi.dialogMessage.developing, resources.vi.btnAction.close)
+    },
+
+    reloadEmployeeDetail(){
+      this.closePopup();
+      this.showNewPopup();
+      this.popupKey++;
+    }
   },
   data() {
     return {
@@ -417,11 +573,17 @@ export default {
       enableMultipleEditor: false,
       deleteMessage: "",
       res: resources,
+      popupTitle: "",
+      action: formAction.createRecord,
+      gridKey: 0,
+      popupKey: 0,
+      showLoader: false,
     };
   },
 };
 </script>
 <style scoped>
- 
-
+.icon:hover {
+  cursor: pointer;
+}
 </style>

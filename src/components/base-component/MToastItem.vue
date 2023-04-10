@@ -8,7 +8,6 @@
       <div class="toast-icon"></div>
       <div class="toast-title">{{ toastAttribute.title }}</div>
       <div class="toast-message">{{ toastMess }}</div>
-      <div class="toast-action">Hoàn tác</div>
       <div class="toast-close" @click="this.closeToast()"></div>
     </div>
   </div>
@@ -24,6 +23,7 @@ export const ToastType = {
 export default {
   name: "MToastItem",
   props: {
+    // Loại thông báo toast
     kindOfToast: {
       type: Number,
       required: true,
@@ -77,8 +77,8 @@ export default {
 </script>
 <style scoped>
 .toast-mess {
-  height: 56px;
-  width: 450px;
+  height: 40px;
+  width: 350px;
   background-color: #fff;
   box-shadow: 2px 2px 2px 2px rgba(10, 10, 10, 0.178);
   position: fixed;
@@ -102,7 +102,7 @@ export default {
 .success-toast .toast-icon {
   height: 20px;
   width: 20px;
-  background: url("../../assets/img/Sprites.64af8f61.svg") no-repeat -512px -408px;
+  background: url("../../assets/img/Sprites.64af8f61.svg") no-repeat -510px -406px;
   margin-left: 18px;
 }
 
@@ -130,6 +130,9 @@ export default {
 .success-toast .toast-title {
   color: #50b83c;
   height: 20px;
+  font-size: 12px;
+  white-space: nowrap;
+  line-height: 20px;
   margin-left: 10px;
   font-weight: 600;
 }
@@ -158,6 +161,8 @@ export default {
 .toast-message {
   height: 20px;
   width: 250px;
+  font-size: 12px;
+  line-height: 20px;
   overflow: hidden;
   margin-left: 5px;
 }
@@ -167,15 +172,17 @@ export default {
   right: calc(16px + 16px + 18px);
   font-weight: 600;
   text-decoration: underline;
+  font-size: 12px;
+  line-height: 20px;
 }
 
 .toast-close {
   height: 16px;
   width: 16px;
-  background: url("../../assets/img/Sprites.64af8f61.svg") no-repeat -1178px -362px;
+  background: url("../../assets/img/Sprites.64af8f61.svg") no-repeat -1176px -360px;
   position: absolute;
-  right: 20px;
-  top: 23px;
+  right: 16px;
+  top: 13px;
 }
 
 .toast-action,

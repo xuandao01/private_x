@@ -2,8 +2,8 @@
 // Author: Xuân Đào(05/03/2023)
 <template>
   <div class="inf-component com1">
-    <div >
-      <span class="bold-text">{{ inputTitle }}</span>
+    <div class="text-area">
+      <span class="bold-text" :title="tooltip">{{ inputTitle }}</span>
       <a v-if="required"> *</a>
     </div>
     <input
@@ -21,23 +21,35 @@
 export default {
   name: "MInput",
   props: {
+    // Dữ liệu binding
     modelValue: {
       type: String,
     },
+
+    // Tiêu đề
     inputTitle: {
       type: String,
       required: false,
     },
+
+    // Được phép trống
     required: {
       type: Boolean,
       required: false,
       default: false,
     },
+
+    // Có thể focus
     canFocus: {
       type: Boolean,
       required: false,
       default: false,
     },
+
+    tooltip:{
+      type: String,
+      required: false
+    }
   },
 
   watch:{
@@ -48,7 +60,6 @@ export default {
 
   created() {
     this.value = this.modelValue;
-    console.log(this.modelValue);
   },
 
   mounted() {
@@ -63,7 +74,7 @@ export default {
      * 
      * Author: Xuân Đào (05/03/2023)
      */
-    focus() {
+    setFocus() {
       this.$refs.mInput.focus();
     },
     /**
@@ -89,7 +100,12 @@ export default {
       } else {
         this.hideErr();
       }
+    },
+
+    getInputName(){
+      return this.inputTitle;
     }
+
   },
   data() {
     return {
@@ -106,10 +122,17 @@ a {
   text-decoration: none;
   color: #E81E1E;
 }
+
+.text-area{
+  font-size: 13px;
+
+}
+
 .com1 {
   width: 150px;
 }
 .errMes{
+  font-size: 13px;
   color: red;
 }
 .input-err{

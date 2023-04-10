@@ -4,6 +4,7 @@
     <TheHeader/>
     <TheContent/>
     <MToastItem :toastMess="ToastControl.toastMess" :kindOfToast="ToastControl.toastType" v-if="ToastControl.isShow" />
+    <MCircleLoader v-if="Loader.isShowLoader"></MCircleLoader>
   </div>
 </template>
 
@@ -14,6 +15,8 @@ import TheMenu from './layout/TheMenu.vue'
 import MToastItem from '../src/components/base-component/MToastItem.vue'
 import resources from './js/resources'
 import { toastControl } from './store/toast.js'
+import MCircleLoader from './components/base-component/MCircleLoader.vue'
+import { loader } from './store/loader'
 
 export default {
   name: 'App',
@@ -21,13 +24,15 @@ export default {
     TheHeader,
     TheMenu,
     TheContent,
-    MToastItem
+    MToastItem,
+    MCircleLoader
   },
 
   setup(){
     const ToastControl = toastControl();
+    const Loader = loader();
     return {
-      ToastControl,
+      ToastControl, Loader
     }
   },
 
@@ -38,7 +43,6 @@ export default {
   data() {
     return {
       res: resources,
-      isShow: false,
     }
   },
 

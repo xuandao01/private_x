@@ -11,53 +11,42 @@ input[type = "radio"]{
 }
 
 .input-component{
-    height: 30px;
-    width: 100px;
-    position: absolute;
-    margin-right: 28px;
-    right: 120px;
+    height: 26px;
+    width: 170px;
+    position: relative;
+    margin-right: 58px;
 }
 
 .input-component input{
-    position: absolute;
-    right: -10px;
-}
-
-.input-component input:focus{
-    animation-name: searchGrow;
-    animation-duration: 0.5s;
-    animation-fill-mode: forwards;
-}
-
-.unfocus{
-    animation-name: searchCollase;
-    animation-duration: 0.5s;
-    animation-fill-mode: forwards;
+    border-radius: 2px;
+    height: 24px !important;
+    font-size: 13px;
+    line-height: 26px;
+    padding: 0px 30px 0px 10px;
+    outline: unset;
+    border: unset;
 }
 
 .content-main__header input{
     height: 100%;
     width: 100%;
     border: solid #EBEBEB 1px;
-    border-radius: 4px;
-    padding-left: 7px;
-    margin: 0px;
 }
 
 .content-main__header input::placeholder{
-    font-size: 14px;
+    font-size: 13px;
     font-style: italic;
-    line-height: 10px;
+    line-height: 26px;
 }
 
 .content-main__header input:focus{
-    outline-color: #50B83C;
+    border-color: #50B83C;
 }
 
 .content-main__header .search-icon{
     position: absolute;
-    top: -2px;
-    right: -12px;
+    top: 3px;
+    right: -32px;
 }
 
 .popup-checkbox {

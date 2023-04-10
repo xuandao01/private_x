@@ -18,9 +18,15 @@ let resources =  {
             7: "Tài sản cố định",
             8: "Báo cáo",
             9: "Giá thành",
+            10: "Thuế",
+            11: "Tổng hợp",
+            12: "Ngân sách",
+            13: "Danh mục",
+
         },
         employeeDetail:{
-            title: "Thông tin nhân viên",
+            createTitle: "Thông tin nhân viên",
+            updateTitle: "Sửa nhân viên",
             customer: "Là khách hàng",
             supplier: "Là nhà cung cấp",
             code: "Mã",
@@ -40,13 +46,15 @@ let resources =  {
             landingPhoneDetail: "Điện thoại cố định",
             bankAccount: "Số tài khoản ngân hàng",
             bankName: "Tên ngân hàng",
-            bankBranch: "Chi nhánh tk ngân hàng"
+            bankBranch: "Chi nhánh tk ngân hàng",
+            bankBranchDetail: "Chi nhánh tài khoản ngân hàng"
             
         },
         dialogMessage:{
             confirmDelete: "Bạn có muốn xóa nhân viên ",
-            confirmMultipleDelete: "Dữ liệu sẽ bị xóa vĩnh viễn, bạn có muốn xóa không ?",
-            confirmChange: "Dữ liệu đã thay đổi, bạn có muốn cất không ?"
+            confirmMultipleDelete: "Bạn có thực sự muốn xóa các nhân viên đã chọn không ?",
+            confirmChange: "Dữ liệu đã thay đổi, bạn có muốn cất không ?",
+            developing: "Tính năng đang được phát triển!"
         },
         btnAction:{
             cancel: "Hủy",
@@ -59,13 +67,29 @@ let resources =  {
         },
         actionMultiple: {
             title: 'Thực hiện hàng loạt',
-            deleteAction: 'Xóa hàng loạt',
+            deleteAction: 'Xóa',
+        },
+        contextMenuAction:{
+            duplicate: "Nhân bản",
+            delete: "Xóa",
+            unuse: "Ngưng sử dụng"
+        },
+        employeeList: {
+            title: "Nhân viên",
+            createButton: "Thêm nhân viên",
+            EmployeeCodeTitle: "Mã nhân viên",
+            EmployeeFullNameTitle: "Tên nhân viên",
+        },
+        common:{
+            developing: "Tính năng đang được phát triển"
         }
     },
 
     en: {
         errorMes: "Oops, something went wrong contact MISA!"
-    }
+    },
+
+    endpoint: "https://localhost:44381/api/"
 }
 
 export default resources

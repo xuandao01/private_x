@@ -13,6 +13,7 @@ import resources from '@/js/resources';
 export default {
 
     props:{
+      // Dữ liệu cho action
         data:{
             type: Array,
             required: true,
@@ -33,18 +34,27 @@ export default {
     },
 
     methods: {
+      /**
+       * Xự kiện click vào item trong context
+       * 
+       * @author Xuân Đào (04/04/2023)
+       */
         comboOnClick(){
-          if (this.enable)
+          if (this.enable && !this.showAction)
             this.showAction = true;
+          else this.showAction = false;
+
+          console.log(this.showAction);
         },
 
-        comboOnBlur(){
-          this.showAction = false;
-        },
-
+        /**
+         * Xự kiện xóa
+         * 
+         * @author Xuân Đào (04/04/2023)
+         */
         multipleDelete(){
           this.$emit('delete');
-          this.showAction = false;
+          // this.showAction = false;
         }
     },
 }
@@ -52,16 +62,18 @@ export default {
 <style scoped>
      .action-multiple{
     position: absolute;
+    height: 26px;
     left: 22px;
-    width: 200px;
+    width: 180px;
     border: solid #222 1px;
     border-radius: 4px;
   }
 
   .action-multiple__text{
-    height: 30px;
-    line-height: 30px;
-    padding-left: 8px;
+    height: 13px;
+    line-height: 26px;
+    padding-left: 16px;
+    font-size: 13px;
     font-family: opens-san-bold;
     font-weight: 600;
   }
@@ -92,11 +104,10 @@ export default {
   .action-multiple__icon{
     height: 24px;
     width: 24px;
-    background-color: red;
     position: absolute;
     background: url('@/assets/img/Sprites.64af8f61.svg') no-repeat -364px -356px;
-    right: 8px;
-    top: 2px;
+    right: 12px;
+    top: 1px;
   }
 
   .focused{
@@ -117,5 +128,9 @@ export default {
 
   .disable .action-multiple__icon{
     background: url('@/assets/img/Sprites.64af8f61.svg') no-repeat -1746px -307px;
+  }
+
+  .multiple_delete{
+    font-size: 13px;
   }
 </style>

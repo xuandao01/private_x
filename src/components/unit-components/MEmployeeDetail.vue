@@ -5,21 +5,27 @@
     <div class="popup-main" id="popupMain">
       <div class="popup-main__header">
         <div class="part1">
-          <div class="title opens-san-bold">{{ txtData.title }}</div>
+          <div class="title opens-san-bold">{{ title }}</div>
           <div class="option">
-            <div class="option is-customer">
-              <input type="checkbox" class="popup-checkbox" />
+            <div class="text-option is-customer">
+              <MCheckbox
+              width="18"
+              height="18"
+              ></MCheckbox>
               <div class="text">{{ txtData.customer }}</div>
             </div>
-            <div class="option is-supplier">
-              <input type="checkbox" class="popup-checkbox" />
+            <div class="text-option is-supplier">
+              <MCheckbox
+              width="18"
+              height="18"
+              ></MCheckbox>
               <div class="text">{{ txtData.supplier }}</div>
             </div>
           </div>
         </div>
         <div class="btn-group">
           <div class="help" title="Trợ giúp (F1)">
-            <div class="icon help-icon"></div>
+            <div class="icon help-icon" @click="showDeveloping"></div>
           </div>
           <div class="close" title="Đóng (ESC)">
             <button
@@ -42,7 +48,7 @@
                 ref="inpEmployeeCode"
                 :inputTitle="txtData.code"
                 :required="true"
-                v-model:modelValue="employee.EmployeeCode"
+                v-model="employee.EmployeeCode"
                 :canFocus="true"
               />
               <MInput
@@ -57,9 +63,9 @@
               <div class="inf-component unit">
                 <MCombobox
                   ref="inpDepartment"
-                  title="Phòng ban"
+                  title="Đơn vị"
                   :isRequired="true"
-                  api="https://localhost:7006/api/Departments"
+                  :api="this.res.endpoint + 'Department'"
                   v-model="employee.DepartmentName"
                   modelName="DepartmentName"
                 />
@@ -83,6 +89,7 @@
                 <MDatePicker
                   :title="txtData.dob"
                   v-model="this.employee.DateOfBirth"
+                  ref="inpDateOfBirth"
                 ></MDatePicker>
               </div>
               <div class="inf-component com2 gender-field">
@@ -91,6 +98,7 @@
                     :title="txtData.gender"
                     :data="['Nam', 'Nữ', 'Khác']"
                     v-model="employee.GenderName"
+                    ref="inpGender"
                   ></MRadioButton>
                 </div>
               </div>
@@ -101,13 +109,15 @@
                   class="position-name"
                   :inputTitle="txtData.identity"
                   v-model:modelValue="employee.IdentityNumber"
-                  ref="inpPosition"
+                  :tooltip="this.res.vi.employeeDetail.identityDetail"
+                  ref="identityNumber"
                 />
               </div>
               <div class="inf-component issue-date" style="width: 170px">
                 <MDatePicker
                   :title="txtData.dateOfIssue"
                   v-model="this.employee.identityDate"
+                  ref="identityDate"
                 ></MDatePicker>
               </div>
             </div>
@@ -115,7 +125,7 @@
               <MInput
                 class="position-name"
                 :inputTitle="txtData.issuedBy"
-                ref="inpPosition"
+                ref="identityPlace"
               />
             </div>
           </div>
@@ -124,36 +134,37 @@
         <div class="contact-info">
           <div class="inf-area">
             <div class="inf-component">
-              <MInput :inputTitle="txtData.address" ref="inpPosition" />
+              <MInput :inputTitle="txtData.address" ref="inpAddress" />
             </div>
           </div>
           <div class="inf-area">
             <div class="inf-component">
-              <MInput :inputTitle="txtData.phoneNumber" ref="inpPosition" />
+              <MInput :inputTitle="txtData.phoneNumber" ref="inpPhonenumber" :tooltip="this.res.vi.employeeDetail.phoneNumberDetail"/>
             </div>
             <div class="inf-component">
-              <MInput :inputTitle="txtData.landingPhone" ref="inpPosition" />
+              <MInput :inputTitle="txtData.landingPhone" ref="inpLandingPhone" :tooltip="this.res.vi.employeeDetail.landingPhoneDetail"/>
             </div>
             <div class="inf-component">
-              <MInput inputTitle="Email" ref="inpPosition" />
+              <MInput inputTitle="Email" ref="inpEmail" />
             </div>
           </div>
           <div class="inf-area">
             <div class="inf-component">
-              <MInput :inputTitle="txtData.bankAccount" ref="inpPosition" />
+              <MInput :inputTitle="txtData.bankAccount" ref="inpBankAccount" />
             </div>
             <div class="inf-component">
               <MInput
                 class="position-name"
                 :inputTitle="txtData.bankName"
-                ref="inpPosition"
+                ref="inpBankName"
               />
             </div>
             <div class="inf-component">
               <MInput
                 class="position-name"
                 :inputTitle="txtData.bankBranch"
-                ref="inpPosition"
+                ref="inpBankBranch"
+                :tooltip="this.res.vi.employeeDetail.bankBranchDetail"
               />
             </div>
           </div>
@@ -163,10 +174,10 @@
       <div class="popup-main__footer">
         <div class="btn group-btn">
           <div class="btn-save">
-            <button id="save" class="optionalBtn">{{ txtBtn.store }}</button>
+            <button id="save" @click="saveData" class="optionalBtn">{{ txtBtn.store }}</button>
           </div>
           <div class="btn btn-saveAndAdd">
-            <button @click="saveAndAdd" id="saveAdd">
+            <button @click="this.saveData(true)" id="saveAdd">
               {{ txtBtn.storeSave }}
             </button>
           </div>
@@ -184,6 +195,10 @@
       @hideDialogPopup="this.undoData()"
       @hideAndSave="this.closeSave()"
     ></ConfirmDialog>
+    <MSingleActionDialog
+    ref="singleDialog"
+    @dialogOnClose="dialogClosed"
+    ></MSingleActionDialog>
   </div>
 </template>
 <script>
@@ -195,15 +210,48 @@ import resources from "../../js/resources.js";
 import { toastControl } from "@/store/toast";
 import { ToastType } from "../base-component/MToastItem.vue";
 import MRadioButton from "../base-component/MRadioButton.vue";
+import MCheckbox from "../base-component/MCheckbox.vue";
+import MSingleActionDialog, {dialogType} from "./MSingleActionDialog.vue";
+import { GenderCode } from '@/js/enum';
+
+export const formAction = {
+  createRecord: 0,
+  updateRecord: 1,
+  duplicateRecord: 2,
+}
 
 export default {
   name: "employee-detail",
+
+  props: {
+    // Hành động của form
+    action:{
+      type: Number,
+      required: false,
+      default: formAction.createRecord,
+    },
+
+    // Dữ liệu của form
+    employeeSelected: {
+      type: Object,
+      required: false
+    },
+
+    // Tiêu đề form
+    title: {
+      type: String,
+      required: false,
+    }
+  },
+
   components: {
     ConfirmDialog,
     MInput,
     MDatePicker,
     MCombobox,
     MRadioButton,
+    MCheckbox,
+    MSingleActionDialog
   },
   setup() {
     const ToastControl = toastControl();
@@ -213,17 +261,8 @@ export default {
   },
 
   created() {
+    this.actions = this.action;
     this.employee = this.employeeSelected;
-    fetch("https://apidemo.laptrinhweb.edu.vn/api/v1/departments")
-      .then((res) => res.json())
-      .then((data) => {
-        this.departments = data;
-      });
-    fetch("https://apidemo.laptrinhweb.edu.vn/api/v1/positions")
-      .then((res) => res.json())
-      .then((data) => {
-        this.positions = data;
-      });
     window.addEventListener("keydown", this.handleKeyDown);
   },
 
@@ -253,34 +292,27 @@ export default {
   watch: {
     // employee: {
     //   handler: function(newVal){
-    //     console.log("Data change: ", newVal.Gender);
+    //     console.log("Data change: ", newVal.EmployeeCode);
     //   },
     //   deep: true
     // }
   },
 
   beforeMount() {
-    if (!this.employee) {
-      this.employee = {
-        EmployeeCode: "",
-        FullName: "",
-        GenderName: "",
-        DepartmentName: "",
-        PositionName: "",
-        DateOfBirth: "",
-        IdentityNumber: "",
-      };
-    } else {
+    if (this.actions == formAction.updateRecord) {
+
       this.employee.DateOfBirth = this.dateFormater;
       if (this.employee.GenderName === "Không xác định")
         this.employee.GenderName = "Khác";
-      console.log(this.employee.DateOfBirth);
     }
     this.CURRENT_DATA = Object.assign({}, this.employee);
   },
 
   mounted() {
-    this.$refs.inpEmployeeCode.focus();
+    this.$refs.inpEmployeeCode.setFocus();
+    this.requiredField.push(this.$refs.inpEmployeeCode);
+    this.requiredField.push(this.$refs.inpEmployeeFullName);
+    this.requiredField.push(this.$refs.inpDepartment);
   },
 
   methods: {
@@ -311,8 +343,6 @@ export default {
      */
     undoData() {
       this.employee = this.CURRENT_DATA;
-      // console.log("employee: ", this.employee);
-      // console.log("currents: ", this.CURRENT_DATA);
       this.closePopup();
     },
     /**
@@ -329,36 +359,47 @@ export default {
      *
      * Author: Xuân Đào (05/03/2023)
      */
-    handleKeyDown(event) {
-      this.keyPressed = event.keyCode;
-      // Kiểm tra trước đó đã bấm phím nào chưa
-      if (!this.lastKeyPress) {
-        this.lastKeyPress = event.keyCode;
-        this.lastTimePress = new Date();
-      } else {
-        // Kiểm tra thời gian giữa 2 lần nhấn phím
-        if (new Date() - this.lastTimePress < 1000) {
-          if (this.lastKeyPress == 17 && event.keyCode == 83) {
-            // ctrl + s
-            event.preventDefault();
-            this.saveAndAdd();
-          } else if (this.lastKeyPress == 17 && event.keyCode == 120) {
-            // ctrl + f9
-            event.preventDefault();
-          }
-        } else {
-          this.lastKeyPress = event.keyCode;
-          this.lastTimePress = new Date();
-        }
+    async handleKeyDown(event) {
+      // this.keyPressed = event.keyCode;
+      // // Kiểm tra trước đó đã bấm phím nào chưa
+      // if (!this.lastKeyPress) {
+      //   this.lastKeyPress = event.keyCode;
+      //   this.lastTimePress = new Date();
+      // } else {
+      //   // Kiểm tra thời gian giữa 2 lần nhấn phím
+      //   if (new Date() - this.lastTimePress < 1000) {
+      //     if (this.lastKeyPress == 17 && event.keyCode == 83) {
+      //       // ctrl + s
+      //       event.preventDefault();
+      //       this.saveData();
+      //     } else if (this.lastKeyPress == 17 && event.keyCode == 120) {
+      //       // ctrl + f9
+      //       event.preventDefault();
+      //     }
+      //   } else {
+      //     this.lastKeyPress = event.keyCode;
+      //     this.lastTimePress = new Date();
+      //   }
+      // }
+      if (event.ctrlKey && event.key === 's'){
+        event.preventDefault();
+        this.saveData(false);
       }
-      if (event.keyCode == 27) {
+
+      if (event.ctrlKey && event.key === 'a'){
+        event.preventDefault();
+        this.saveData(true);
+      }
+      
+      if (event.key === 'Escape') {
         //ESC Pressed
         this.closePopup();
       }
+      
     },
 
     /**
-     * Hàm sử lý tab order của người dùng
+     * Hàm xử lý tab order của người dùng
      *
      * Author: Xuân Đào (05/03/2023)
      */
@@ -371,63 +412,63 @@ export default {
      *
      * Author: Xuân Đào (06/03/2023)
      */
-    async createRecord(
-      employeeCode,
-      employeeFullName,
-      department,
-      position,
-      departmentId,
-      positionId,
-      identityNumber
-    ) {
+    async createRecord(newEmployee){
       try {
         const options = {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            createdDate: null,
-            createdBy: "",
-            modifiedDate: null,
-            modifiedBy: "",
-            employeeId: "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-            employeeCode: employeeCode,
-            firstName: "",
-            lastName: "",
-            fullName: employeeFullName,
-            gender: 0,
-            dateOfBirth: null,
-            phoneNumber: "",
-            email: "",
-            address: "",
-            identityNumber: identityNumber,
-            identityDate: "",
-            identityPlace: "",
-            joinDate: "",
-            martialStatus: 0,
-            educationalBackground: 0,
-            qualificationId: "",
-            departmentId: departmentId,
-            positionId: positionId,
-            workStatus: 0,
-            personalTaxCode: "",
-            salary: 0,
-            positionCode: "",
-            positionName: position,
-            departmentCode: "",
-            departmentName: department,
-            qualificationName: "",
-          }),
+          body: JSON.stringify(newEmployee),
         };
-        let res = await fetch(
-          "https://apidemo.laptrinhweb.edu.vn/api/v1/Employees",
-          options
-        );
+        let res = await fetch(`${this.res.endpoint}Employees`, options);
         let data = await res.json();
         console.log(data);
-        return { status: res.status, value: data };
+        return { status: res.status, value: data, message: data['Message'] };
+      } catch (err) {
+        return { status: 400, value: null, message: err};
+      }
+    },
+
+    /**
+     * Hàm cập nhật thông tin một bản ghi
+     * 
+     * @author Xuân Đào (14/03/2023)
+     */
+    async updateRecord(newEmployee){
+      try {
+        const options = {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(newEmployee),
+        };
+        let res = await fetch(`${this.res.endpoint}Employees?id=${newEmployee.EmployeeId}`, options);
+        let data = await res.json();
+        console.log(data);
+        return { status: res.status, value: data, message: data['Message'] };
       } catch (err) {
         console.log(err);
       }
+    },
+
+    /**
+     * Validate dữ liệu truyền lên api
+     * 
+     * @author Xuân Đào (14/03/2023)
+     */
+    valueValidate(){
+
+      this.requiredField.forEach(el => {
+        el.validate();
+      })
+
+      for(let i = 0; i<this.requiredField.length; i++){
+        if (this.requiredField[i].isError) {
+          this.currentError= this.requiredField[i]
+          this.$refs.singleDialog.showDialogOn(dialogType.info, this.requiredField[i].getInputName() + " không được để trống.", resources.vi.btnAction.close);
+          return false;
+        }
+      }
+
+      return true;
     },
 
     /**
@@ -435,66 +476,38 @@ export default {
      *
      * Author: Xuân Đào (05/03/2023)
      */
-    async saveAndAdd() {
-      this.$refs.inpEmployeeCode.validate();
-      this.$refs.inpEmployeeFullName.validate();
-      this.$refs.inpDepartment.validate();
-      if (this.$refs.inpEmployeeCode.isError) {
-        this.$refs.inpEmployeeCode.focus();
-      } else if (this.$refs.inpEmployeeFullName.isError) {
-        this.$refs.inpEmployeeFullName.focus();
-      } else if (this.$refs.inpDepartment.isError) {
-        this.$refs.inpDepartment.setFocus();
-      } else {
-        if (this.actions == 0) {
-          const employeeCode = this.$refs.inpEmployeeCode.value;
-          const employeeFullName = this.$refs.inpEmployeeFullName.value;
-          const department = this.$refs.inpDepartment.getValue();
-          const position = this.$refs.inpPosition.value
-            ? this.$refs.inpPosition.value
-            : "";
-          let departmentId = "";
-          let positionId = "";
-          for (const depart of this.departments) {
-            if (
-              this.removeVietnameseTones(
-                depart.DepartmentName.toLowerCase()
-              ) === this.removeVietnameseTones(department.toLowerCase())
-            )
-              departmentId = depart.DepartmentId;
+    async saveData(reload) {
+      if (this.valueValidate()){
+        const newEmployee = this.getInputData();
+          let res = "";
+          if (this.actions == formAction.createRecord || this.actions == formAction.duplicateRecord){
+            res = await this.createRecord(newEmployee);
+          } else if (this.actions == formAction.updateRecord) {
+            res = await this.updateRecord(newEmployee);
           }
-          for (const pos of this.positions) {
-            if (
-              this.removeVietnameseTones(pos.PositionName.toLowerCase()) ===
-              this.removeVietnameseTones(position.toLowerCase())
-            )
-              positionId = pos.PositionId;
-          }
-          let res = await this.createRecord(
-            employeeCode,
-            employeeFullName,
-            department,
-            position,
-            departmentId,
-            positionId
-          );
-          console.log(res);
-          this.$emit("hidePopup");
           if (res.status === 200 || res.status === 201) {
-            this.ToastControl.showToastMsg(
-              ToastType.Success,
-              "Thêm mới thành công!"
-            );
-            this.$emit('refreshData');
+            if (res['value']['IsSuccess']) {
+              this.ToastControl.showToastMsg(
+                ToastType.Success,
+                res['message']
+              );
+              this.$emit('updateData', newEmployee);
+              this.$emit("hidePopup");
+              this.closeDialog();
+              if (reload === true) {
+                this.$emit('reloadPopup');
+              }
+            }
+            else {
+              this.$refs.singleDialog.showDialogOn(dialogType.info, res['value']['Data'][0]['UserMsg'], resources.vi.btnAction.close);
+            }
           } else {
-            console.log(res.value.userMsg);
-            this.ToastControl.showToastMsg(ToastType.Error, res.value.userMsg);
+            console.log(res['Message']);
+            this.$refs.singleDialog.showDialogOn(dialogType.info, res.value.errors, resources.vi.btnAction.close);
           }
-        } else {
-          //
-        }
       }
     },
+
     /**
      * Hàm xóa các ký tự dấu và các ký tự đặc biệt
      */
@@ -530,18 +543,54 @@ export default {
      * Author: Xuân Đào (07/03/2023)
      */
     closeSave() {
-      this.closeDialog();
-      this.saveAndAdd();
+      this.saveData();
+      this.$emit("reloadPopup");
     },
 
-    /**
-     * Hàm hiển thị thông báo xác nhận xóa
-     *
-     * Author: Xuân Đào (08/03/2023)
-     */
-    showDeleteDialog() {},
+    showDeveloping(){
+      this.$refs.singleDialog.showDialogOn(dialogType.info, resources.vi.dialogMessage.developing, resources.vi.btnAction.close)
+    },
+
+    dialogClosed(){
+      this.currentError.setFocus();
+    },
+
+    getGenderCode(name){
+      switch(name){
+        case "Nam": return GenderCode.Male;
+        case "Nữ": return GenderCode.Female;
+        case "Other": return GenderCode.Other;
+        default: return GenderCode.Unknow;
+      }
+    },
+
+    getInputData(){
+      try{
+        const employee = {
+            EmployeeId: this.employee.EmployeeId,
+            EmployeeCode: this.$refs.inpEmployeeCode.value,
+            FullName: this.$refs.inpEmployeeFullName.value,
+            DepartmentId: this.$refs.inpDepartment.getSelectedId("DepartmentId"),
+            PositionId: "35e773ea-5d44-2dda-26a8-6d513e380bde",
+            Gender: this.getGenderCode(this.$refs.inpGender.value),
+            DateOfBirth: this.$refs.inpDateOfBirth.value ? (this.$refs.inpDateOfBirth.value) : null,
+            PhoneNumer: this.$refs.inpPhonenumber.value,
+            Email: this.$refs.inpEmail.value,
+            Address: this.$refs.inpAddress.value,
+            IdentityNumber: this.$refs.identityNumber.value,
+            IdentityDate: this.$refs.identityDate.value ? (this.$refs.identityDate.value) : null,
+            IdentityPlace: this.$refs.identityPlace.value,
+            BankAccount: this.$refs.inpBankAccount.value,
+            BankName: this.$refs.inpBankName.value,
+            BankBranch: this.$refs.inpBankBranch.value,
+          }
+          return employee
+      } catch (ex) {
+        console.log(ex);
+        return;
+      }
+    },
   },
-  props: ["employeeSelected"],
   data() {
     return {
       employee: null,
@@ -549,14 +598,17 @@ export default {
       confirmDialog: false,
       txtData: resources.vi.employeeDetail,
       txtBtn: resources.vi.btnAction,
+      res: resources,
       keyPressed: null,
       checkFocus: false,
       lastKeyPress: null,
       lastTimePress: null,
       departments: null,
-      positions: null,
-      actions: 0,
+      actions: formAction.createRecord,
       deleteDialog: true,
+      employeeCode: null,
+      requiredField:[],
+      currentError: null,
     };
   },
 };
@@ -573,4 +625,17 @@ a {
   font-family: opens-san-bold;
   font-weight: 600;
 }
+
+.text-option{
+  display: flex;
+  column-gap: 8px;
+  align-items: center;
+  font-size: 14px;
+  color: #111111;
+}
+
+.text-option .text{
+  font-family: Notosans;
+}
+
 </style>

@@ -12,7 +12,7 @@
               :class="{ 'fix-start': isFixedStart }"
               v-if="muiltipleSelect"
             >
-              <MCheckbox></MCheckbox>
+              <MCheckbox ref="parentCheckbox" @click="parentCheckBoxOnClick"></MCheckbox>
             </th>
             <th
               :class="item.dataType"
@@ -74,6 +74,7 @@
     <MContextMenu
       ref="context"
       @deleteEvent="deleteRowData"
+      @duplicateEvent="duplicateData"
       v-show="showContext"
     ></MContextMenu>
   </div>
@@ -82,10 +83,18 @@
 import MGridDataLoading from "../unit-components/MGridDataLoading.vue";
 import MContextMenu from "./MContextMenu.vue";
 import MCheckbox from "./MCheckbox.vue";
+import { deleteType } from '../unit-components/MConfirmDeleteDialog.vue';
+import { multipleSelectedData } from "@/store/multipleDeleteEmployee";
+
 export default {
   name: "MGridData",
 
   emits: ['update:totalRecord', 'update:enableMultipleEditor'],
+
+  setup(){
+    const selectedList = multipleSelectedData()
+    return selectedList;
+  },
 
   components: {
     MContextMenu,
@@ -94,29 +103,40 @@ export default {
   },
 
   props: {
+    // Api lấy dữ liệu cho grid data
     api: {
       type: String,
       required: true,
     },
+
+    // Dữ liệu mapping với api
     data: {
       type: Object,
       required: true,
     },
+
+    // Fix cột đầu tiên trong grid
     isFixedStart: {
       type: Boolean,
       required: false,
       default: false,
     },
+
+    // Fix cột cuối cùng trong grid
     isFixedEnd: {
       type: Boolean,
       required: false,
       default: false,
     },
+
+    // Grid ao gồm gột chọn nhiều hay không
     muiltipleSelect: {
       type: Boolean,
       required: false,
       default: false,
     },
+
+    // Grid gồm gột chức năng hay không
     editable: {
       type: Boolean,
       required: false,
@@ -129,11 +149,15 @@ export default {
    * @author  Xuân Đào(12/03/2023)
    */
   async created() {
-    let data = await (await fetch(this.api)).json();
-    this.gridData = data.data;
-    this.$emit('refresh', data.totalRecord.TotalRecord);
-    this.showLoading = false;
-    this.apiString = this.api;
+    try {
+      let data = await (await fetch(this.api)).json();
+      this.gridData = data.data;
+      this.$emit('refresh', data.totalRecord.TotalRecord);
+      this.showLoading = false;
+      this.apiString = this.api;
+    } catch (ex) {
+      console.log(ex);
+    }
   },
 
   /**
@@ -157,6 +181,7 @@ export default {
       }
     } else {
       for (let i = 0; i < this.data.length; i++) {
+        this.widthList.push(this.data[i].colWidth);
         this.$refs.tableThead.children[0].children[i + 1].style.width =
           this.data[i].colWidth + "px";
         if (parseInt(this.data[i].colWidth))
@@ -259,33 +284,95 @@ export default {
       apiString: null,
       selectedMultiple: [],
       selectedMultipleRow: [],
-      selectedRow: null,
+      widthList:[],
     };
   },
   methods: {
 
-    deleteSelectedMultipleRow(){
-      this.selectedMultipleRow.forEach(el => {
-        console.log(el);
-      })
+    /**
+     * Hàm nhân bản dữ liệu 
+     * 
+     * @author Xuân Đào (04/04/2023)
+     */
+    duplicateData(){
+      this.$emit("duplicateData", this.selectedData);
     },
 
+    /**
+     * Hàm xử lý ô checkbox cha
+     * 
+     * @author Xuân Đào (04/04/2023)
+     */
+    parentCheckBoxOnClick(){
+      let data = this.$refs.tableBody.children;
+      if (this.$refs.parentCheckbox.checked){
+        for (let i=0;i<data.length;i++){
+          data[i].classList.add("checked-item");
+          data[i].children[0].children[0].classList.add("checked");
+          if (!this.selectedMultipleRow.includes(data[i])){
+            this.selectedMultipleRow.push(data[i]);
+            this.selectedMultiple.push(this.gridData[i]);
+          }
+        }
+      } else {
+        for (let i=0;i<data.length;i++){
+          data[i].classList.remove("checked-item");
+          data[i].children[0].children[0].classList.remove("checked");
+          if (this.selectedMultipleRow.includes(data[i])){
+            this.selectedMultipleRow = this.removeItemFromArr(this.selectedMultipleRow, this.selectedMultipleRow.indexOf(data[i]));
+            this.selectedMultiple = this.removeItemFromArr(this.selectedMultiple, this.selectedMultipleRow.indexOf(data[i]))
+          }
+        }
+      }
+      this.$emit('selectMultiple', this.selectedMultipleRow.length);
+    },
+
+    /**
+     * Hàm xóa các hàng được chọn
+     * 
+     * @author Xuân Đào (04/04/2023)
+     */
+    deleteSelectedMultipleRow(){
+      this.selectedMultipleRow.forEach(el => {
+        el.remove();
+      })
+      this.selectedMultipleRow = [];
+      this.selectedMultiple = [];
+    },
+
+    /**
+     * Hàm xóa 1 hàng
+     * 
+     * @author Xuân Đào (04/04/2023)
+     */
     deleteSelectedRow(){
-      this.selectedRow.remove();
+      this.selected.remove();
     },
     
+    /**
+     * Hàm click checkbox
+     * 
+     * @author Xuân Đào (04/04/2023)
+     */
     checkBoxOnClick(item) {
+      let targetEl = event.target.parentElement.parentElement
       if (this.selectedMultiple.includes(item)) {
         this.selectedMultipleRow = this.removeItemFromArr(this.selectedMultipleRow, this.selectedMultiple.indexOf(item));
         this.selectedMultiple = this.removeItemFromArr(this.selectedMultiple, this.selectedMultiple.indexOf(item));
+        targetEl.classList.remove("checked-item");
       } else {
         this.selectedMultiple.push(item);
-        this.selectedMultipleRow[this.selectedMultipleRow.length] = event.target.parentElement.parentElement;
+        this.selectedMultipleRow[this.selectedMultipleRow.length] = targetEl;
+        targetEl.classList.add("checked-item");
       }
-      console.log(this.selectedMultipleRow);
       this.$emit('selectMultiple', this.selectedMultiple.length);
     },
 
+    /**
+     * Hàm xóa 1 item khỏi array
+     * 
+     * @author Xuân Đào (04/04/2023)
+     */
     removeItemFromArr(proxy, index) {
       let arr = [];
       for (let i = 0; i < proxy.length; i++) {
@@ -339,7 +426,7 @@ export default {
       this.$refs.context.setPosition(50, this.cursor_y + 15);
       this.showContext = true;
       this.selectedData = item;
-      this.selectedRow = event.target.parentElement.parentElement.parentElement;
+      this.selected = event.target.parentElement.parentElement.parentElement;
     },
 
     /**
@@ -366,9 +453,11 @@ export default {
     dateFormator(date) {
       const data = new Date(date);
       if (data.toDateString() !== "Invalid Date") {
-        const dateVal = data.getDay() + 1;
-        const month = data.getMonth() + 1;
+        let dateVal = data.getDay() + 1;
+        let month = data.getMonth() + 1;
         const year = data.getFullYear();
+        dateVal = dateVal < 10 ? "0"+dateVal:dateVal;
+        month = month < 10 ? "0"+month:month;
         return `${dateVal}/${month}/${year}`;
       } else return "";
     },
@@ -401,21 +490,6 @@ export default {
     },
 
     /**
-     * Hàm load dữ liệu
-     *
-     * @author  Xuân Đào (12/03/2023)
-     */
-    loadData() {
-      this.showLoading = true;
-      fetch("https://apidemo.laptrinhweb.edu.vn/api/v1/Employees")
-        .then((res) => res.json())
-        .then((data) => {
-          this.gridData = data;
-          this.hideLoadingSkeleton();
-        });
-    },
-
-    /**
      * Hàm ẩn animation loading khi load xong dữ liệu
      *
      * @author  Xuân Đào (12/03/2023)
@@ -430,14 +504,18 @@ export default {
      * @author  Xuân Đào (12/03/2023)
      */
     async refreshData(api) {
-      this.apiString = api;
-      this.showLoading = true;
-      this.showData = false;
-      let rawData = await (await fetch(this.apiString)).json();
-      this.gridData = rawData.data;
-      this.$emit('refresh', rawData.totalRecord.TotalRecord);
-      this.showLoading = false;
-      this.showData = true;
+      try {
+        this.apiString = api;
+        this.showLoading = true;
+        this.showData = false;
+        let rawData = await (await fetch(this.apiString)).json();
+        this.gridData = rawData.data;
+        this.$emit('refresh', rawData.totalRecord.TotalRecord);
+        this.showLoading = false;
+        this.showData = true;
+      } catch (ex) {
+        console.log(ex);
+      }
     },
 
     /**
@@ -455,16 +533,19 @@ export default {
      * @author  Xuân Đào (12/03/2023)
      */
     deleteRowData() {
-      this.$emit("deleteRc", this.selectedData);
+      this.$emit("deleteRc", this.selectedData, deleteType.singleDelete);
     },
 
-    contextOnDelete() {},
+    getRemainingRow(){
+      return this.$refs.tableBody.children.length;
+    }
   },
 };
 </script>
 <style scoped>
 .date {
   text-align: center;
+  padding:0;
 }
 
 .multiple-select {
@@ -478,5 +559,11 @@ export default {
 
 .edit-text {
   cursor: pointer;
+  margin-left: 15px;
+}
+
+.checked-item, .checked-item td:first-child, .checked-item td:last-child{
+    background-color: #e5f3ff;
+    z-index: 3;
 }
 </style>

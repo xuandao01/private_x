@@ -47,6 +47,7 @@ th{
     text-align: left;
     padding-left: 12px;
     position: sticky;
+    font-size: 13px;
     top: -1px;
     z-index: 2;
     font-family: Opens-san-bold;
@@ -56,7 +57,8 @@ th:first-child, th:last-child{
 }
 
 td{
-    padding-left: 12px;
+    padding:0 12px;
+    font-size: 13px;
     position: relative;
 }
 
@@ -82,12 +84,8 @@ td{
     width: 100%;
 }
 
-.grid-table tbody{
-    height: 100px;
-}
-
 tr {
-height: 40px;
+height: 36px;
 width: 100%;
 }
 
