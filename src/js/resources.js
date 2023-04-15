@@ -80,8 +80,42 @@ let resources =  {
             EmployeeCodeTitle: "Mã nhân viên",
             EmployeeFullNameTitle: "Tên nhân viên",
         },
+        employeeDetailError:{
+            duplicateCode: "Mã nhân viên đã tồn tại trong hệ thống",
+            codeInvalidLength: "Mã nhân viên không được phép vượt quá 20 ký tự",
+            nameInvalidLength: "Tên nhân viên không được phép vượt quá 100 ký tự",
+            dobInvalidData: "Ngày sinh không hợp lệ",
+            issueDateInvalid: "Ngày cấp không hợp lệ",
+        },
+        employeeDetailBtn:{
+            save: "Cất",
+            saveTooltip: "Cất (Ctrl + S)",
+            saveAndAdd: "Cất và thêm",
+            saveAndAddTooltip: "Cất và thêm (Ctrl + Shift + S)",
+            close: "Hủy",
+            closeTooltip: "Hủy (ESC)"
+        },
         common:{
             developing: "Tính năng đang được phát triển"
+        },
+        cash:{
+            progress:{
+                title: "NGHIỆP VỤ TIỀN MẶT"
+            },
+
+            main:{
+                content: ['Thu tiền', 'Chi tiền', 'Kiểm kê quỹ'],
+                menu: ['Khách hàng', 'Nhà cung cấp', 'Nhân viên', 'Tài khoản']
+            },
+
+            report:{
+                title: "BÁO CÁO",
+                main: ['Bảng kê số dư theo ngày', 'Dòng tiền', 'S03a1-DN: Sổ nhật ký thu tiền', 'Sổ kế toán chi tiết quỹ tiền mặt', 'S03a2-DN: Sổ nhật ký chi tiền'],
+                footer: "Tất cả báo cáo",
+            }
+        },
+        di:{
+            
         }
     },
 

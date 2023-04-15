@@ -17,6 +17,7 @@ import resources from './js/resources'
 import { toastControl } from './store/toast.js'
 import MCircleLoader from './components/base-component/MCircleLoader.vue'
 import { loader } from './store/loader'
+import { multipleSelectedData } from './store/multipleDeleteEmployee'
 
 export default {
   name: 'App',
@@ -31,8 +32,9 @@ export default {
   setup(){
     const ToastControl = toastControl();
     const Loader = loader();
+    const SelectedList = multipleSelectedData();
     return {
-      ToastControl, Loader
+      ToastControl, Loader, SelectedList
     }
   },
 

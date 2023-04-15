@@ -94,14 +94,22 @@ export default {
     /**Hàm thực hiện validate nếu cần */
     validate(){
       if (!this.required) return;
-      const value = this.$refs.mInput.value;
-      if (value.trim() == "" || value == null || value == undefined){
-        this.showErr();
-      } else {
-        this.hideErr();
+      let value = "";
+      if(this.$refs.mInput){
+        value = this.$refs.mInput.value;
+        if (value.trim() == "" || value == null || value == undefined){
+          this.showErr();
+        } else {
+          this.hideErr();
+        }
       }
     },
 
+    /**
+     * Hàm lấy tên input
+     *
+     * @author  Xuân Đào (12/03/2023)
+     */
     getInputName(){
       return this.inputTitle;
     }

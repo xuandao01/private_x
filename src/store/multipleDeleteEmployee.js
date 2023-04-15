@@ -2,21 +2,26 @@ import { defineStore } from 'pinia'
 
 export const multipleSelectedData = defineStore('MultipleSelectedData', {
     state: () => ({
-        selectedList: [],
+        selectedItemList: [],
     }),
     actions: {
       addItem(item){
-        this.selectedList.push(item);
+        this.selectedItemList.push(item);
+      },
+
+      removeAll(){
+        this.selectedItemList = [];
       },
 
       removeItemFromList(index) {
         let arr = [];
-        for (let i = 0; i < this.selectedList.length; i++) {
+        for (let i = 0; i < this.selectedItemList.length; i++) {
           if (i !== index) {
-            arr.push(this.selectedList[i]);
+            arr.push(this.selectedItemList[i]);
           }
         }
-        this.selectedList = arr;
+        this.removeAll();
+        this.selectedItemList = arr;
       },
     }
   })

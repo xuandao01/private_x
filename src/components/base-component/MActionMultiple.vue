@@ -13,12 +13,6 @@ import resources from '@/js/resources';
 export default {
 
     props:{
-      // Dữ liệu cho action
-        data:{
-            type: Array,
-            required: true,
-        },
-
         enable: {
           type: Boolean,
           required: false,

@@ -45,7 +45,12 @@ export default {
     mounted(){
       this.$nextTick(() => {
         this.$refs.leftBtn.focus();
-      })
+        window.addEventListener("keydown", this.handleOnKeydown)
+      });
+    },
+
+    unmounted(){
+      window.removeEventListener("keydown", this.handleOnKeydown)
     },
 
     methods:{
@@ -65,13 +70,32 @@ export default {
          */
         closeAndDelete(){
             this.$emit("hideAndDelete", this.deleteType);
-        }
+        },
+
+        /**
+         * Hàm xử lý sự kiện bàn phím
+         * 
+         * Author: Xuân Đào (05/03/2023)
+         */
+        handleOnKeydown(){
+          if (event.key == "Tab"){
+            event.preventDefault();
+            if (this.focused == 0) {
+              this.$refs.rightBtn.focus();
+              this.focused = 1;
+            } else {
+              this.$refs.leftBtn.focus();
+              this.focused = 0;
+            }
+          }
+        },
     },
     data() {
         return {
             txtData: resources.vi.dialogMessage,
             txtBtn: resources.vi.btnAction,
             deleteType: 0,
+            focused: 0,
         }
     },
 }

@@ -18,9 +18,9 @@
           @delete="multipleDelete"
         ></MActionMultiple>
         <MSearchBar @onSearch="this.searchOnInput"></MSearchBar>
-        <div @click="renewData" title="Tải lại" class="icon reload-icon"></div>
+        <div @click="renewData" title="Tải lại (Ctrl + R)" class="icon reload-icon"></div>
         <div
-          title="Xuất dữ liệu ra excel"
+          title="Xuất ra excel (Ctrl + E)"
           @click="excelExport"
           class="icon export-excel-icon"
         ></div>
@@ -162,18 +162,18 @@
   </div>
 </template>
 <script>
-import MGridData from "../base-component/MGridData.vue";
+import MGridData from "@/components/base-component/MGridData.vue";
 // import { ToastType } from '../base-component/MToastItem.vue';
-import MDeleteConfirmDialog, { deleteType } from "./MConfirmDeleteDialog.vue";
+import MDeleteConfirmDialog, { deleteType } from "@/components/unit-components/MConfirmDeleteDialog.vue";
 import { toastControl } from "@/store/toast";
-import MEmployeeDetail, { formAction } from "./MEmployeeDetail.vue";
-import { ToastType } from "../base-component/MToastItem.vue";
-import MPagination from "../base-component/MPagination.vue";
-import MSearchBar from "../base-component/MSearchBar.vue";
-import MActionMultiple from "../base-component/MActionMultiple.vue";
+import MEmployeeDetail, { formAction } from "@/components/unit-components/MEmployeeDetail.vue";
+import { ToastType } from "@/components/base-component/MToastItem.vue";
+import MPagination from "@/components/base-component/MPagination.vue";
+import MSearchBar from "@/components/base-component/MSearchBar.vue";
+import MActionMultiple from "@/components/base-component/MActionMultiple.vue";
 import resources from "@/js/resources";
-import MSingleActionDialog, { dialogType } from "./MSingleActionDialog.vue";
-import MCircleLoader from "../base-component/MCircleLoader.vue";
+import MSingleActionDialog, { dialogType } from "@/components/unit-components/MSingleActionDialog.vue";
+import MCircleLoader from "@/components/base-component/MCircleLoader.vue";
 import { loader } from '@/store/loader';
 
 export default {
@@ -271,6 +271,23 @@ export default {
       month = month < 10 ? "0" + month : month;
       return `${date}/${month}/${fyear}`;
     },
+
+    /**
+     * Hàm format dữ liệu ngày thàng
+     *
+     * Author: Xuân Đào (03/03/2023)
+     */
+     readableDateFormater(data) {
+      const date = new Date(data);
+      const dateVal =
+        date.getDate() < 10 ? "0" + date.getDate() : date.getDate();
+      const month =
+        date.getMonth() < 10
+          ? "0" + (date.getMonth() + 1)
+          : date.getMonth() + 1;
+      const year = date.getFullYear();
+      return `${year}-${month}-${dateVal}`;
+    },
     /**
      * Hàm hiển thị popup thêm nhân viên
      * @author Xuân Đào 02.03.2023
@@ -363,7 +380,7 @@ export default {
       
       if (event.ctrlKey && event.key === 'm'){
         event.preventDefault();
-        if(this.$refs.gridData.selectedMultiple.length > 0){
+        if(this.$refs.gridData.getSelectedList().length > 0){
           this.deleteRecord(null, deleteType.multipleDelete);
         }
       }
@@ -403,6 +420,7 @@ export default {
       } else if (type === deleteType.multipleDelete) {
         this.deleteMessage = this.res.vi.dialogMessage.confirmMultipleDelete;
       }
+
       this.showDeleteDialog(type);
     },
     /**
@@ -442,13 +460,10 @@ export default {
           const res = await fetch(apiString, options);
           if (res.status === 200) {
             let data = await res.json();
-            console.log(data);
-            /*eslint-disable no-debugger */
-            debugger
             this.ToastControl.showToastMsg(ToastType.Success,data['Message']);
           }
         } else if (type === deleteType.multipleDelete) {
-          let dataList = this.$refs.gridData.selectedMultiple
+          let dataList = this.$refs.gridData.getSelectedList();
           let idList = dataList[0].EmployeeId;
           for (let i=1;i<dataList.length;i++){
             idList += `,${dataList[i].EmployeeId}`;
@@ -461,11 +476,10 @@ export default {
           };
           const res = await fetch(apiString, options);
           const data = await res.json();
-          console.log(data);
           if (res.status === 200) {
             this.ToastControl.showToastMsg(ToastType.Success, data['Message']);
+            this.totalRecord -= this.$refs.gridData.getSelectedList().length;
             this.$refs.gridData.deleteSelectedMultipleRow();
-            this.totalRecord -= this.$refs.gridData.selectedMultipleRow.length;
             this.selectMultiple(0);
             const rowLeft = this.$refs.gridData.getRemainingRow();
             if (rowLeft == 0) {
@@ -517,12 +531,19 @@ export default {
       // new JsFileDownloader({url: link});
     },
 
+    /**
+     * Hàm nhân bản nhân viên
+     *
+     * @author  Xuân Đào (12/03/2023)
+     */
     async duplicateEmployee(employee){
       this.action = formAction.duplicateRecord;
       this.selectedEmployee = employee;
       const newCode = await fetch(`${this.res.endpoint}Employees/NewEmployeeCode`);
       const data = await newCode.text();
       this.selectedEmployee.EmployeeCode = data;
+      this.selectedEmployee.DateOfBirth = this.readableDateFormater(this.selectedEmployee.DateOfBirth);
+      this.selectedEmployee.IdentityDate = this.readableDateFormater(this.selectedEmployee.IdentityDate);
       this.popupTitle = this.res.vi.employeeDetail.createTitle;
       this.isShowPopup = true;
     },
@@ -546,6 +567,11 @@ export default {
       this.$refs.singleDialog.showDialogOn(dialogType.info, resources.vi.dialogMessage.developing, resources.vi.btnAction.close)
     },
 
+    /**
+     * Hàm load lại popup
+     *
+     * @author  Xuân Đào (12/03/2023)
+     */
     reloadEmployeeDetail(){
       this.closePopup();
       this.showNewPopup();

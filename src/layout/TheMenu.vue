@@ -24,12 +24,12 @@
                 <!-- Phần hiển thị text -->
                 <div class="menu-item__context">{{ data[0] }}</div>
             </router-link>
-            <div class="menu-item">
+            <router-link to="/money" class="menu-item">
                 <div class="menu-item__icon">
                     <div class="icon money"></div>
                 </div>
                 <div class="menu-item__context">{{ data[1] }}</div>
-            </div>
+            </router-link>
             <div class="menu-item">
                 <div class="menu-item__icon">
                     <div class="icon s-money"></div>
@@ -97,7 +97,7 @@
                 </div>
                 <div class="menu-item__context">{{ data[12] }}</div>
             </div>
-            <router-link to="/employee" class="menu-item">
+            <router-link to="/DI" class="menu-item">
                 <div class="menu-item__icon">
                     <div class="icon user-group"></div>
                 </div>

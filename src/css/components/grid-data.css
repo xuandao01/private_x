@@ -3,6 +3,7 @@ tr .fix-start{
     left: -1px;
     background-color: #fff;
     z-index: 3;
+    width: 25px;
 }
 
 tr .fix-end{

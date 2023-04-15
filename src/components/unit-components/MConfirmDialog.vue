@@ -64,6 +64,11 @@ export default {
 
   methods: {
 
+    /**
+     * Hàm xử lý sự kiện bàn phím
+     *
+     * @author  Xuân Đào (12/03/2023)
+     */
     handleOnKeyDown(){
       if(event.code === "Tab"){
         event.preventDefault();

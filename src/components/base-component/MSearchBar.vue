@@ -41,6 +41,11 @@ export default {
       this.isFocus = false;
     },
 
+    /**
+     * Hàm debounce tìm kiếm sau 0.5s không nhập liệu
+     *
+     * @author  Xuân Đào (12/03/2023)
+     */
     inputOnSearch: debounce(function() {
       this.$emit('onSearch', this.$refs.searchBar.value);
     }, 500),

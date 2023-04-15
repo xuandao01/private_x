@@ -19,7 +19,7 @@
 @import url(../css/components/router.css);
 body{
     margin: 0px;
-    background-color: #E0E0E0;
+    background-color: #eceef1;
 }
 @font-face {
     font-family: Notosans;
@@ -28,6 +28,10 @@ body{
 @font-face {
     font-family: Notosans-semibold;
     src: url("../assets/fonts/notosans-semibold.df3e6dc4.woff2");
+}
+@font-face {
+    font-family: Notosans-bold;
+    src: url("../assets/fonts/notosans-bold.3ede5aff.woff2");
 }
 @font-face {
     font-family: Roboto;
@@ -75,7 +79,7 @@ a{
 ::-webkit-scrollbar {
     width: 0.5em;
     height: 0.5em;
-    z-index: 99999;
+    z-index: 99999999;
 }
 ::-webkit-scrollbar-track-piece {
     background-color: #fff;

@@ -95,6 +95,13 @@ export default {
       } else if (event.key == "ArrowDown") {
         if (this.selected == this.comboboxData.length - 1) this.selected = 0;
         else this.selected++;
+      } else if (event.key == "Enter") {
+        this.$emit("changeVal", this.selected);
+        this.showData = false;
+      } else if (event.key == "Tab") {
+        event.preventDefault();
+        this.$emit("changeVal", this.selected);
+        this.showData = false;
       }
     },
 
