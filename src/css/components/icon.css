@@ -211,3 +211,9 @@
 	height: 22px !important;
     background: url("../../assets/img/Sprites.64af8f61.svg") no-repeat -1378px -257px;
 }
+
+.back-icon{
+    background: url('../../assets/img/Sprites.64af8f61.svg') no-repeat -228px -362px;
+	width: 8px;
+	height: 12px;
+}

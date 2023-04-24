@@ -37,8 +37,6 @@ export default {
           if (this.enable && !this.showAction)
             this.showAction = true;
           else this.showAction = false;
-
-          console.log(this.showAction);
         },
 
         /**

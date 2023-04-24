@@ -17,22 +17,22 @@
                     </div>
                 </div>
                 <div class="c-major__main--menu">
-                    <div class="c-menu__item">
+                    <router-link to="/DI/DICustomer" class="c-menu__item">
                         <div class="c-menu__item--icon customer-icon"></div>
                         <div class="c-menu__item--content">{{ resources.vi.cash.main.menu[0] }}</div>
-                    </div>
-                    <div class="c-menu__item">
+                    </router-link>
+                    <router-link to="/DI/DISupplier" class="c-menu__item">
                         <div class="c-menu__item--icon supplier-icon"></div>
                         <div class="c-menu__item--content">{{ resources.vi.cash.main.menu[1] }}</div>
-                    </div>
-                    <div class="c-menu__item">
+                    </router-link>
+                    <router-link to="/DI/DIEmployee" class="c-menu__item">
                         <div class="c-menu__item--icon employee-icon"></div>
                         <div class="c-menu__item--content">{{ resources.vi.cash.main.menu[2] }}</div>
-                    </div>
-                    <div class="c-menu__item">
+                    </router-link>
+                    <router-link to="DI/DIAccountSystem" class="c-menu__item">
                         <div class="c-menu__item--icon account-icon"></div>
                         <div class="c-menu__item--content">{{ resources.vi.cash.main.menu[3] }}</div>
-                    </div>
+                    </router-link>
                 </div>
             </div>
             <div class="c-major__report">
@@ -90,7 +90,7 @@ export default {
         width: 1000px;
         position: absolute;
         top: calc((100% - 460px)/2);
-        left: calc((100% - 1000px)/2);
+        left: 150px;
     }
 
     .c-major__main{
@@ -213,6 +213,7 @@ export default {
     .c-menu__item--content{
         font-size: 13px;
         font-family: Notosans;
+        color: black;
     }
 
     .cr-title{

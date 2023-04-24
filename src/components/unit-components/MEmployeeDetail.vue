@@ -425,7 +425,6 @@ export default {
         };
         let res = await fetch(`${this.res.endpoint}Employees`, options);
         let data = await res.json();
-        console.log(data);
         return { status: res.status, value: data, message: data['Message'] };
       } catch (err) {
         return { status: 400, value: null, message: err};
@@ -448,7 +447,6 @@ export default {
         newEmployee.IdentityDate = this.formatDate(newEmployee.IdentityDate)
         let res = await fetch(`${this.res.endpoint}Employees?id=${newEmployee.EmployeeId}`, options);
         let data = await res.json();
-        console.log(data);
         return { status: res.status, value: data, message: data['Message'] };
       } catch (err) {
         console.log(err);

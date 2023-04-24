@@ -1,32 +1,38 @@
 <template>
-    <div class="part1">
-          Tổng số: <b id="numberOfRecord"> {{ totalRecord }}</b> bản ghi
+    <div class="pg-main">
+      <div class="part1">
+            Tổng số: <b id="numberOfRecord"> {{ totalRecord }}</b> bản ghi
+      </div>
+      <div class="part2" v-if="allowPaging">
+        <div>
+          <MComboboxNomal
+              :data="[
+                  '10 bản ghi trên 1 trang',
+                  '20 bản ghi trên 1 trang',
+                  '30 bản ghi trên 1 trang',
+                  '50 bản ghi trên 1 trang',
+                  '100 bản ghi trên 1 trang',
+              ]"
+              :enable="true"
+              displayDirection="Up"
+              :defaultValue="1"
+              @changeVal="updateVal"
+          >
+          </MComboboxNomal>
         </div>
-        <div class="part2">
-          <div>
-            <MComboboxNomal
-                :data="[
-                    '10 bản ghi trên 1 trang',
-                    '20 bản ghi trên 1 trang',
-                    '30 bản ghi trên 1 trang',
-                    '50 bản ghi trên 1 trang',
-                    '100 bản ghi trên 1 trang',
-                ]"
-                :defaultValue="1"
-                @changeVal="updateVal"
-            >
-            </MComboboxNomal>
-          </div>
-          <div class="page-number" ref="paging">
-            <div @click="previousPage" :class="{'disabled': currentPage==1}" class="previous">Trước</div>
-            <div @click="pageNumberOnClick" class="slot1 selected-page">{{ slot1 }}</div>
-            <div @click="pageNumberOnClick" class="slot2" v-if="totalPage >= 2">{{ slot2 }}</div>
-            <div @click="pageNumberOnClick" class="slot3" v-if="totalPage >= 3">{{ slot3 }}</div>
-            <div @click="pageNumberOnClick" class="slot4" v-if="totalPage >= 4">{{ slot4 }}</div>
-            <div @click="pageNumberOnClick" class="slot5" v-if="totalPage >= 5">{{ totalPage }}</div>
-            <div @click="nextPage" :class="{'disabled': currentPage==totalPage}" class="next">Sau</div>
-          </div>
+        <div class="page-number" ref="paging">
+          <div @click="previousPage" :class="{'disabled': currentPage==1}" class="previous">Trước</div>
+          <div @click="pageNumberOnClick" class="backToStart" v-if="slot1 != 1">1</div>
+          <div class="backToStart" v-if="slot1 != 1">. . .</div>
+          <div @click="pageNumberOnClick" class="slot1 selected-page">{{ slot1 }}</div>
+          <div @click="pageNumberOnClick" class="slot2" v-if="totalPage >= 2">{{ slot2 }}</div>
+          <div @click="pageNumberOnClick" class="slot3" v-if="totalPage >= 3">{{ slot3 }}</div>
+          <div @click="pageNumberOnClick" class="slot4" v-if="totalPage >= 4">{{ slot4 }}</div>
+          <div @click="pageNumberOnClick" class="slot5" v-if="totalPage >= 5">{{ totalPage }}</div>
+          <div @click="nextPage" :class="{'disabled': currentPage==totalPage}" class="next">Sau</div>
         </div>
+      </div>
+    </div>
 </template>
 <script>
 import MComboboxNomal from "../base-component/MComboboxNomal.vue";
@@ -41,6 +47,12 @@ export default {
             required: true,
             default: 0,
         },
+
+        allowPaging:{
+          type: Boolean,
+          required: false,
+          default: true,
+        }
     },
 
     watch:{
@@ -215,5 +227,29 @@ export default {
 
     .disabled:hover{
       cursor: not-allowed;
+    }
+
+    .pg-main{
+      height: calc(100% - 28px);
+      width: calc(100% - 24px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 12px;
+    }
+
+    .part1{
+      height: 100%;
+      display: flex;
+      align-items: center;
+      column-gap: 4px;
+      font-size: 13px;
+    }
+
+    .part2{
+      height: 100%;
+      display: flex;
+      align-items: center;
+      font-size: 13px;
     }
 </style>

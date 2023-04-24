@@ -24,7 +24,7 @@
                 <!-- Phần hiển thị text -->
                 <div class="menu-item__context">{{ data[0] }}</div>
             </router-link>
-            <router-link to="/money" class="menu-item">
+            <router-link to="/CA" class="menu-item">
                 <div class="menu-item__icon">
                     <div class="icon money"></div>
                 </div>

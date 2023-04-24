@@ -12,7 +12,7 @@ export default {
 </script>
 <style scoped>
     div div{
-        padding: 40px 100px;
+        padding: 10px;
         font-size: 25px;
         font-weight: 600;
     }

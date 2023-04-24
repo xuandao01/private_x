@@ -2,15 +2,17 @@
 // Props gồm title: Tiêu đề, modelValue: Dữ liệu binding
 // Author: Xuân Đào(05/03/2023)
 <template>
-  <div class="title">{{ title }}</div>
-  <input
-    type="date"
-    class="pop-input date-time"
-    v-model="this.value"
-    @blur="this.validate()"
-    ref="mInput"
-  />
-  <div v-if="inValid" class="errMes">Ngày không hợp lệ</div>
+  <div class="dp-main">
+    <div class="title">{{ title }}</div>
+    <input
+      type="date"
+      class="pop-input date-time"
+      v-model="this.value"
+      @blur="this.validate()"
+      ref="mInput"
+    />
+    <div v-if="inValid" class="errMes">Ngày không hợp lệ</div>
+  </div>
 </template>
 <script>
 export default {
@@ -60,6 +62,23 @@ export default {
 };
 </script>
 <style scoped>
+
+.pop-input{
+  border-radius: 2px;
+  border: solid 1px #d0d0d0;
+  outline: unset;
+  font-size: 13px;
+  height: 26px;
+  min-width: 150px;
+  padding: 0 8px;
+}
+
+.dp-main{
+  display: flex;
+  flex-direction: column;
+  row-gap: 4px;
+}
+
 .errMes {
   color: red;
   font-size: 13px;

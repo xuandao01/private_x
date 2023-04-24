@@ -76,14 +76,19 @@ a{
     padding: 0 ;
 }
 
+.align-right{
+    text-align: right;
+    padding: 0 ;
+}
+
 ::-webkit-scrollbar {
     width: 0.5em;
     height: 0.5em;
     z-index: 99999999;
 }
 ::-webkit-scrollbar-track-piece {
-    background-color: #fff;
+    background-color: #efefef;
 }
 ::-webkit-scrollbar-thumb {
-    background-color: #E6E6E6;
+    background-color: #b2b1b1;
 }

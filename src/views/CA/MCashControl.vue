@@ -1,10 +1,10 @@
 <template>
     <div class="cash-main">
         <div class="cash-menubar">
-            <router-link to="/money" class="cash-menu">Quy trình</router-link>
-            <router-link to="/money/ReceiptPayment" class="cash-menu">Thu, chi tiền</router-link>
-            <router-link to="/money/AuditList" class="cash-menu">Kiểm kê</router-link>
-            <router-link to="/money/MonetaryFlow" class="cash-menu">Dự báo dòng tiền</router-link>
+            <router-link to="/CA" class="cash-menu">Quy trình</router-link>
+            <router-link to="/CA/ReceiptPayment" class="cash-menu">Thu, chi tiền</router-link>
+            <router-link to="/CA/AuditList" class="cash-menu">Kiểm kê</router-link>
+            <router-link to="/CA/MonetaryFlow" class="cash-menu">Dự báo dòng tiền</router-link>
         </div>
         <div class="cash-router-view">
             <router-view></router-view>
@@ -45,8 +45,9 @@ export default {
         color: #2ca01c;
     }
     .cash-router-view{
-        height: calc(100% - 41px);
+        height: calc(100% - 41px - 12px);
         width: 100%;
+        margin-top: 12px;
     }
 
     .cash-menubar .router-link-exact-active{

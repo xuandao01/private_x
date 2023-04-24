@@ -19,7 +19,7 @@ export default {
 <style scoped>
   .m-content{
     position: absolute;
-    height: calc(100vh - 48px);
+    height: calc(100vh - 49px);
     width: calc(100% - 178px);
     top: 48px;
     left: 178px;

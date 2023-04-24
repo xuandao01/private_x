@@ -1,15 +1,12 @@
 <template>
   <div class="content" ref="content">
-    <!-- Phần hiển thị nội dung của bảng -->
     <div class="content-header">
       <div class="content-title">{{ this.res.vi.employeeList.title }}</div>
-      <div class="content-button">
-        <!-- Button thêm mới nhân viên -->
-        <button class="btn-add" id="add_employee" @click="showNewPopup">
-          <div class="text">{{ this.res.vi.employeeList.createButton }}</div>
-        </button>
-      </div>
     </div>
+    <router-link to='/DI' class="ct-header">
+      <div class="ct-header__icon back-icon"></div>
+      <div class="ct-header__text">{{ res.vi.di.return }}</div>
+    </router-link>
     <!-- Phần hiển thị nội dung chính của table -->
     <div class="content-main">
       <div class="content-main__header">
@@ -24,6 +21,10 @@
           @click="excelExport"
           class="icon export-excel-icon"
         ></div>
+        <div class="create-btn">
+          <div class="ct-btn" @click="showNewPopup"> Thêm </div>
+          <div class="more-icon"></div>
+        </div>
       </div>
       <div class="content-main__data">
         <MGridData
@@ -33,14 +34,14 @@
             {
               title: res.vi.employeeList.EmployeeCodeTitle,
               tooltip: res.vi.employeeList.EmployeeCodeTitle,
-              dataField: 'EmployeeCode',
+              dataField: 'employeecode',
               dataType: 'text',
               colWidth: '150',
             },
             {
               title: res.vi.employeeList.EmployeeFullNameTitle,
               tooltip: res.vi.employeeList.EmployeeFullNameTitle,
-              dataField: 'FullName',
+              dataField: 'fullname',
               dataType: 'text',
               colWidth: '300',
             },
@@ -54,63 +55,63 @@
             {
               title: res.vi.employeeDetail.dob,
               tooltip: res.vi.employeeDetail.dob,
-              dataField: 'DateOfBirth',
+              dataField: 'dateofbirth',
               dataType: 'date',
               colWidth: '200',
             },
             {
               title: res.vi.employeeDetail.identity,
               tooltip: res.vi.employeeDetail.identityDetail,
-              dataField: 'IdentityNumber',
+              dataField: 'identitynumber',
               dataType: 'text',
               colWidth: '200',
             },
             {
               title: res.vi.employeeDetail.dateOfIssue,
               tooltip: res.vi.employeeDetail.dateOfIssue,
-              dataField: 'IdentityDate',
+              dataField: 'identitydate',
               dataType: 'date',
               colWidth: '200',
             },
             {
               title: res.vi.employeeDetail.issuedBy,
               tooltip: res.vi.employeeDetail.issuedBy,
-              dataField: 'IdentityPlace',
+              dataField: 'identityplace',
               dataType: 'text',
               colWidth: '200',
             },
             {
               title: res.vi.employeeDetail.position,
               tooltip: res.vi.employeeDetail.position,
-              dataField: 'PositionName',
+              dataField: 'positionname',
               dataType: 'text',
               colWidth: '200',
             },
             {
               title: res.vi.employeeDetail.department,
               tooltip: res.vi.employeeDetail.department,
-              dataField: 'DepartmentName',
+              dataField: 'departmentname',
               dataType: 'text',
               colWidth: '300',
             },
             {
               title: res.vi.employeeDetail.bankAccount,
               tooltip: res.vi.employeeDetail.bankAccount,
-              dataField: 'BankAccount',
+              dataField: 'bankaccount',
               dataType: 'text',
               colWidth: '200',
             },
             {
               title: res.vi.employeeDetail.bankName,
               tooltip: res.vi.employeeDetail.bankName,
-              dataField: 'BankName',
+              dataField: 'bankname',
               dataType: 'text',
               colWidth: '200',
             },
             {
               title:  res.vi.employeeDetail.bankBranch,
               tooltip: res.vi.employeeDetail.bankBranchDetail,
-              dataField: 'BankBranch',
+              dataField: 'bankbranch',
               dataType: 'text',
               colWidth: '300',
             },
@@ -198,11 +199,6 @@ export default {
     MCircleLoader
   },
   created() {
-    // fetch("https://apidemo.laptrinhweb.edu.vn/api/v1/Employees")
-    //   .then((res) => res.json())
-    //   .then((data) => {
-    //     this.employees = data;
-    //   });
     this.APIString =
       `${this.res.endpoint}Employees/Filter?pageSize=20&pageNumber=1&keyWord=`;
     window.addEventListener("keydown", this.handleKeyDown);
@@ -611,5 +607,46 @@ export default {
 <style scoped>
 .icon:hover {
   cursor: pointer;
+}
+
+.ct-header{
+  display: flex;
+  font-size: 13px;
+  height: 22px;
+  line-height: 20px;
+  align-items: center;
+  column-gap: 4px;
+  margin-left: 4px;
+  color: #0075c0;
+}
+
+.create-btn{
+  height: 28px;
+  width: 100px;
+  background-color: #2ca01c;
+  border-radius: 25px;
+  display: flex;
+  margin-right: 20px;
+  cursor: pointer;
+}
+
+.ct-btn{
+  color: #fff;
+  font-size: 13px;
+  font-family: Notosans-bold;
+  height: 22px;
+  margin-top: 3px;
+  width: 50px;
+  line-height: 22px;
+  margin-left: 15px;
+  border-right: solid #fff 1px;
+}
+
+.more-icon{
+  margin-top: 3px;
+  margin-left: 6px;
+  height: 22px;
+  width: 22px;
+  background: url('@/assets/img/Sprites.64af8f61.svg') no-repeat -846px -356px;
 }
 </style>

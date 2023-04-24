@@ -58,8 +58,11 @@ let resources =  {
         },
         btnAction:{
             cancel: "Hủy",
+            cancelTooltip: "Hủy (ESC)",
             store: "Cất",
+            storeTooltip: "Cất (Ctrl + S)",
             storeSave: "Cất và thêm",
+            storeSaveToolTip: "Cất và thêm (Ctrl + Shift + S",
             confirm: "Đồng ý",
             yes: "Có",
             close: "Đóng",
@@ -115,8 +118,150 @@ let resources =  {
             }
         },
         di:{
+            return: "Tất cả danh mục",
+            title: ['Danh mục', 'Nhân viên', 'Khách hàng', 'Nhà cung cấp', 'Tài khoản'],
+            areaTitle: {
+                object: 'Đối tượng',
+                expense: "Chi phí",
+                commodity: 'Vật tư hàng hóa',
+                account: 'Tài khoản',
+                bank: 'Ngân hàng',
+                assets: 'Tài sản',
+                branch: 'Chi nhánh, phòng ban',
+                tax: 'Thuế',
+                other: 'Khác',
+            },
+            objectList: [
+                {txt: "Khách hàng", router: "DICustomer" },
+                {txt: "Nhà cung cấp", router: "DISupplier" },
+                {txt: "Nhân viên", router: "DIEmployee" },
+                {txt: "Nhóm khách hàng, nhà cung cấp", router: "DICustomerSupplier" },
+            ],
+            accountList: [
+                {txt: 'Hệ thống tài khoản', router: 'DIAccountSystem'},
+                {txt: 'Tài khoản kết chuyển', router: 'DIAccountTransfer'},
+                {txt: 'Tài khoản ngầm định', router: 'DIAccountDefault'},
+            ],
+            commodityList: ['Vật tư hàng hóa', 'Kho', 'Nhóm vật tu, hàng hóa, dịch vụ', 'Đơn vị tính'],
+            expenseList: ['Đối tượng tập hợp chi phí', 'Khoản mục chi phí', 'Công trình', 'Loại công trình'],
+            bankList: ['Ngân hàng', 'Tài khoản ngân hàng'],
+            branchList: ['Cơ cấu tổ chức'],
+            assetsList: ['Loại công cụ dụng cụ', 'Loại tài sản cố định'],
+            taxList: ['Biểu thuế tiêu thụ đặc biệt', 'Biểu thuế tài nguyên'],
+            otherList: ['Điều khoản thanh toán', 'Mục thu/chi', 'Mã thống kế', 'Loại tiền', 'Loại chứng từ'],
+        },
+        
+        accountList:{
+            title: "Hệ thống tài khoản",
+            inputPlaceholder: "Tìm kiếm theo số, tên tài khoản",
+            data:{
+                accountNumber: "Số tài khoản",
+                accountName: "Tên tài khoản",
+                property: "Tính chất",
+                englishName: "Tên tiếng anh",
+                description: "Diễn giải",
+                status: "Trạng thái",
+            },
+
+            parentAcc: "Tài khoản tổng hợp",
             
-        }
+            status: {
+                using: "Đang sử dụng",
+                unuse: "Ngưng sử dụng",
+            },
+
+            props: {
+                Debt: 'Dư nợ',
+                Excess: 'Dư có',
+                Hermaphrodite: 'Lưỡng tính',
+                NoBalance: 'Không có số dư',
+            }
+        },
+
+        accountDetail:{
+            title:{
+                create: "Thêm tài khoản",
+                update: "Sửa tài khoản",
+            },
+
+            followTo: "Theo dõi chi tiết theo",
+
+            checkboxTitle: {
+                Accounting: "Có hoạch toán theo ngoại lệ",
+                Object: "Đối tượng",
+                ObjectTHCP: "Đối tượng THCP",
+                Order: "Đơn đặt mua",
+                PurchaseContract: "Hợp đồng mua",
+                Unit: "Đơn vị",
+                BankAccount: "Tài khoản ngân hàng",
+                Construct: "Công trình",
+                SellContract: "Hợp đồng bán",
+                CPItem: "Khoản mục CP",
+                StatisticalCode: "Mã thống kê"
+            },
+
+            comboboxData: {
+                ObjectFollow: ['Khách hàng', 'Nhân viên', 'Nhà cung cấp'],
+                AlertRequired: ['Chỉ cảnh báo', 'Bắt buộc nhập'],
+
+            }
+        },
+
+        cashControl:{
+            actionBtn: {
+                PC: "Chi tiền",
+                PT: "Thu tiền"
+            },
+
+            gridData:{
+                rp_date: "Ngày hạch toán",
+                rp_ref_no: "Số chứng từ",
+                rp_description: "Diễn giải",
+                amount: "Số tiền",
+                object: "Đối tượng",
+                rp_reason: "Lý do thu/chi",
+                ca_type: "Loại chứng từ",
+            },
+
+            detail: "Chi tiết",
+
+            gridMaster:{
+                total_txt: "Tổng",
+            },
+
+            gridDetail:{
+                title: 'Phiếu chi',
+                rp_description: "Diễn giải",
+                debit_account: "TK nợ",
+                debit_account_tooltip: "Tài khoản nợ",
+                credit_account: "TK có",
+                credit_account_tooltip: "Tài khoản có",
+                amount: "Số tiền",
+                object: "Đối tượng",
+                object_name: "Tên đối tượng",
+                payment_date: 'Ngày phiếu chi',
+                success_date: 'Ngày hạch toán',
+            },
+
+            objectCombobox:{
+                object: 'Đối tượng',
+                objectCode: 'Mã đối tượng',
+                objectName: 'Tên đối tượng',
+                tax_code: 'Mã số thuế',
+                address: 'Địa chỉ',
+                phone_number: 'Số điện thoại',
+                receive: 'Người nhận',
+                pay_reason: 'Lý do chi',
+                employee: 'Nhân viên',
+                more: 'Kèm theo',
+                re_no: 'Số phiếu chi',
+                summary: 'Tổng tiền',
+            }
+        },
+
+        empty_audit_list: 'Thêm biên bản kiểm kê quỹ để ghi nhận kết quả kiểm kê quỹ tiền mặt thực tế và hạch toán xử lý chênh lệch từ việc kiểm kê',
+
+        empty_monetary_flow: 'Dự báo dòng tiền thu vào, chi ra trong một kỳ nhất định để biết được khả năng thu, chi trong tương lai đảm bảo đủ vốn để thực hiện các hoạt động thường xuyên của đơn vị',
     },
 
     en: {

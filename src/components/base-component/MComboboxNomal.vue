@@ -3,14 +3,14 @@
     class="combobox-nomal"
     id="combobox-paging"
     tabindex="0"
-    :class="{ focused: showData }"
+    :class="{ 'focused': showData, 'disabled': !enable }"
     @focus="comboboxOnFocus"
     @blur="comboboxOnBlur"
     @keydown="comboboxOnKeyDown"
   >
-    <input type="text" class="selected" v-model="comboboxData[selected]" />
+    <input ref="cbInput" type="text" class="selected" v-model="comboboxData[selected]" />
     <div class="icon dropdown-icon" @click="iconOnClick"></div>
-    <div class="combo-item-list" v-show="showData">
+    <div ref="cbMain" class="combo-item-list" v-show="showData">
       <div
         :class="{ 'seleted-item': selected == index }"
         class="combo-item"
@@ -38,11 +38,48 @@ export default {
       required: false,
       default: 0,
     },
+
+    enable: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
+
+    displayDirection: {
+      type: String,
+      required: false,
+      default: "Down",
+    }
   },
 
   created() {
     this.selected = this.defaultValue;
     this.comboboxData = this.data;
+    this.isEnable = this.enable;
+  },
+
+  mounted(){
+
+    if(!this.isEnable) this.$refs.cbInput.value = "";
+
+    switch(this.displayDirection){
+      case "Down":{
+        this.$refs.cbMain.classList.add("combo-item-list__down")
+        break;
+      }
+      case "Up":{
+        this.$refs.cbMain.classList.add("combo-item-list__up")
+        break;
+      }
+      case "Left":{
+        this.$refs.cbMain.classList.add("combo-item-list__left")
+        break;
+      }
+      case "Right":{
+        this.$refs.cbMain.classList.add("combo-item-list__right")
+        break;
+      }
+    }
   },
 
   data() {
@@ -50,6 +87,7 @@ export default {
       selected: null,
       comboboxData: null,
       showData: false,
+      isEnable: false,
     };
   },
 
@@ -71,7 +109,8 @@ export default {
      * @author Xuân Đào (04/04/2023)
      */
     comboboxOnFocus() {
-      this.showData = true;
+      if(this.isEnable)
+        this.showData = true;
     },
 
     /**
@@ -111,12 +150,18 @@ export default {
      * @author Xuân Đào (04/04/2023)
      */
     iconOnClick(){
-      this.showData = true;
+      if(this.isEnable)
+        this.showData = true;
     },
   },
 };
 </script>
 <style scoped>
+
+.disabled{
+  background-color: #eff0f2;
+}
+
 input {
   border: unset;
   font-size: 13px;
@@ -149,22 +194,41 @@ input {
 .combo-item-list {
   width: 100%;
   position: absolute;
-  bottom: 30px;
   background-color: #fff;
   border: solid #b0b0b0 1px;
+  z-index: 99;
+}
+
+.combo-item-list__up{
+  bottom: 30px;
+}
+
+.combo-item-list__down{
+  top: 30px;
+}
+
+.combo-item-list__up{
+  bottom: 30px;
+}
+
+.combo-item-list__up{
+  bottom: 30px;
 }
 
 .combo-item {
   height: 32px;
   line-height: 26px;
   padding-left: 12px;
-  margin-top: 4px;
   display: flex;
   align-items: center;
 }
 
 .combo-item:last-child {
   margin-bottom: 4px;
+}
+
+.combo-item:first-child {
+  margin-top: 4px;
 }
 
 .combo-item:hover {

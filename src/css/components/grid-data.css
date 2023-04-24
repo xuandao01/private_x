@@ -4,6 +4,8 @@ tr .fix-start{
     background-color: #fff;
     z-index: 3;
     width: 25px;
+    border-left: unset;
+    border-radius: unset;
 }
 
 tr .fix-end{
@@ -33,18 +35,18 @@ tr{
     background-color: #fff;
 }
 
-tr:hover{
+tbody tr:hover{
     background-color: #f4faff !important;
     z-index: 0;
 }
 
-tr:hover td:first-child, tr:hover td:last-child{
+tbody tr:hover td:first-child, tbody tr:hover td:last-child{
     background-color: #f4faff !important;
     z-index: 3;
 } 
 
 th{
-    background-color: #f4f5f6 !important;
+    background-color: #e5e8ec !important;
     text-align: left;
     padding-left: 12px;
     position: sticky;
@@ -61,6 +63,7 @@ td{
     padding:0 12px;
     font-size: 13px;
     position: relative;
+    border-left: unset !important;
 }
 
 .checkbox{
@@ -69,7 +72,6 @@ td{
 }
 
 .grid-viewer {
-    height: calc(100% - 64px);
     border-bottom: solid #e0e0e0 1px;
 }
 
@@ -92,7 +94,7 @@ width: 100%;
 
 th,
 td {
-border: solid #e0e0e0 1px;
+border: solid #bfbfbf 1px;
 }
 
 .content-main__footer{
@@ -112,4 +114,25 @@ border: solid #e0e0e0 1px;
 .tr-selected, .tr-selected td:first-child, .tr-selected td:last-child{
     background-color: #e5f3ff;
     z-index: 3;
+}
+
+.date input{
+    text-align: center;
+    padding:0;
+}
+
+.d-money{
+    text-align: right;
+    padding-right: 12px;
+}
+
+.number{
+    width: 50px !important;
+    position: sticky;
+    left: 0;
+}
+
+.d-money input{
+    text-align: right;
+    padding:0;
 }

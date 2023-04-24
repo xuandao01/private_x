@@ -1,11 +1,17 @@
 <template>
     <div class="DI">
-        <div class="di-title"></div>
+        <router-view></router-view>
     </div>
 </template>
 <script>
+import resources from '@/js/resources';
 export default {
-    
+    name: "DIControl",
+    data() {
+        return {
+            resources: resources,
+        }
+    },
 }
 </script>
 <style scoped>
@@ -15,8 +21,8 @@ export default {
         margin: 0 20px;
     }
 
-    .di-title{
-        height: 61px;
+    .di-content{
+        height: calc(100% - 61px);
         width: 100%;
     }
     

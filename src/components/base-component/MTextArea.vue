@@ -3,24 +3,24 @@
 <template>
   <div class="inf-component com1">
     <div class="text-area">
-      <span ref="inpText" class="bold-text" :title="tooltip">{{ inputTitle }}</span>
+      <span class="bold-text" ref="inpText" :title="tooltip">{{ inputTitle }}</span>
       <a v-if="required"> *</a>
     </div>
-    <input
-      ref="mInput"
-      type="text"
+    <textarea
+      ref="mArea"
+      type="textarea"
       autocomplete="off"
       id="employeeCode"
       v-model="this.value"
+      class="inp-text"
       @blur="this.validate()"
-      :placeholder="placeholder"
-    />
-    <!-- <div v-if="isError" class="errMes">{{ inputTitle }} không được trống</div> -->
+    ></textarea>
+    <div v-if="isError" class="errMes">{{ inputTitle }} không được trống</div>
   </div>
 </template>
 <script>
 export default {
-  name: "MInput",
+  name: "MTextArea",
   props: {
     // Dữ liệu binding
     modelValue: {
@@ -52,20 +52,22 @@ export default {
       required: false
     },
 
-    titleColor: {
-      type: String,
-      required: false,
-      dafault: "000"
+    height: {
+        type: Number,
+        required: false,
+        default: 40,
     },
 
-    placeholder:{
+    titleColor:{
       type: String,
       required: false,
+      default: "000",
     },
 
-    textAlign:{
-      type: String,
+    resizable:{
+      type: Boolean,
       required: false,
+      default: true,
     }
   },
 
@@ -82,10 +84,8 @@ export default {
   mounted() {
     this.$nextTick(() => {
       // this.focus();
-      this.$refs.inpText.style.color = `#${this.titleColor}`;
-      if (this.textAlign){
-        this.$refs.mInput.style.textAlign = this.textAlign;
-      }
+        this.$refs.mArea.style.height = this.height + "px";
+        this.$refs.inpText.style.color = `#${this.titleColor}`;
     });
   },
 
@@ -145,6 +145,14 @@ export default {
 };
 </script>
 <style scoped>
+
+textarea{
+    outline: unset;
+    border-color: #b0b0b0;
+    resize: none;
+    padding: 8px;
+}
+
 a {
   border: unset;
   outline: unset;
@@ -159,7 +167,6 @@ a {
 
 .com1 {
   width: 150px;
-  flex: 1;
 }
 .errMes{
   font-size: 13px;
@@ -172,5 +179,9 @@ a {
 .bold-text{
   font-family: opens-san-bold !important;
   font-weight: 600;
+}
+
+.inp-text{
+  border-radius: 2px;
 }
 </style>

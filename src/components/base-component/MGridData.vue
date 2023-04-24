@@ -35,7 +35,10 @@
         </thead>
         <tbody ref="tableBody">
           <MGridDataLoading v-if="showLoading"></MGridDataLoading>
-          <tr v-for="(item, index) in gridData" :key="index">
+          <tr v-for="(item, index) in gridData" :key="index" 
+          @click="itemOnClick(item, index)"
+          :class="{'tr-selected': index == 0 && isFocusFirst}"
+          >
             <td
               v-if="muiltipleSelect"
               :class="{ 'fix-start': isFixedStart }"
@@ -46,14 +49,14 @@
               <div class="rightBorder"></div>
             </td>
             <td
-              :class="value.dataType"
+              :class="[value.dataType] "
               v-for="(value, index) in data"
               :key="index"
               v-show="showData"
               @dblclick="editOnDbClick(item)"
-              @click="itemOnClick(item)"
             >
-              {{ item[value.dataField] }}
+            <!-- <input class="grid-input" :class="{'disable-editor': !canEditValue, 'enable-editor': canEditValue}" type="text" :value="item[value.dataField]"> -->
+            {{ item[value.dataField] }}
             </td>
             <td
               class="editable"
@@ -90,6 +93,7 @@ import MContextMenu from "./MContextMenu.vue";
 import MCheckbox from "./MCheckbox.vue";
 import { deleteType } from '../unit-components/MConfirmDeleteDialog.vue';
 import { multipleSelectedData } from "@/store/multipleDeleteEmployee";
+import { loader } from "@/store/loader";
 
 export default {
   name: "MGridData",
@@ -98,8 +102,9 @@ export default {
 
   setup(){
     const SelectedList = multipleSelectedData()
+    const Loader = loader()
     return {
-      SelectedList
+      SelectedList, Loader
     }
   },
 
@@ -149,22 +154,26 @@ export default {
       required: false,
       default: false,
     },
+
+    canEditValue: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+
+    isFocusFirst:{
+      type: Boolean,
+      requried: false,
+      default: false,
+    }
   },
   /**
    * Lấy dữ liệu từ api và đổ vào data
    *
    * @author  Xuân Đào(12/03/2023)
    */
-  async created() {
-    try {
-      let data = await (await fetch(this.api)).json();
-      this.gridData = data.data;
-      this.$emit('refresh', data.totalRecord.TotalRecord);
-      this.showLoading = false;
-      this.apiString = this.api;
-    } catch (ex) {
-      console.log(ex);
-    }
+  created() {
+    this.getApiData();
   },
 
   /**
@@ -202,16 +211,14 @@ export default {
     }
     this.$refs.gridViewer.style.minWidth = totalWidth + "px";
     //
+    /*eslint-disable no-debugger */
+    // debugger
   },
 
   watch: {
-    gridData: function (newVal) {
-      for (const item of newVal) {
-        item.DateOfBirth = this.dateFormator(item.DateOfBirth);
-        item.IdentityDate = this.dateFormator(item.IdentityDate);
-        item.GenderName = this.getGenderName(item.Gender);
-      }
-    },
+    api: function(){
+      this.getApiData();
+    }
   },
 
   data() {
@@ -231,6 +238,59 @@ export default {
     };
   },
   methods: {
+
+    formatMoney(amount, decimalCount = 0, decimal = "", thousands = ".") {
+      decimalCount = Math.abs(decimalCount);
+      decimalCount = isNaN(decimalCount) ? 2 : decimalCount;
+      const negativeSign = amount < 0 ? "-" : "";
+      let i = parseInt(amount = Math.abs(Number(amount) || 0).toFixed(decimalCount)).toString();
+      let j = (i.length > 3) ? i.length % 3 : 0;
+      return negativeSign + (j ? i.substr(0, j) + thousands : '') + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + thousands) + (decimalCount ? decimal + Math.abs(amount - i).toFixed(decimalCount).slice(2) : "");
+    },
+
+    async getApiData(){
+    if(this.api){
+      this.showLoading = true;
+      try {
+        let data = await (await fetch(this.api)).json();
+        this.gridData = data.data;
+        if (this.gridData[0]){
+          let total_record = this.gridData[0]['total_record'];
+          this.$emit('refresh', total_record);
+          for(let i=0;i<this.data.length;i++){
+            if (this.data[i]['dataType'] === 'date'){
+              for(let j=0;j<this.gridData.length;j++){
+                this.gridData[j][this.data[i]['dataField']] = this.dateFormator(this.gridData[j][this.data[i]['dataField']]);
+                this.gridData[j].re_no = j;
+              }
+            }
+            if (this.data[i]['dataType'] === 'd-money'){
+              for(let j=0;j<this.gridData.length;j++){
+                this.gridData[j][this.data[i]['dataField']] = this.formatMoney(this.gridData[j][this.data[i]['dataField']]);
+              }
+            }
+          }
+          for(let j=0;j<this.gridData.length;j++){
+            this.gridData[j].re_no = j;
+          }
+        }
+        this.showLoading = false;
+        this.gridOnLoaded();
+        this.apiString = this.api;
+      } catch (ex) {
+        console.log(ex);
+      }
+    }
+    },
+
+    gridOnLoaded(){
+      this.$emit("loadCompleted");
+      if (this.isFocusFirst){
+        this.selected = this.$refs.tableBody.children[0];
+        this.selected.classList.add("tr-selected");
+        this.selectedData = this.gridData[0];
+      }
+    },
 
     /**
      * Hàm xử lý checkbox gridData
@@ -415,16 +475,18 @@ export default {
      *
      * @author  Xuân Đào (14/03/2023x)
      */
-    itemOnClick(item) {
-      if (this.selected === null) this.selected = event.target.parentElement;
+    itemOnClick(item, index) {
+      /*eslint-disable no-debugger */
+      // debugger
+      this.$refs.tableBody.children[0].classList.remove("tr-selected");
+      if (this.selected === null) this.selected = this.$refs.tableBody.children[index];
       else {
         this.selected.classList.remove("tr-selected");
-        this.selected = event.target.parentElement;
-        if (this.selected.tagName !== "DIV") {
-          this.selected.classList.add("tr-selected");
-        }
+        this.selected = this.$refs.tableBody.children[index];
       }
+      this.selected.classList.add("tr-selected");
       this.selectedData = item;
+      this.$emit("gridItemClicked", item);
     },
     /**
      * Hàm định dạng dữ liệu ngày tháng
@@ -532,13 +594,13 @@ export default {
 };
 </script>
 <style scoped>
-.date {
-  text-align: center;
-  padding:0;
+
+.first-data{
+  border-left: unset;
 }
 
 .multiple-select {
-  width: 40px;
+  width: 30px;
 }
 
 .editable {
@@ -558,21 +620,48 @@ export default {
 
 .rightBorder{
   height: 100%;
-  width: 0.5px;
-  background-color: #e0e0e0;
-  z-index: 999;
+  width: 0.5px !important;
+  background-color: #bfbfbf;
+  z-index: 99;
   top: 0;
   right: -1px;
   position: absolute;
 }
 
+/* tr td:first-child{
+  border-right: unset;
+} */
+
 .leftBorder{
   height: 100%;
   width: 0.5px;
-  background-color: #e0e0e0;
+  background-color: #bfbfbf;
   z-index: 999;
   top: 0;
-  left: 0;
+  left: -0.5px;
   position: absolute;
 }
+
+.disable-editor{
+  pointer-events: none;
+  padding: 0 !important;
+}
+
+.enable-editor:focus{
+  border: solid #2ca01c 1px;
+  border-radius: 4px;
+  background-color: #fff;
+}
+
+.grid-input{
+  border: unset;
+  outline: unset;
+  line-height: 26px;
+  height: 26px;
+  padding-left: 8px;
+  background-color: unset;
+  font-size: 14px;
+  font-family: Notosans;
+}
+
 </style>
