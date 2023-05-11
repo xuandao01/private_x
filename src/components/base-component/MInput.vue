@@ -13,7 +13,9 @@
       id="employeeCode"
       v-model="this.value"
       @blur="this.validate()"
+      @input="this.$emit('onInput', value)"
       :placeholder="placeholder"
+      :title="this.errMessage"
     />
     <!-- <div v-if="isError" class="errMes">{{ inputTitle }} không được trống</div> -->
   </div>
@@ -66,16 +68,29 @@ export default {
     textAlign:{
       type: String,
       required: false,
+    },
+    maxLength:{
+      type: Number,
+      required: false,
+    },
+
+    minLength:{
+      type: Number,
+      required: false,
     }
   },
 
   watch:{
     value(newVal){
       this.$emit("update:modelValue", newVal);
+    },
+
+    modelValue(newVal) {
+      this.value = newVal;
     }
   },
 
-  created() {
+  created(){
     this.value = this.modelValue;
   },
 
@@ -101,9 +116,10 @@ export default {
     /**
      * Hàm hiển thị thông báo lỗi nếu có
      */
-    showErr(){
+    showErr(errMes){
       this.isError = true;
       this.$refs.mInput.classList.add("input-err");
+      this.errMessage = errMes;
     },
     /**
      * Hàm xoá thông báo lỗi nếu có
@@ -111,19 +127,35 @@ export default {
     hideErr(){
       this.$refs.mInput.classList.remove("input-err");
       this.isError = false;
+      this.errMessage = "";
     },
     /**Hàm thực hiện validate nếu cần */
     validate(){
-      if (!this.required) return;
       let value = "";
       if(this.$refs.mInput){
         value = this.$refs.mInput.value;
-        if (value.trim() == "" || value == null || value == undefined){
-          this.showErr();
+        if ((value.trim() == "" || value == null || value == undefined) && this.required){
+          this.showErr(this.inputTitle + " không được để trống!");
+          return;
+        } else {
+          this.hideErr();
+        }
+        
+        if (this.maxLength && value.length > this.maxLength){
+          this.showErr(`${this.inputTitle} không được vượt quá ${this.maxLength} ký tự`);
+          return;
+        } else {
+          this.hideErr();
+        }
+
+        if (this.maxLength && value.length < this.minLength){
+          this.showErr(`${this.inputTitle} không được ít hơn ${this.minLength} ký tự`);
+          return;
         } else {
           this.hideErr();
         }
       }
+
     },
 
     /**
@@ -139,7 +171,8 @@ export default {
   data() {
     return {
       value: null,
-      isError: false
+      isError: false,
+      errMessage: "",
     };
   },
 };
@@ -165,6 +198,7 @@ a {
   font-size: 13px;
   color: red;
 }
+
 .input-err{
     border-color: #E81E1E !important;
 }

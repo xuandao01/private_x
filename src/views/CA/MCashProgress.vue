@@ -5,13 +5,13 @@
                 <div class="c-major__main--content">
                     <div class="c-major__title">{{ resources.vi.cash.progress.title }}</div>
                     <div class="c-major__content">
-                        <div class="cm-content c-major__content--1">
+                        <router-link to="CA/ReceiptPayment" class="cm-content c-major__content--1">
                             <div class="cm-title__button">{{ resources.vi.cash.main.content[0] }}</div>
-                        </div>
-                        <div class="cm-content c-major__content--2">
+                        </router-link>
+                        <div to="CA/ReceiptPayment" class="cm-content c-major__content--2">
                             <div class="cm-title__button">{{ resources.vi.cash.main.content[2] }}</div>
                         </div>
-                        <div class="cm-content c-major__content--3">
+                        <div @click="gotoDetail" class="cm-content c-major__content--3">
                             <div class="cm-title__button">{{ resources.vi.cash.main.content[1] }}</div>
                         </div>
                     </div>
@@ -68,8 +68,17 @@
 </template>
 <script>
 import resources from '@/js/resources';
+import { PaymentFormMode } from './MReceiptPaymentList.vue';
 export default {
     name: "MCashProgress",
+
+    methods: {
+        async gotoDetail(){
+            sessionStorage.paymentMode = PaymentFormMode.create;
+            this.$router.push({ name : "PaymentDetail"});
+      }
+    },
+
     data() {
         return {
             resources: resources,
@@ -78,6 +87,11 @@ export default {
 }
 </script>
 <style scoped>  
+    .cm-title__button {
+        text-decoration: none;
+        color: #111111;
+    }
+
     .cash-progress{
         height: 100%;
         width: 100%;

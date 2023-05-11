@@ -613,6 +613,7 @@ export default {
   display: flex;
   font-size: 13px;
   height: 22px;
+  max-width: 200px;
   line-height: 20px;
   align-items: center;
   column-gap: 4px;

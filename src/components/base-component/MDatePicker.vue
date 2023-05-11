@@ -8,13 +8,14 @@
       type="date"
       class="pop-input date-time"
       v-model="this.value"
-      @blur="this.validate()"
+      @blur="onBlur"
       ref="mInput"
+      :title="this.tooltip"
     />
-    <div v-if="inValid" class="errMes">Ngày không hợp lệ</div>
   </div>
 </template>
 <script>
+
 export default {
   name: "MDatePicker",
   props: {
@@ -25,6 +26,10 @@ export default {
     modelValue: {
       type: Date,
       required: false,
+    },
+    defaultDate: {
+      type: String,
+      required: false,
     }
   },
   data() {
@@ -32,17 +37,44 @@ export default {
       value: null,
       datePicked: null,
       inValid: false,
+      tooltip: "",
     };
   },
   created(){
     this.value = this.modelValue;
   },
+
+  mounted() {
+    if(this.defaultDate) {
+      /*eslint-disable no-debugger */
+      // debugger
+      this.$refs.mInput.value = this.defaultDate;
+    }
+  },
+
   watch:{
     value: function(newVal){
       this.$emit("update:modelValue", newVal);
+    },
+
+    defaultDate: function(newVal){
+      this.value = newVal;
     }
   },
   methods: {
+
+    setFocus(){
+      this.$refs.mInput.focus();
+    },
+
+    setValue(value){
+      this.$refs.mInput.value = value;
+    },
+
+    onBlur(){
+      this.$emit("valueChange", this.$refs.mInput.value);
+      this.validate();
+    },
     /**
      * Hàm validate dữ liệu hợp lệ 
      * 
@@ -50,12 +82,14 @@ export default {
      */
     validate() {
       const value = this.$refs.mInput.value;
-      if (value && new Date(value) <= new Date()) {
+      if (value) {
         this.inValid = false;
         this.$refs.mInput.classList.remove("input-err");
+        this.tooltip = "";
       } else {
         this.$refs.mInput.classList.add("input-err");
         this.inValid = true;
+        this.tooltip = this.title + " không hợp lệ"
       }
     },
   },
@@ -71,6 +105,10 @@ export default {
   height: 26px;
   min-width: 150px;
   padding: 0 8px;
+}
+
+.pop-input:focus{
+  border-color: #2ca01c;
 }
 
 .dp-main{

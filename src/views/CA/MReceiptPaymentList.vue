@@ -7,9 +7,9 @@
         :enable="enableMultipleEditor"
         @delete="multipleDelete"
         ></m-action-multiple>
-      <m-search-bar></m-search-bar>
+      <m-search-bar @onSearch="onSearch" ref="searchBar"></m-search-bar>
       <div
-        @click="renewData"
+        @click="this.gridKey++"
         title="Tải lại (Ctrl + R)"
         class="icon reload-icon"
       ></div>
@@ -18,15 +18,8 @@
         @click="excelExport"
         class="icon export-excel-icon"
       ></div>
-      <div class="create-btn">
-        <div class="ct-btn" @click="showNewPopup">{{ this.resources.vi.cashControl.actionBtn.PT }}</div>
-        <div class="more-icon"></div>
-      </div>
-
-      <div class="create-btn">
-        <div class="ct-btn" @click="showNewPopup">{{ this.resources.vi.cashControl.actionBtn.PC }}</div>
-        <div class="more-icon"></div>
-      </div>
+      <MOptionalButton ref="btn1" @onClick="showNewPopup(0)" :content="this.resources.vi.cashControl.actionBtn.PT"></MOptionalButton>
+      <MOptionalButton ref="btn2" @onClick="showNewPopup(0)" :content="this.resources.vi.cashControl.actionBtn.PC"></MOptionalButton>
     </div>
     <div ref="reMaster" class="content-main_master">
         <div class="content-main__data">
@@ -38,6 +31,13 @@
                   title: resources.vi.cashControl.gridData.rp_date,
                   tooltip: resources.vi.cashControl.gridData.rp_date,
                   dataField: 're_date',
+                  dataType: 'date',
+                  colWidth: '200',
+                },
+                {
+                  title: resources.vi.cashControl.gridData.ca_date,
+                  tooltip: resources.vi.cashControl.gridData.rp_date,
+                  dataField: 'ca_date',
                   dataType: 'date',
                   colWidth: '200',
                 },
@@ -79,7 +79,7 @@
                 {
                   title: resources.vi.cashControl.gridData.ca_type,
                   tooltip: resources.vi.cashControl.gridData.ca_type,
-                  dataField: 'ca_type',
+                  dataField: 'ca_type_name',
                   dataType: 'text',
                   colWidth: '150',
                 },
@@ -91,7 +91,12 @@
             :key="gridKey"
             @loadCompleted = "gridMasterLoaded"
             @gridItemClicked = "gridItemOnClicked"
+            @functionClicked = "watchPayment"
+            @duplicateEvent="duplicateEvent"
+            @deleteEvent="showConfirmDelete"
+            @dbClicked="watchPayment"
             :isFocusFirst="true"
+            function="Xem"
             ></MGridData>
         </div>
         <div class="re-pagination">
@@ -121,7 +126,7 @@
                   tooltip: '',
                   dataField: 're_no',
                   dataType: 'num',
-                  colWidth: '30',
+                  colWidth: '0',
                 },
                 {
                   title: resources.vi.cashControl.gridDetail.rp_description,
@@ -166,8 +171,6 @@
                   colWidth: '350',
                 },
             ]"
-            :isFixedEnd="true"
-            :editable="true"
             :key="gridKey"
             @loadCompleted = "gridDetailLoaded"
             ></MGridData>
@@ -180,27 +183,52 @@
           <MPagination
           :totalRecord="this.totalDetail"
           @updateAPI="updateAPIDetail"
+          
           ref="pagingDetail"
         ></MPagination>
         </div>
     </div>
-    <MPaymentDetail @closeDetail="closeDetail" v-if="showDetail"></MPaymentDetail>
+    <!-- <MPaymentDetail :formMode="detailMode" :payment="detailPayment" @closeDetail="closeDetail" v-if="showDetail"></MPaymentDetail> -->
   </div>
+  <MConfirmDeleteDialog v-if="showConfirm" :messagse="confirmMessage" @hideDeleteDialog="showConfirm = false"
+          @hideAndDelete="deleteEvent"></MConfirmDeleteDialog>
 </template>
 <script>
+export const PaymentFormMode = {
+  create: 0,
+  modify: 1,
+  watch: 2,
+  duplicate: 3,
+}
+
 import resources from "@/js/resources";
 import MSearchBar from '@/components/base-component/MSearchBar.vue';
 import MActionMultiple from "@/components/base-component/MActionMultiple.vue";
 import MGridData from "@/components/base-component/MGridData.vue";
 import MPagination from "@/components/base-component/MPagination.vue";
-import MPaymentDetail from '@/views/CA/MPaymentDetail.vue'
+// import MPaymentDetail from '@/views/CA/MPaymentDetail.vue';
+import MOptionalButton from "@/components/base-component/MOptionalButton.vue";
+import { paymentDetail } from "@/store/paymentDetail";
+import { toastControl } from '@/store/toast';
+import { ToastType } from '@/components/base-component/MToastItem.vue';
+import MConfirmDeleteDialog from "@/components/unit-components/MConfirmDeleteDialog.vue";
+import { loader } from '@/store/loader';
  
 export default {
-  components: { MSearchBar, MActionMultiple, MGridData, MPagination, MPaymentDetail },
+  components: { MSearchBar, MActionMultiple, MGridData, MPagination, MOptionalButton, MConfirmDeleteDialog },
   name: "MReceiptPaymentList",
 
+  setup() {
+    const PaymentDetail = paymentDetail();
+    const Toast = toastControl();
+    const Loader = loader();
+    return {
+      PaymentDetail, Toast, Loader
+    };
+  },
+
   created(){
-    this.APIString = this.resources.endpoint + 'ReceiptPayment/Filter?pageSize=20&pageNumber=1';
+    this.APIString = this.resources.endpoint + 'ReceiptPayment/Filter?pageSize=20&pageNumber=1&keyWord=';
   },
 
   mounted(){
@@ -208,34 +236,100 @@ export default {
 
   methods: {
 
+    async excelExport(){
+      this.Loader.showLoader();
+      let keyword = this.$refs.searchBar.getInputValue();
+      let apiString = `${this.resources.endpoint}ReceiptPayment/ExcelExport?widthList=50%2C150%2C150%2C100%2C150%2C150%2C200%2C200%2C250%2C200&keyword=${keyword}`;
+      const res = await fetch(apiString);
+      const data = await res.blob();
+      var a = document.createElement("a");
+      a.href = window.URL.createObjectURL(data);
+      a.download = "Thu_chi_tien_mat-" + Date.now().toString();
+      a.click();
+      a.remove();
+      this.Loader.closeLoader();
+    },
+
+    onSearch(keyword){
+      this.keyword = keyword;
+      const pageSize = this.$refs.pagingDetail.pageSize;
+      const pageNum = this.$refs.pagingDetail.currentPage;
+      this.updateMasterApi(pageSize, pageNum);
+    },
+
+    showConfirmDelete(payment){
+      this.confirmMessage = "Bạn có muốn xóa chứng từ <" + payment['re_ref_no'] + "> đã chọn không?";
+      this.selectedPayment = payment;
+      this.showConfirm = true;
+    },
+
+    async deleteEvent(){
+      let apiString = this.resources.endpoint + "ReceiptPayment/FullDelete?id=" + this.selectedPayment['re_id'];
+      const options = {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+      };
+      const res = await fetch(apiString, options);
+      const data = await res.json();
+      this.Toast.showToastMsg(ToastType.Success, data['Message']);
+      this.gridKey++;
+      this.showConfirm = false;
+    },
+
+    duplicateEvent(payment){
+      this.showNewPopup(PaymentFormMode.duplicate, payment)
+    },
+
+    watchPayment(item){
+      this.showNewPopup(PaymentFormMode.watch, item);
+    },
+
     updateAPIDetail(){
-      //
+      // this.APIString = this.resources.endpoint + `ReceiptPayment/Filter?pageSize=${pageSize}&pageNumber=${pageNum}`;
     },
 
     updateMasterApi(pageSize, pageNum){
-      this.APIString = this.resources.endpoint + `ReceiptPayment/Filter?pageSize=${pageSize}&pageNumber=${pageNum}`;
-      console.log(this.APIString);
+      this.APIString = this.resources.endpoint + `ReceiptPayment/Filter?pageSize=${pageSize}&pageNumber=${pageNum}&keyWord=${this.keyword}`;
     },
 
-    showNewPopup(){
-      this.showDetail = true;
+    async showNewPopup(formMode, payment){
+      let id = "";
+      if (formMode != PaymentFormMode.create){
+        id = payment['re_id'];
+      }
+      sessionStorage.paymentMode = formMode;
+      this.$router.push({ name: "PaymentDetail", params: {id: id}});
     },
 
     closeDetail(){
       this.showDetail = false;
     },
 
-    gridMasterLoaded(){
+    gridMasterLoaded(service){
         this.currentPayment = this.$refs.gridMaster.gridData[0];
-        this.total_amount_master = this.$refs.gridMaster.gridData[0]['summary'];
-        this.totalMaster = this.$refs.gridMaster.gridData[0]['total_record'];
+        this.total_amount_master = service['optionResult'][0]['sum'];
+        this.totalMaster = service['totalRecord'][0]['Total record'];
         this.detailAPI = this.resources.endpoint + 'ReceiptPaymentDetail/GetAllByReId?re_id=' + this.currentPayment.re_id;
+        let gridMaster = this.$refs.gridMaster.gridData;
+        for (let i = 0; i< gridMaster.length;i++){
+          switch (gridMaster[i].ca_type){
+            case 0: {
+              gridMaster[i].ca_type_name = "Phiếu chi";
+              break;
+            }
+            default: {
+              gridMaster[i].ca_type_name = "Phiếu thu";
+            }
+          }
+        }
+        this.$refs.gridMaster.gridData = gridMaster;
+        
     },
 
-    gridDetailLoaded(){ 
+    gridDetailLoaded(service){ 
       if (this.$refs.gridDetail.gridData[0]){
-        this.total_amount_detail = this.$refs.gridDetail.gridData[0]['total_amount'];
-        this.totalDetail = this.$refs.gridDetail.gridData[0]['total_record'];
+        this.total_amount_detail = service['summary'][0]['Total amount'];
+        this.totalDetail = service['totalRecord'][0]['Total record'];
       }
       else this.total_amount_detail = 0;
     },
@@ -264,7 +358,6 @@ export default {
 
     gridItemOnClicked(item){
       this.detailAPI = this.resources.endpoint + 'ReceiptPaymentDetail/GetAllByReId?re_id=' + item['re_id'];
-      console.log(this.detailAPI);
     },
 
     formatMoney(amount, decimalCount = 0, decimal = "", thousands = ".") {
@@ -290,6 +383,12 @@ export default {
       totalMaster: 0,
       totalDetail: 0,
       showDetail: false,
+      detailPayment: null,
+      detailMode: 0,
+      showConfirm: false,
+      confirmMessage: "",
+      selectedPayment: null,
+      keyword:"",
     };
   },
 };
@@ -300,37 +399,6 @@ export default {
   width: 100%;
   background-color: #fff;
   position: relative;
-}
-
-.create-btn {
-  height: 28px;
-  width: 115px;
-  background-color: #2ca01c;
-  border-radius: 25px;
-  display: flex;
-  margin-right: 20px;
-  cursor: pointer;
-}
-
-.ct-btn {
-  color: #fff;
-  font-size: 13px;
-  font-family: Notosans-bold;
-  height: 22px;
-  margin-top: 3px;
-  width: 50px;
-  line-height: 22px;
-  margin-left: 15px;
-  border-right: solid #fff 1px;
-  width: 65px;
-}
-
-.more-icon {
-  margin-top: 3px;
-  margin-left: 6px;
-  height: 22px;
-  width: 22px;
-  background: url("@/assets/img/Sprites.64af8f61.svg") no-repeat -846px -356px;
 }
 
 .search-bar {
@@ -436,7 +504,7 @@ export default {
   font-size: 13px;
   line-height: 28px;
   position: absolute;
-  right: 607px;
+  right: 420px;
 }
 
 .total_amount{

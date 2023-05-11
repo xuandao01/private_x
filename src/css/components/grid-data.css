@@ -3,7 +3,6 @@ tr .fix-start{
     left: -1px;
     background-color: #fff;
     z-index: 3;
-    width: 25px;
     border-left: unset;
     border-radius: unset;
 }
@@ -40,7 +39,7 @@ tbody tr:hover{
     z-index: 0;
 }
 
-tbody tr:hover td:first-child, tbody tr:hover td:last-child{
+tbody tr:hover + td, tbody tr:hover .fix-end, tbody tr:hover .fix-start{
     background-color: #f4faff !important;
     z-index: 3;
 } 
@@ -48,12 +47,14 @@ tbody tr:hover td:first-child, tbody tr:hover td:last-child{
 th{
     background-color: #e5e8ec !important;
     text-align: left;
-    padding-left: 12px;
+    padding: 0 12px;
     position: sticky;
     font-size: 13px;
     top: -1px;
     z-index: 2;
     font-family: Opens-san-bold;
+    user-select: none;
+    cursor: pointer;
 }
 th:first-child, th:last-child{
     z-index: 5;
@@ -111,7 +112,7 @@ border: solid #bfbfbf 1px;
     z-index: 6;
 }
 
-.tr-selected, .tr-selected td:first-child, .tr-selected td:last-child{
+.tr-selected, .tr-selected + td, .tr-selected .fix-start, .tr-selected .fix-end{
     background-color: #e5f3ff;
     z-index: 3;
 }

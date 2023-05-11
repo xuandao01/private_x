@@ -9,6 +9,7 @@ import Dashboard from '@/components/unit-components/MDashboard.vue'
 import CashControl from '@/views/CA/MCashControl.vue'
 import AuditList from '@/views/CA/MAuditList.vue'
 import MonetaryFlow from '@/views/CA/MMonetaryFlow.vue'
+import MPaymentDetail from '@/views/CA/MPaymentDetail.vue'
 const routers = [
     {path: "/DI", component: MDIControl, children:[
         {
@@ -30,8 +31,15 @@ const routers = [
             component: CashProgress,
         },
         {
-            path: 'ReceiptPayment',
+            path: '/CA/ReceiptPayment',
             component: ReceiptPayment,
+            // children:[
+            //     {
+            //         path: '/CA/ReceiptPayment/Detail/:id?',
+            //         name: 'PaymentDetail',
+            //         component: MPaymentDetail,
+            //     },
+            // ]
         },
         {
             path: 'AuditList',
@@ -43,7 +51,13 @@ const routers = [
         },
         
     ]},
-    {path: "/", component: Dashboard}
+    {
+        path: '/CA/ReceiptPayment/Detail/:id?',
+        name: 'PaymentDetail',
+        component: MPaymentDetail,
+        props: true,
+    },
+    {path: "/", component: Dashboard},
 ]
 
 export const router = createRouter({

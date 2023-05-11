@@ -172,7 +172,6 @@ export default {
 }
 
 .dialog-message__title {
-  height: 26px;
   width: 100%;
   font-weight: 400;
   display: flex;

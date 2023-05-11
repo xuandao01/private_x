@@ -137,6 +137,7 @@
 .export-excel-icon{
     background: url('/src/assets/img/Sprites.64af8f61.svg') no-repeat -705px -200px;
     margin-right: 8px;
+    cursor: pointer;
 }
 
 .ui-setting{
@@ -216,4 +217,16 @@
     background: url('../../assets/img/Sprites.64af8f61.svg') no-repeat -228px -362px;
 	width: 8px;
 	height: 12px;
+}
+
+.setup-icon{
+    background: url('../../assets/img/Sprites.64af8f61.svg') no-repeat -90px -200px;
+	width: 23px;
+	height: 24px;
+}
+
+.pc-icon{
+    background: url('../../assets/img/Sprites.64af8f61.svg') no-repeat -416px -359px;
+	width: 18px;
+	height: 18px;
 }

@@ -14,6 +14,6 @@ export default {
     div div{
         padding: 10px;
         font-size: 25px;
-        font-weight: 600;
+        font-family: Opens-san-bold;
     }
 </style>

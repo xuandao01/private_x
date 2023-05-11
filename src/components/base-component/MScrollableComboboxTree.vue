@@ -146,7 +146,6 @@ export default {
                 this.$refs.dropdown.style.top = "4px";
                 // this.$refs.comboData.style.top = "30px";
             }
-
         });
     },
 
@@ -176,15 +175,8 @@ export default {
             }
             if (elementList[newVal])
                 elementList[newVal].classList.add("row-selected");
-            /*eslint-disable no-debugger */
-
-            if (this.apiData[this.selectedIndex][this.displayModel])
-                this.value = this.apiData[this.selectedIndex][this.displayModel];
+            this.value = this.apiData[this.selectedIndex][this.displayModel];
         },
-
-        defaultValue: function(newVal){
-            this.value = newVal;
-        }
     },
 
     methods: {
@@ -205,15 +197,14 @@ export default {
             try{
                 let data = await (await fetch(this.localAPI)).json();
                 if (!this.apiData[0])
-                    this.apiData = data.Data['data'];
+                    this.apiData = data['data'];
                 else {
-                    this.apiData.push(...data.Data['data']);
+                    this.apiData.push(...data['data']);
                 }
                 if (this.defaultValue) {
                     this.setSelectedValue(this.defaultValue, this.displayModel);
-                    if (this.defaultValue) this.value = this.defaultValue; 
                 }
-                if (!this.apiData || this.apiData.length > 0) this.noData = false;
+                if (this.apiData.length > 0) this.noData = false;
             } catch (ex) {
                 console.log(ex);
             }

@@ -1,5 +1,6 @@
 let resources =  {
     vi: {
+        noData: "Không có dữ liệu để hiển thị",
         errorMes: "Có lỗi xảy ra vui lòng liên hệ MISA!",
         companyName: {
             0: "CÔNG TY TNHH SẢN XUẤT - THƯƠNG MẠI - DỊCH VỤ - QUÝ PHÚC"
@@ -52,6 +53,7 @@ let resources =  {
         },
         dialogMessage:{
             confirmDelete: "Bạn có muốn xóa nhân viên ",
+            confirmDeleteAccount: "Bạn có thực sự muốn xóa Tài khoản ",
             confirmMultipleDelete: "Bạn có thực sự muốn xóa các nhân viên đã chọn không ?",
             confirmChange: "Dữ liệu đã thay đổi, bạn có muốn cất không ?",
             developing: "Tính năng đang được phát triển!"
@@ -75,7 +77,7 @@ let resources =  {
         contextMenuAction:{
             duplicate: "Nhân bản",
             delete: "Xóa",
-            unuse: "Ngưng sử dụng"
+            unuse: "Ngừng sử dụng"
         },
         employeeList: {
             title: "Nhân viên",
@@ -150,10 +152,28 @@ let resources =  {
             taxList: ['Biểu thuế tiêu thụ đặc biệt', 'Biểu thuế tài nguyên'],
             otherList: ['Điều khoản thanh toán', 'Mục thu/chi', 'Mã thống kế', 'Loại tiền', 'Loại chứng từ'],
         },
+
+        paymentDetail:{
+            payment_reason: [
+                'Trả tiền cho nhà cung cấp (không theo hóa đơn)',
+                'Tạm ứng cho nhân viên',
+                'Chi mua ngoài có hóa đơn',
+                'Trả lương nhân viên',
+                'Chuyển tiền cho chi nhánh khác',
+                'Gửi tiền vào ngân hàng',
+                'Chi khác',
+            ],
+
+            paymentError: {
+                debitRequired: 'Tài khoản nợ không được để trống',
+                creditRequired: 'Tài khoản có không được để trống',
+            }
+        },
         
         accountList:{
             title: "Hệ thống tài khoản",
             inputPlaceholder: "Tìm kiếm theo số, tên tài khoản",
+            searchPlaceholder: "Nhập từ khóa tìm kiếm",
             data:{
                 accountNumber: "Số tài khoản",
                 accountName: "Tên tài khoản",
@@ -161,13 +181,18 @@ let resources =  {
                 englishName: "Tên tiếng anh",
                 description: "Diễn giải",
                 status: "Trạng thái",
+                dataLevel: "Mức độ phụ thuộc",
+                createdDate: "Ngày tạo",
+                createdBy: "Người tạo",
+                modifiedDate: "Ngày sửa",
+                modifiedBy: "Người sửa",
             },
 
             parentAcc: "Tài khoản tổng hợp",
             
             status: {
                 using: "Đang sử dụng",
-                unuse: "Ngưng sử dụng",
+                unuse: "Ngừng sử dụng",
             },
 
             props: {
@@ -175,13 +200,24 @@ let resources =  {
                 Excess: 'Dư có',
                 Hermaphrodite: 'Lưỡng tính',
                 NoBalance: 'Không có số dư',
-            }
+            },
+
+            deleteFail: "Bạn phải xóa các tài khoản con trước khi xóa tài khoản cha",
+
+            foldAll: 'Thu gọn',
+
+            expandAll: 'Mở rộng',
+
+            updateStatusConfirm: 'Bạn có muốn thiết lập trạng thái "Sử dụng" cho tất cả Tài khoản con không',
+
+            updateStatusFail: 'Tài khoản cha đang ở trạng thái "Ngừng sử dụng". Bạn không thể thiết lập trạng thái "Sử dụng" cho Tài khoản con',
         },
 
         accountDetail:{
             title:{
                 create: "Thêm tài khoản",
                 update: "Sửa tài khoản",
+                duplicate: "Nhân bản tài khoản",
             },
 
             followTo: "Theo dõi chi tiết theo",
@@ -203,8 +239,9 @@ let resources =  {
             comboboxData: {
                 ObjectFollow: ['Khách hàng', 'Nhân viên', 'Nhà cung cấp'],
                 AlertRequired: ['Chỉ cảnh báo', 'Bắt buộc nhập'],
+            },
 
-            }
+            property:[{props: 'Dư nợ'}, {props: 'Dư có'}, {props: 'Lưỡng tính'},{props: 'Không có số dư'}],
         },
 
         cashControl:{
@@ -215,6 +252,7 @@ let resources =  {
 
             gridData:{
                 rp_date: "Ngày hạch toán",
+                ca_date: "Ngày chứng từ",
                 rp_ref_no: "Số chứng từ",
                 rp_description: "Diễn giải",
                 amount: "Số tiền",
@@ -262,6 +300,16 @@ let resources =  {
         empty_audit_list: 'Thêm biên bản kiểm kê quỹ để ghi nhận kết quả kiểm kê quỹ tiền mặt thực tế và hạch toán xử lý chênh lệch từ việc kiểm kê',
 
         empty_monetary_flow: 'Dự báo dòng tiền thu vào, chi ra trong một kỳ nhất định để biết được khả năng thu, chi trong tương lai đảm bảo đủ vốn để thực hiện các hoạt động thường xuyên của đơn vị',
+        
+        ui_setting: 'Tùy chỉnh giao diện',
+
+        ui_setting_button: {
+            setDefault: 'Lấy mẫu ngầm định',
+        },
+
+        ui_setting_data:{
+            colName: 'Tên cột dữ liệu',
+        }
     },
 
     en: {

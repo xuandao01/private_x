@@ -49,7 +49,7 @@
               <div class="rightBorder"></div>
             </td>
             <td
-              :class="[value.dataType] "
+              :class="[value.dataType]"
               v-for="(value, index) in data"
               :key="index"
               v-show="showData"
@@ -65,7 +65,7 @@
               v-show="showData"
             >
               <div class="edit">
-                <div class="edit-text" @click="editOnDbClick(item)">Sửa</div>
+                <div class="edit-text" @click="this.$emit('functionClicked', item)">{{ this.function }}</div>
                 <div
                   tabindex="0"
                   class="edit-icon"
@@ -77,12 +77,17 @@
             </td>
           </tr>
         </tbody>
+        <div class="no-data" v-show="noData">{{ this.resources.vi.noData }}</div>
       </table>
     </div>
     <MContextMenu
       ref="context"
-      @deleteEvent="deleteRowData"
-      @duplicateEvent="duplicateData"
+      slot1="Sửa"
+      slot2="Xóa"
+      slot3 ="Nhân bản"
+      @action1="ModifyEvent"
+      @action2="DeleteEvent"
+      @action3="DuplicateEvent"
       v-show="showContext"
     ></MContextMenu>
   </div>
@@ -94,6 +99,8 @@ import MCheckbox from "./MCheckbox.vue";
 import { deleteType } from '../unit-components/MConfirmDeleteDialog.vue';
 import { multipleSelectedData } from "@/store/multipleDeleteEmployee";
 import { loader } from "@/store/loader";
+import Sortable from "sortablejs"
+import resources from "@/js/resources";
 
 export default {
   name: "MGridData",
@@ -165,6 +172,12 @@ export default {
       type: Boolean,
       requried: false,
       default: false,
+    },
+
+    function: {
+      type: String,
+      required: false,
+      default: "Sửa"
     }
   },
   /**
@@ -210,9 +223,8 @@ export default {
       }
     }
     this.$refs.gridViewer.style.minWidth = totalWidth + "px";
-    //
-    /*eslint-disable no-debugger */
-    // debugger
+    // this.initSortable();
+    this.resizableGrid(this.$refs.gridTable.children[0]);
   },
 
   watch: {
@@ -235,9 +247,42 @@ export default {
       selectedMultiple: [],
       selectedMultipleRow: [],
       widthList:[],
+      serviceResult: null,
+      resources: resources,
+      noData: false,
     };
   },
   methods: {
+
+    // getWidthList(){
+    //   let wList = "";
+    //   for(let i=0;i<this.data.length;i++){
+    //     if (i == 0) wList += this.data[i]['colWidth'];
+    //   }
+    // },
+
+    DeleteEvent(){
+      this.$emit("deleteEvent", this.selectedData);
+    },
+
+    DuplicateEvent(){
+      this.$emit("duplicateEvent", this.selectedData);
+    },
+
+    initSortable(){
+      let ths = this.$refs.tableThead.children[0];
+      Sortable.create(ths, {
+        draggable: 'th',
+        onEnd: (evt) => {
+          if (evt.oldIndex != evt.newIndex)
+            this.$emit("columnSwapped", evt.newIndex, evt.oldIndex);
+        },
+        animation: 0,
+        filter: ".editable",
+        ghostClass: 'ghost-class',  
+        onMove: function (e) { return e.related.className.indexOf('static') === -1;  }
+      })
+    },
 
     formatMoney(amount, decimalCount = 0, decimal = "", thousands = ".") {
       decimalCount = Math.abs(decimalCount);
@@ -253,15 +298,18 @@ export default {
       this.showLoading = true;
       try {
         let data = await (await fetch(this.api)).json();
-        this.gridData = data.data;
+        this.serviceResult = data.Data;
+        // if (!serviceData) serviceData = data['data'];
+        this.gridData = this.serviceResult['data'];
         if (this.gridData[0]){
-          let total_record = this.gridData[0]['total_record'];
+          this.noData = false;
+          let total_record = this.serviceResult['totalRecord'][0]['Total record'];
           this.$emit('refresh', total_record);
           for(let i=0;i<this.data.length;i++){
             if (this.data[i]['dataType'] === 'date'){
               for(let j=0;j<this.gridData.length;j++){
                 this.gridData[j][this.data[i]['dataField']] = this.dateFormator(this.gridData[j][this.data[i]['dataField']]);
-                this.gridData[j].re_no = j;
+                this.gridData[j].re_no = j+1;
               }
             }
             if (this.data[i]['dataType'] === 'd-money'){
@@ -271,9 +319,9 @@ export default {
             }
           }
           for(let j=0;j<this.gridData.length;j++){
-            this.gridData[j].re_no = j;
+            this.gridData[j].re_no = j+1;
           }
-        }
+        } else this.noData = true;
         this.showLoading = false;
         this.gridOnLoaded();
         this.apiString = this.api;
@@ -284,7 +332,7 @@ export default {
     },
 
     gridOnLoaded(){
-      this.$emit("loadCompleted");
+      this.$emit("loadCompleted", this.serviceResult);
       if (this.isFocusFirst){
         this.selected = this.$refs.tableBody.children[0];
         this.selected.classList.add("tr-selected");
@@ -589,11 +637,107 @@ export default {
      */
     getRemainingRow(){
       return this.$refs.tableBody.children.length;
-    }
+    },
+
+    resizableGrid(table) {
+      var row = table.getElementsByTagName('tr')[0],
+      cols = row ? row.children : undefined;
+      if (!cols) return;
+      
+      table.style.overflow = 'hidden';
+      
+      var tableHeight = table.offsetHeight;
+      
+      for (var i=0;i<cols.length;i++){
+        var div = createDiv(tableHeight);
+        cols[i].appendChild(div);
+        setListeners(div);
+      }
+
+      function setListeners(div){
+        var pageX,curCol,nxtCol,curColWidth,nxtColWidth;
+
+        div.addEventListener('mousedown', function (e) {
+        curCol = e.target.parentElement;
+        nxtCol = curCol.nextElementSibling;
+        pageX = e.pageX; 
+      
+        var padding = paddingDiff(curCol);
+      
+        curColWidth = curCol.offsetWidth - padding;
+        if (nxtCol)
+          nxtColWidth = nxtCol.offsetWidth - padding;
+        });
+
+        div.addEventListener('mouseover', function (e) {
+        e.target.style.borderRight = '2px solid transparent';
+        })
+
+        div.addEventListener('mouseout', function (e) {
+        e.target.style.borderRight = '';
+        })
+
+        document.addEventListener('mousemove', function (e) {
+        if (curCol) {
+          var diffX = e.pageX - pageX;
+      
+          if (nxtCol)
+          nxtCol.style.width = (nxtColWidth - (diffX))+'px';
+
+          curCol.style.width = (curColWidth + diffX)+'px';
+        }
+        });
+
+        document.addEventListener('mouseup', function () { 
+        curCol = undefined;
+        nxtCol = undefined;
+        pageX = undefined;
+        nxtColWidth = undefined;
+        curColWidth = undefined
+        });
+      }
+      
+      function createDiv(height){
+        var div = document.createElement('div');
+        div.style.top = 0;
+        div.style.right = 0;
+        div.style.width = '5px';
+        div.style.position = 'absolute';
+        div.style.cursor = 'col-resize';
+        div.style.userSelect = 'none';
+        div.style.height = height + 'px';
+        return div;
+      }
+      
+      function paddingDiff(col){
+      
+        if (getStyleVal(col,'box-sizing') == 'border-box'){
+        return 0;
+        }
+      
+        var padLeft = getStyleVal(col,'padding-left');
+        var padRight = getStyleVal(col,'padding-right');
+        return (parseInt(padLeft) + parseInt(padRight));
+
+      }
+
+      function getStyleVal(elm,css){
+        return (window.getComputedStyle(elm, null).getPropertyValue(css))
+      }
+      },
   },
 };
 </script>
 <style scoped>
+
+.no-data{
+  position: absolute;
+  font-size: 13px;
+  text-align: center;
+  width: calc(100vw - 200px);
+  line-height: 36px;
+
+}
 
 .first-data{
   border-left: unset;
@@ -624,7 +768,7 @@ export default {
   background-color: #bfbfbf;
   z-index: 99;
   top: 0;
-  right: -1px;
+  right: -0.5px;
   position: absolute;
 }
 
@@ -638,7 +782,7 @@ export default {
   background-color: #bfbfbf;
   z-index: 999;
   top: 0;
-  left: -0.5px;
+  left: -1px;
   position: absolute;
 }
 
@@ -662,6 +806,10 @@ export default {
   background-color: unset;
   font-size: 14px;
   font-family: Notosans;
+}
+
+.date{
+  text-align: center;
 }
 
 </style>
