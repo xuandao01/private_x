@@ -147,6 +147,10 @@ export default {
 
   methods: {
 
+    /**
+     * Hàm lưu ui đã chọn
+     * @author Xuân Đào (13/05/2023)
+     */
     saveUI(){
       let activeUI = 0;
       this.localData.forEach(el => {
@@ -159,6 +163,10 @@ export default {
       }
     },
 
+    /**
+     * Hàm check / uncheck toàn bộ hàng
+     * @author Xuân Đào (13/05/2023)
+     */
     parentClicked(){
       this.localData.forEach(el => {
         el['display'] = this.$refs.parentCheck.checked
@@ -173,6 +181,10 @@ export default {
         }
     },
 
+    /**
+     * Hàm mở rộng popup
+     * @author Xuân Đào (13/05/2023)
+     */
     expandOnClick() {
       if (!this.isExpanded) {
         this.isExpanded = true;
@@ -187,6 +199,10 @@ export default {
       }
     },
 
+    /**
+     * Hàm lưu thu gọn popup
+     * @author Xuân Đào (13/05/2023)
+     */
     collaseOnClick() {
       if (!this.collase) {
         this.collase = true;

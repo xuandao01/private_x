@@ -6,8 +6,11 @@
     </div>
 </template>
 <script>
+import { BtnOption } from '@/views/CA/MPaymentDetail.vue'
 export default {
-    
+    mounted(){
+        sessionStorage.extendBtnOption = BtnOption.saveAndClose;
+    }
 }
 </script>
 <style scoped>

@@ -33,7 +33,7 @@
             </th>
           </tr>
         </thead>
-        <tbody ref="tableBody">
+        <tbody ref="tableBody" class="grid-body">
           <MGridDataLoading v-if="showLoading"></MGridDataLoading>
           <tr v-for="(item, index) in gridData" :key="index" 
           @click="itemOnClick(item, index)"
@@ -44,7 +44,7 @@
               :class="{ 'fix-start': isFixedStart }"
               v-show="showData"
             >
-              <MCheckbox @click="checkBoxOnClick(item)">
+              <MCheckbox @click="checkBoxOnClick(item)" ref="childCheckbox">
               </MCheckbox>
               <div class="rightBorder"></div>
             </td>
@@ -162,12 +162,6 @@ export default {
       default: false,
     },
 
-    canEditValue: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
-
     isFocusFirst:{
       type: Boolean,
       requried: false,
@@ -178,8 +172,14 @@ export default {
       type: String,
       required: false,
       default: "Sửa"
+    },
+
+    recordId: {
+      type: String,
+      required: false,
     }
   },
+
   /**
    * Lấy dữ liệu từ api và đổ vào data
    *
@@ -187,6 +187,7 @@ export default {
    */
   created() {
     this.getApiData();
+
   },
 
   /**
@@ -254,6 +255,14 @@ export default {
   },
   methods: {
 
+    /**
+     * Hàm emit sửa dữ liệu
+     * @author Xuân Đào(13/05/2023)
+     */
+    ModifyEvent(){
+      this.$emit("modifyEvent", this.selectedData);
+    },
+
     // getWidthList(){
     //   let wList = "";
     //   for(let i=0;i<this.data.length;i++){
@@ -261,14 +270,26 @@ export default {
     //   }
     // },
 
+    /**
+     * Hàm emit xóa dữ liệu
+     * @author Xuân Đào(13/05/2023)
+     */
     DeleteEvent(){
       this.$emit("deleteEvent", this.selectedData);
     },
 
+    /**
+     * Hàm emit nhân bản dữ liệu
+     * @author Xuân Đào(13/05/2023)
+     */
     DuplicateEvent(){
       this.$emit("duplicateEvent", this.selectedData);
     },
 
+    /**
+     * Hàm khởi tạo cho phép thay đổi vị trí cột hiển thị
+     * @author Xuân Đào(13/05/2023)
+     */
     initSortable(){
       let ths = this.$refs.tableThead.children[0];
       Sortable.create(ths, {
@@ -284,6 +305,13 @@ export default {
       })
     },
 
+    /**
+     * Hàm định dạng tiền
+     * @param amount: Số tiền
+     * @param decimalCount: Số lượng số sau dấu phẩy
+     * @param thousands: Ngăn cách hàng nghìn
+     * @author Xuân Đào(13/05/2023)
+     */
     formatMoney(amount, decimalCount = 0, decimal = "", thousands = ".") {
       decimalCount = Math.abs(decimalCount);
       decimalCount = isNaN(decimalCount) ? 2 : decimalCount;
@@ -293,6 +321,10 @@ export default {
       return negativeSign + (j ? i.substr(0, j) + thousands : '') + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + thousands) + (decimalCount ? decimal + Math.abs(amount - i).toFixed(decimalCount).slice(2) : "");
     },
 
+    /**
+     * Hàm lấy dữ liệu từ api
+     * @author Xuân Đào(13/05/2023)
+     */
     async getApiData(){
     if(this.api){
       this.showLoading = true;
@@ -331,6 +363,10 @@ export default {
     }
     },
 
+    /**
+     * Hàm emit load xong dữ liệu
+     * @author Xuân Đào(13/05/2023)
+     */
     gridOnLoaded(){
       this.$emit("loadCompleted", this.serviceResult);
       if (this.isFocusFirst){
@@ -396,7 +432,7 @@ export default {
           data[i].children[0].children[0].classList.add("checked");
           if (!this.selectedMultipleRow.includes(data[i])){
             this.selectedMultipleRow.push(data[i]);
-            this.SelectedList.addItem(this.gridData[i]);
+            this.selectedMultiple.push(this.gridData[i][this.recordId])
           }
         }
       } else {
@@ -405,7 +441,7 @@ export default {
           data[i].children[0].children[0].classList.remove("checked");
           if (this.selectedMultipleRow.includes(data[i])){
             this.selectedMultipleRow = this.removeItemFromArr(this.selectedMultipleRow, this.selectedMultipleRow.indexOf(data[i]));
-            this.SelectedList.selectedItemList = [];
+            this.selectedMultiple = [];
           }
         }
       }
@@ -445,12 +481,12 @@ export default {
      */
     checkBoxOnClick(item) {
       let targetEl = event.target.parentElement.parentElement
-      if (this.SelectedList.selectedItemList.includes(item)) {
-        this.selectedMultipleRow = this.removeItemFromArr(this.selectedMultipleRow, this.SelectedList.selectedItemList.indexOf(item));
-        this.SelectedList.removeItemFromList(this.SelectedList.selectedItemList.indexOf(item));
+      if (this.selectedMultiple.includes(item[this.recordId])) {
+        this.selectedMultipleRow = this.removeItemFromArr(this.selectedMultipleRow, this.selectedMultiple.indexOf(item[this.recordId]));
+        this.selectedMultiple = this.removeItemFromArr(this.selectedMultiple, this.selectedMultiple.indexOf(item[this.recordId]));
         targetEl.classList.remove("checked-item");
       } else {
-        this.SelectedList.addItem(item);
+        this.selectedMultiple.push(item[this.recordId]);
         this.selectedMultipleRow[this.selectedMultipleRow.length] = targetEl;
         targetEl.classList.add("checked-item");
       }
@@ -524,8 +560,7 @@ export default {
      * @author  Xuân Đào (14/03/2023x)
      */
     itemOnClick(item, index) {
-      /*eslint-disable no-debugger */
-      // debugger
+      if (event.target.classList[0] == 'edit-text') return;
       this.$refs.tableBody.children[0].classList.remove("tr-selected");
       if (this.selected === null) this.selected = this.$refs.tableBody.children[index];
       else {
@@ -729,6 +764,11 @@ export default {
 };
 </script>
 <style scoped>
+
+table thead tr th{
+  border-top: unset !important;
+  border-bottom: unset !important;
+}
 
 .no-data{
   position: absolute;

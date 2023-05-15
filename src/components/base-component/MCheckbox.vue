@@ -1,5 +1,5 @@
 <template>
-    <div @focus="onFocus" @blur="onBlur" tabindex="1" ref="checkbox" class="m-checkbox" :class="{'checked': checked}" @click="checked = !checked">
+    <div @focus="onFocus" @blur="onBlur" tabindex="1" ref="checkbox" class="m-checkbox" :class="{'checked': checked}" @click="checkboxOnClick">
         <div :class="{'onFocus': isFocus}"></div>
     </div>
 </template>
@@ -47,16 +47,43 @@ export default {
     },
 
     methods:{
+
+        /**
+         * Hàm cập nhật trạng thái khi click checkbox
+         * @author Xuân Đào(13/05/2023)
+         */
+        checkboxOnClick(){
+            if (this.$refs.checkbox.classList[1] == "checked"){
+                this.checked = false;
+                this.$refs.checkbox.classList.remove("checked");
+            } else {
+                this.checked = true;
+                this.$refs.checkbox.classList.add("checked");
+            }
+        },
+
+        /**
+         * Hàm cập nhật trạng thái khi focus checkbox
+         * @author Xuân Đào(13/05/2023)
+         */
         onFocus(){
             this.isFocus = true;
             window.addEventListener("keydown", this.hanldeOnKeydown)
         },
 
+        /**
+         * Hàm cập nhật trạng thái khi blur checkbox
+         * @author Xuân Đào(13/05/2023)
+         */
         onBlur(){
             this.isFocus = false;
             window.removeEventListener("keydown", this.hanldeOnKeydown)
         },
 
+        /**
+         * Hàm xử lý sự kiện bàn phím cho checkbox
+         * @author Xuân Đào(13/05/2023)
+         */
         hanldeOnKeydown(){
             if(event.key == "Enter"){
                 this.checked = !this.checked;
@@ -64,6 +91,10 @@ export default {
             }
         },
 
+        /**
+         * Hàm set focus vào checkbox
+         * @author Xuân Đào(13/05/2023)
+         */
         setFocus(){
             this.$refs.checkbox.focus();
         }

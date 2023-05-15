@@ -14,8 +14,10 @@
       v-model="this.value"
       @blur="this.validate()"
       @input="this.$emit('onInput', value)"
+      @keyup="onKeyUp"
       :placeholder="placeholder"
       :title="this.errMessage"
+      :maxlength="this.maximumLength"
     />
     <!-- <div v-if="isError" class="errMes">{{ inputTitle }} không được trống</div> -->
   </div>
@@ -74,9 +76,19 @@ export default {
       required: false,
     },
 
+    maximumLength:{
+      type: Number,
+      required: false,
+    },
+
     minLength:{
       type: Number,
       required: false,
+    },
+
+    type: {
+      type: String,
+      required: false
     }
   },
 
@@ -105,6 +117,43 @@ export default {
   },
 
   methods: {
+
+    /**
+     * Hàm set focus vào input
+     * 
+     * @author Xuân Đào (05/03/2023)
+     */
+    onKeyUp(){
+      if (this.type && this.type == 'd-money'){
+        event.target.value = this.formatMoney(event.target.value.replaceAll('.',''));
+      }
+    },
+
+    /**
+     * Hàm định dạng tiền
+     * @author Xuân Đào(13/05/2023)
+     */
+     formatMoney(amount, decimalCount = 0, decimal = ",", thousands = ".") {
+      decimalCount = Math.abs(decimalCount);
+      decimalCount = isNaN(decimalCount) ? 2 : decimalCount;
+      const negativeSign = amount < 0 ? "-" : "";
+      let i = parseInt(
+        (amount = Math.abs(Number(amount) || 0).toFixed(decimalCount))
+      ).toString();
+      let j = i.length > 3 ? i.length % 3 : 0;
+      return (
+        negativeSign +
+        (j ? i.substr(0, j) + thousands : "") +
+        i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + thousands) +
+        (decimalCount
+          ? decimal +
+            Math.abs(amount - i)
+              .toFixed(decimalCount)
+              .slice(2)
+          : "")
+      );
+    },
+
     /**
      * Hàm set focus vào input
      * 

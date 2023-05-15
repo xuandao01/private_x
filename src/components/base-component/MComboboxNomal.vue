@@ -7,8 +7,9 @@
     @focus="comboboxOnFocus"
     @blur="comboboxOnBlur"
     @keydown="comboboxOnKeyDown"
+    ref="focusable"
   >
-    <input ref="cbInput" type="text" class="selected" v-model="comboboxData[selected]" />
+    <input ref="cbInput" type="text" class="selected" tabindex="-1" v-model="comboboxData[selected]" />
     <div class="icon dropdown-icon" @click="iconOnClick"></div>
     <div ref="cbMain" class="combo-item-list" v-show="showData">
       <div
@@ -109,6 +110,12 @@ export default {
   },
 
   methods: {
+
+    setFocus(){
+      this.$refs.focusable.classList.add('focused');
+      this.$refs.focusable.focus();
+    },
+
     /**
      * Xự kiện click vào item trong combobox
      * 
@@ -148,14 +155,15 @@ export default {
       if (event.key == "ArrowUp") {
         if (this.selected == 0) this.selected = this.comboboxData.length - 1;
         else this.selected--;
+        this.showData = true;
       } else if (event.key == "ArrowDown") {
         if (this.selected == this.comboboxData.length - 1) this.selected = 0;
         else this.selected++;
+        this.showData = true;
       } else if (event.key == "Enter") {
         this.$emit("changeVal", this.selected);
         this.showData = false;
       } else if (event.key == "Tab") {
-        event.preventDefault();
         this.$emit("changeVal", this.selected);
         this.showData = false;
       }
@@ -200,6 +208,10 @@ input {
   border-radius: 2px;
   position: relative;
   outline: unset;
+}
+
+.combobox-nomal:focus{
+  border: #50b83c solid 1px;
 }
 
 .disabled .dropdown-icon{

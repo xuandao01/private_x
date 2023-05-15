@@ -21,10 +21,10 @@
           <div class="ad-content__row">
             <MInput ref="inpAccountName" class="ad-content__row--item" titleColor="333333"
               :input-title="this.resources.vi.accountList.data.accountName" v-model="this.currentAccount['accountname']"
-              :required="true"></MInput>
+              :required="true" :max-length="255" ></MInput>
             <MInput ref="inpEnglishName" class="ad-content__row--item" titleColor="333333"
               :input-title="this.resources.vi.accountList.data.englishName" v-model="this.currentAccount['englishname']"
-              :required="false"></MInput>
+              :required="false" :max-length="255"></MInput>
           </div>
           <div class="ad-content__row2">
             <MScrollableCombobox :width="440" :rawData="sortedData" titleColor="333333"
@@ -216,17 +216,20 @@ export default {
   name: "MAccountDetail",
 
   props: {
+    // Dữ liệu đã được sắp xếp
     sortedData: {
       type: Array,
       required: false,
     },
 
+    // Dữ liệu binding lên form
     account: {
       type: Object,
       required: false,
       default: null,
     },
 
+    // Hành động của form
     formMode: {
       type: Number,
       required: false,
@@ -327,9 +330,12 @@ export default {
       this.inputList.push(this.$refs.inpDescription);
       this.inputList.push(this.$refs.inpProperty);
       this.$refs.inpAccountNumber.setFocus();
+      if (this.formMode == formMode.create)
+        this.$refs.inpProperty.selectedIndex = 0;
       if (this.account){
-        if (this.formMode == formMode.create)
+        if (this.formMode == formMode.create){
           this.$refs.inpDependency.setSelectedValue(this.account['accountid'], "accountid");
+        }
         else {
           this.$refs.inpProperty.setSelectedValue(this.account['propertyname'], "props");
           this.$refs.inpDependency.setSelectedValue(this.account['dependency'], "accountid");
@@ -382,6 +388,10 @@ export default {
 
   methods: {
 
+    /**
+     * Hàm xử lý sự kiện bàn phím
+     * @author Xuân Đào (04/05/2023)
+     */
     handleOnKeydown(){
       if (event.key == 'Tab'){
         if(this.$refs.inpDescription.isFocus){
@@ -421,28 +431,52 @@ export default {
       }
     },
 
+    /**
+     * Hàm hiển thị tính năng đang phát triển
+     * @author Xuân Đào (04/05/2023)
+     */
     showDeveloping(){
       this.$refs.singleDialog.showDialogOn(dialogType.info, resources.vi.dialogMessage.developing, resources.vi.btnAction.close)
     },
 
+    /**
+     * Hàm cập nhật dữ liệu tính chất
+     * @author Xuân Đào (04/05/2023)
+     */
     updateProperty(value){
       this.currentAccount['propertyname'] = value;
     },
 
+    /**
+     * Hàm cập nhật dữ liệu tài khoản tổng hợp
+     * @author Xuân Đào (04/05/2023)
+     */
     updateDependency(value){
       this.currentAccount['dependency'] = value;
     },
 
+    /**
+     * Hàm yêu cầu lưu dữ liệu
+     * @author Xuân Đào (04/05/2023)
+     */
     saveData(){
       this.showConfirmChange = false;
       this.saveOnClick();
     },
 
+    /**
+     * Hàm hủy bỏ những thay đổi
+     * @author Xuân Đào (04/05/2023)
+     */
     undoData(){
       this.showConfirmChange = false;
       this.$emit("closeMe");
     },
 
+    /**
+     * Hàm đóng form
+     * @author Xuân Đào (04/05/2023)
+     */
     closeDetail() {
       if (JSON.stringify(this.beforeAccount) != JSON.stringify(this.currentAccount)) {
         this.showConfirmChange = true;
@@ -451,6 +485,10 @@ export default {
       this.$emit("closeMe");
     },
 
+    /**
+     * Hàm mở rộng form
+     * @author Xuân Đào (04/05/2023)
+     */
     expandOnClick() {
       if (!this.isExpanded) {
         this.isExpanded = true;
@@ -465,6 +503,10 @@ export default {
       }
     },
 
+    /**
+     * Hàm thu gọn form
+     * @author Xuân Đào (04/05/2023)
+     */
     collaseOnClick() {
       if (!this.collase) {
         this.collase = true;
@@ -481,6 +523,10 @@ export default {
       }
     },
 
+    /**
+     * Hàm xử lý validate dữ liệu
+     * @author Xuân Đào (04/05/2023)
+     */
     validate() {
       this.currentError = null;
       this.inputList.forEach(el => {
@@ -496,6 +542,10 @@ export default {
       else return true;
     },
 
+    /**
+     * Hàm lưu dữ liệu
+     * @author Xuân Đào (04/05/2023)
+     */
     async saveOnClick(reload) {
       if(this.validate()){
         const data = this.getInputData();
@@ -506,7 +556,9 @@ export default {
             if (!reload)
               this.$emit("closeOnSuccess");
             else {
+              this.$emit("reloadGrid");
               this.currentAccount = Object.assign({}, this.beforeAccount);
+              this.$refs.inpProperty.selectedIndex = 0;
             }
           } else {
             this.currentError = this.inputList[0];
@@ -516,11 +568,34 @@ export default {
       }
     },
 
+    /**
+     * Hàm focus nhập liệu lỗi khi đóng dialog
+     * @author Xuân Đào (04/05/2023)
+     */
     dialogClosed() {
       if (this.currentError)
         this.currentError.setFocus();
     },
 
+    /**
+     * Hàm xóa 1 item khỏi array
+     *
+     * @author Xuân Đào (04/04/2023)
+     */
+     removeItemFromArr(proxy, index) {
+      let arr = [];
+      for (let i = 0; i < proxy.length; i++) {
+        if (i !== index) {
+          arr.push(proxy[i]);
+        }
+      }
+      return arr;
+    },
+
+    /**
+     * Hàm lấy dữ liệu input
+     * @author Xuân Đào (04/05/2023)
+     */
     getInputData() {
       let dataLevel = 0;
       if (this.$refs.inpDependency.value){
@@ -561,6 +636,10 @@ export default {
       return account;
     },
 
+    /**
+     * Hàm lưu dữ liệu
+     * @author Xuân Đào (04/05/2023)
+     */
     async saveAccount(account){
       try {
         let queryString = (this.formMode == formMode.create || this.formMode == formMode.duplicate) ? `${this.resources.endpoint}Account`
@@ -575,6 +654,12 @@ export default {
         return { status: res.status, value: data, message: data['Message'] };
       } catch (err) {
         return { status: 400, value: null, message: err};
+      }
+    },
+
+    findParent(arr, data) {
+      for (let i = 0; i < arr.length; i++) {
+        if (arr[i]["accountid"] === data) return i;
       }
     },
   },

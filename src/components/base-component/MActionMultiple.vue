@@ -45,7 +45,7 @@ export default {
          * @author Xuân Đào (04/04/2023)
          */
         multipleDelete(){
-          this.$emit('delete');
+          this.$emit('deleteMultiple');
           // this.showAction = false;
         }
     },

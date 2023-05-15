@@ -37,6 +37,7 @@
                   @keyup="inputOnType(item['type'])"
                   @blur="inputOnInput(item['type'], inx, index)"
                   :tabindex="[item['editable'] ? '0' : '-1']"
+                  :maxlength="[item['type'] == 'd-money' ? '18' : '999']"
                   :style="{ textAlign: item.align }"
                   :class="{
                     disable: !editable || !item['editable'],
@@ -96,39 +97,46 @@ export default {
   name: "MGridEditable",
 
   props: {
+    // Api lấy dữ liệu cho grid
     api: {
       type: String,
       required: false,
     },
 
+    // Dữ liệu của grid khi không có api
     data: {
       type: Array,
       required: false,
     },
 
+    // Dữ liệu mapping lên grid
     mapData: {
       type: Array,
       required: false,
     },
 
+    // Cố định cột đầu tiên hay không
     fixStart: {
       type: Boolean,
       required: false,
       default: false,
     },
 
+    // Cố định cột cuối cùng hay không
     fixEnd: {
       type: Boolean,
       required: false,
       default: false,
     },
 
+    // Có cho phép sửa hay không
     editable: {
       type: Boolean,
       required: false,
       default: false,
     },
 
+    // Dữ liệu cho combobox trong grid
     comboboxData: {
       type: Array,
       required: false,
@@ -175,12 +183,22 @@ export default {
   },
 
   methods: {
+    /**
+     * Hàm định dạng tiền
+     * @author Xuân Đào(13/05/2023)
+     */
     formatDataMoney() {
       this.gridData.forEach((element) => {
         element["amount"] = this.formatMoney(element["amount"]);
       });
     },
 
+    /**
+     * Hàm focus nhập liệu lỗi
+     * @param index: Chỉ số hàng bị lỗi
+     * @param elIndex: Chỉ số cột bị lỗi
+     * @author Xuân Đào(13/05/2023)
+     */
     focusElement(index, elIndex) {
       let trList = this.$refs.tbody.children;
       /*eslint-disable no-debugger */
@@ -188,6 +206,11 @@ export default {
       trList[index].children[elIndex].querySelector("input").focus();
     },
 
+    /**
+     * Hàm định dạng tiền khi input
+     * @param type: Kiểu dữ liệu của input
+     * @author Xuân Đào(13/05/2023)
+     */
     inputOnType(type) {
       if (type == "d-money") {
         // if (event.keyCode >= 65 && event.keyCode <= 90) {
@@ -202,8 +225,19 @@ export default {
       }
     },
 
+    /**
+     * Xóa dữ liệu
+     * @param inx: vị trí xóa
+     * @author Xuân Đào(13/05/2023)
+     */
     deleteOnClick(inx) {
-      this.$emit("deleteOnClick", inx);
+      let grid = [];
+      for(let i=0;i<this.gridData.length;i++){
+        if (i != inx){
+          grid.push(this.gridData[i]);
+        }
+      }
+      this.gridData = grid;
       this.selected_index = -1;
     },
 
@@ -213,6 +247,10 @@ export default {
     //   }
     // }, 100),
 
+    /**
+     * Hàm binding dữ liệu 2 chiều
+     * @author Xuân Đào(13/05/2023)
+     */
     inputOnInput(type, dataIndex, modelIndex) {
       if (type == "d-money") {
         this.$emit(
@@ -230,10 +268,18 @@ export default {
       );
     },
 
+    /**
+     * Hàm binding dữ liệu 2 chiều cho combobox
+     * @author Xuân Đào(13/05/2023)
+     */
     comboboxOnSelect(data) {
       this.$emit("comboOnChange", this.currentElementIndex + 1, data);
     },
 
+    /**
+     * Hàm định dạng tiền
+     * @author Xuân Đào(13/05/2023)
+     */
     formatMoney(amount, decimalCount = 0, decimal = ",", thousands = ".") {
       decimalCount = Math.abs(decimalCount);
       decimalCount = isNaN(decimalCount) ? 2 : decimalCount;
@@ -255,6 +301,11 @@ export default {
       );
     },
 
+    /**
+     * Hàm cập nhật hàng được chọn và cho phép sửa
+     * @param indexL Chỉ số hàng được chọn
+     * @author Xuân Đào(13/05/2023)
+     */
     rowOnClick(index) {
       if (event.target.classList[0] === "delete-icon") return;
       let target = this.$refs.tbody.children[index];
@@ -276,6 +327,11 @@ export default {
       }
       this.selected_row.classList.add("tr-selected");
     },
+
+    /**
+     * Khởi tạo cho phép thay đổi độ rông cột
+     * @author Xuân Đào(13/05/2023)
+     */
     resizableGrid(table) {
       var row = table.getElementsByTagName("tr")[0],
         cols = row ? row.children : undefined;

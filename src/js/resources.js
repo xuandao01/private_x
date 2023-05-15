@@ -64,15 +64,18 @@ let resources =  {
             store: "Cất",
             storeTooltip: "Cất (Ctrl + S)",
             storeSave: "Cất và thêm",
-            storeSaveToolTip: "Cất và thêm (Ctrl + Shift + S",
+            storeSaveToolTip: "Cất và thêm (Ctrl + Shift + S)",
             confirm: "Đồng ý",
             yes: "Có",
             close: "Đóng",
-            no: "Không"
+            no: "Không",
+            saveAndClose: "Cất và đóng",
+            saveAndCloseTooltip: "Cất và đóng (Ctrl + Shift + S)",
         },
         actionMultiple: {
             title: 'Thực hiện hàng loạt',
             deleteAction: 'Xóa',
+            deleteMultipleConfirm: "Bạn có muốn xóa những chứng từ này không?"
         },
         contextMenuAction:{
             duplicate: "Nhân bản",

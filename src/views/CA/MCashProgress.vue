@@ -73,6 +73,10 @@ export default {
     name: "MCashProgress",
 
     methods: {
+        /**
+         * Hàm mở popup payment detail
+         * @author Xuân Đào (13/05/2023)
+         */
         async gotoDetail(){
             sessionStorage.paymentMode = PaymentFormMode.create;
             this.$router.push({ name : "PaymentDetail"});

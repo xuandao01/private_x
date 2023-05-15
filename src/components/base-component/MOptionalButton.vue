@@ -4,7 +4,9 @@
     <div v-else class="ct-btn">
         <MCustomLoader></MCustomLoader>
     </div>
-    <div class="more-icon"></div>
+    <div class="more-icon">
+      <div class="more-icon__icon"></div>
+    </div>
   </div>
 </template>
 <script>
@@ -67,11 +69,17 @@ export default {
   height: 28px;
   position: absolute;
   right: 0;
-  border-left: solid #fff 1px;
   width: 35px;
-  background: url("@/assets/img/Sprites.64af8f61.svg") no-repeat -840px -353px;
 }
 
+.more-icon__icon{
+  background: url("@/assets/img/Sprites.64af8f61.svg") no-repeat -840px -357px;
+  height: 20px;
+  border-left: solid #fff 1px;
+  position: absolute;
+  top: 4px;
+  width: 35px;
+}
 .more-icon:hover {
   background-color: #2fc21c;
   border-radius: 0 25px 25px 0;

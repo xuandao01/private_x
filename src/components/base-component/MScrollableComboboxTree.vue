@@ -2,6 +2,7 @@
     <div class="inf-component com1">
     <div class="text-area">
       <span ref="inpText" class="bold-text" :title="tooltip">{{ inputTitle }}</span>
+      <span v-if="this.required" class="requried"> *</span>
     </div>
     <input
       ref="mInput"
@@ -145,6 +146,17 @@ export default {
             if (!this.inputTitle) {
                 this.$refs.dropdown.style.top = "4px";
                 // this.$refs.comboData.style.top = "30px";
+            }
+            if (this.inputTitle == "Tài khoản tổng hợp"){
+                if (this.account){
+                    let index = this.findParent(this.account['accountid'], this.apiData);
+                    while(this.account['datalevel'] < this.apiData[index]['datalevel']){
+                        this.apiData = this.removeItemFromArr(this.apiData, index);
+                        index++;
+                    }
+                    /*eslint-disable no-debugger */
+                    debugger
+                }
             }
         });
     },
@@ -348,7 +360,28 @@ export default {
 
         getDataLevel(){
             return this.apiData[this.selectedIndex];
+        },
+
+        /**
+         * Hàm xóa 1 item khỏi array
+         *
+         * @author Xuân Đào (04/04/2023)
+         */
+        removeItemFromArr(proxy, index) {
+        let arr = [];
+        for (let i = 0; i < proxy.length; i++) {
+            if (i !== index) {
+            arr.push(proxy[i]);
+            }
         }
+        return arr;
+        },
+
+        findParent(arr, data) {
+            for (let i = 0; i < arr.length; i++) {
+                if (arr[i]["accountid"] === data) return i;
+            }
+        },
     },
 
     data() {
@@ -370,6 +403,10 @@ export default {
 }
 </script>
 <style scoped>
+
+    .requried{
+        color: red;
+    }
 
     .no-data{
         width: 100%;

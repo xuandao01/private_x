@@ -5,7 +5,7 @@
         <m-action-multiple
         class="action-multiple"
         :enable="enableMultipleEditor"
-        @delete="multipleDelete"
+        @deleteMultiple="multipleDelete"
         ></m-action-multiple>
       <m-search-bar @onSearch="onSearch" ref="searchBar"></m-search-bar>
       <div
@@ -89,12 +89,15 @@
             :muiltiple-select="true"
             :editable="true"
             :key="gridKey"
+            recordId="re_id"
             @loadCompleted = "gridMasterLoaded"
             @gridItemClicked = "gridItemOnClicked"
             @functionClicked = "watchPayment"
             @duplicateEvent="duplicateEvent"
             @deleteEvent="showConfirmDelete"
+            @modifyEvent="modifyPayment"
             @dbClicked="watchPayment"
+            @selectMultiple="updateSelected"
             :isFocusFirst="true"
             function="Xem"
             ></MGridData>
@@ -194,11 +197,19 @@
           @hideAndDelete="deleteEvent"></MConfirmDeleteDialog>
 </template>
 <script>
+
+// Trạng thái của form
 export const PaymentFormMode = {
   create: 0,
   modify: 1,
   watch: 2,
   duplicate: 3,
+}
+
+// Mode xóa dữ liệu
+export const DeleteMode = {
+  singleDelete: 0,
+  multipleDelete: 1,
 }
 
 import resources from "@/js/resources";
@@ -236,6 +247,41 @@ export default {
 
   methods: {
 
+    /**
+     * Hàm sửa chứng từ
+     * @param payment: Chứng từ
+     * @author Xuân Đào (12/05/2023)
+     */
+    modifyPayment(payment){
+      this.showNewPopup(PaymentFormMode.modify, payment)
+    },
+    
+    /**
+     * Hàm xóa hàng loạt chứng từ
+     * @param payment: Chứng từ
+     * @author Xuân Đào (12/05/2023)
+     */
+    multipleDelete(){
+      this.deleteMode = DeleteMode.multipleDelete;
+      this.confirmMessage = this.resources.vi.actionMultiple.deleteMultipleConfirm;
+      this.showConfirm = true;
+    },
+
+    /**
+     * Hàm cập nhật trạng thái cho button xóa nhiều
+     * @param payment: Chứng từ
+     * @author Xuân Đào (12/05/2023)
+     */
+    updateSelected(length){
+      if (length > 1) this.enableMultipleEditor = true;
+      else this.enableMultipleEditor = false;
+    },
+
+    /**
+     * Hàm xuất excel chứng từ
+     * @param payment: Chứng từ
+     * @author Xuân Đào (12/05/2023)
+     */
     async excelExport(){
       this.Loader.showLoader();
       let keyword = this.$refs.searchBar.getInputValue();
@@ -250,6 +296,11 @@ export default {
       this.Loader.closeLoader();
     },
 
+    /**
+     * Hàm tìm kiếm chứng từ
+     * @param payment: Chứng từ
+     * @author Xuân Đào (12/05/2023)
+     */
     onSearch(keyword){
       this.keyword = keyword;
       const pageSize = this.$refs.pagingDetail.pageSize;
@@ -257,54 +308,109 @@ export default {
       this.updateMasterApi(pageSize, pageNum);
     },
 
+    /**
+     * Hàm hiển thị xác nhận xóa chứng từ
+     * @param payment: Chứng từ
+     * @author Xuân Đào (11/05/2023)
+     */
     showConfirmDelete(payment){
       this.confirmMessage = "Bạn có muốn xóa chứng từ <" + payment['re_ref_no'] + "> đã chọn không?";
       this.selectedPayment = payment;
+      this.deleteMode = DeleteMode.singleDelete;
       this.showConfirm = true;
     },
 
+    /**
+     * Hàm xóa chứng từ
+     * @param payment: Chứng từ
+     * @author Xuân Đào (11/05/2023)
+     */
     async deleteEvent(){
-      let apiString = this.resources.endpoint + "ReceiptPayment/FullDelete?id=" + this.selectedPayment['re_id'];
-      const options = {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-      };
-      const res = await fetch(apiString, options);
-      const data = await res.json();
-      this.Toast.showToastMsg(ToastType.Success, data['Message']);
-      this.gridKey++;
-      this.showConfirm = false;
+      if (this.deleteMode == DeleteMode.singleDelete){
+        let apiString = this.resources.endpoint + "ReceiptPayment/FullDelete?id=" + this.selectedPayment['re_id'];
+        const options = {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+        };
+        const res = await fetch(apiString, options);
+        const data = await res.json();
+        this.Toast.showToastMsg(ToastType.Success, data['Message']);
+        this.gridKey++;
+        this.showConfirm = false;
+      } else if (this.deleteMode == DeleteMode.multipleDelete){
+        let apiString = this.resources.endpoint + "ReceiptPayment/DeleteMultiple";
+        const idList = this.$refs.gridMaster.selectedMultiple;
+        const options = {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(idList),
+        };
+        const res = await fetch(apiString, options);
+        const data = await res.json();
+        this.Toast.showToastMsg(ToastType.Success, data['Message']);
+        this.gridKey++;
+        this.showConfirm = false;
+      }
     },
 
+    /**
+     * Hàm nhân bản chứng từ
+     * @param payment: Chứng từ
+     * @author Xuân Đào (11/05/2023)
+     */
     duplicateEvent(payment){
       this.showNewPopup(PaymentFormMode.duplicate, payment)
     },
 
+    /**
+     * Hàm xem chứng từ
+     * @param item: Chứng từ
+     * @author Xuân Đào (11/05/2023)
+     */
     watchPayment(item){
       this.showNewPopup(PaymentFormMode.watch, item);
     },
 
+    /**
+     * Hàm cập nhật api detail
+     * @author Xuân Đào (11/05/2023)
+     */
     updateAPIDetail(){
       // this.APIString = this.resources.endpoint + `ReceiptPayment/Filter?pageSize=${pageSize}&pageNumber=${pageNum}`;
     },
 
+    /**
+     * Hàm cập nhật api master
+     * @param pageSize: Số bản ghi/trang
+     * @param pageNum: Trang hiện tại
+     * @author Xuân Đào (11/05/2023)
+     */
     updateMasterApi(pageSize, pageNum){
       this.APIString = this.resources.endpoint + `ReceiptPayment/Filter?pageSize=${pageSize}&pageNumber=${pageNum}&keyWord=${this.keyword}`;
     },
 
+    /**
+     * Hàm đi tới màn chi tiết chứng từ
+     * @param payment: Chứng từ
+     * @param formMode: hành động của form
+     * @author Xuân Đào (10/05/2023)
+     */
     async showNewPopup(formMode, payment){
       let id = "";
-      if (formMode != PaymentFormMode.create){
+      if (formMode != PaymentFormMode.create && formMode != PaymentFormMode.duplicate){
         id = payment['re_id'];
       }
       sessionStorage.paymentMode = formMode;
-      this.$router.push({ name: "PaymentDetail", params: {id: id}});
+      if (formMode == PaymentFormMode.duplicate)
+        sessionStorage.currentPaymentId = payment['re_id'];
+      this.$router.push({ name: "PaymentDetail", params: {id: id, data: 2}});
     },
 
-    closeDetail(){
-      this.showDetail = false;
-    },
-
+    /**
+     * Hàm xử lý dữ liệu khi grid load xong
+     * @param servie: Chứng từ
+     * @author Xuân Đào (10/05/2023)
+     */
     gridMasterLoaded(service){
         this.currentPayment = this.$refs.gridMaster.gridData[0];
         this.total_amount_master = service['optionResult'][0]['sum'];
@@ -323,9 +429,28 @@ export default {
           }
         }
         this.$refs.gridMaster.gridData = gridMaster;
-        
+        const selectedList = this.$refs.gridMaster.selectedMultiple;
+        setTimeout(() => {
+          const checkboxList = document.querySelector(".grid-body").querySelectorAll(".m-checkbox");
+          const trList = document.querySelector(".grid-body").querySelectorAll("tr");
+          for (let i=0;i<checkboxList.length;i++){
+            if (selectedList.indexOf(this.$refs.gridMaster.gridData[i]['re_id']) != -1){
+              checkboxList[i].classList.add("checked");
+              trList[i].classList.add("checked-item");
+            } 
+            else {
+              checkboxList[i].classList.remove("checked");
+              trList[i].classList.remove("checked-item");
+            }
+          }
+        }, 100);
     },
 
+    /**
+     * Hàm đi tới màn chi tiết chứng từ
+     * @param payment: Chứng từ
+     * @author Xuân Đào (10/05/2023)
+     */
     gridDetailLoaded(service){ 
       if (this.$refs.gridDetail.gridData[0]){
         this.total_amount_detail = service['summary'][0]['Total amount'];
@@ -334,6 +459,10 @@ export default {
       else this.total_amount_detail = 0;
     },
 
+    /**
+     * Hàm thu gọn detail
+     * @author Xuân Đào (10/05/2023)
+     */
     collaseDetail(){
         if (!this.collased){
             this.$refs.reMaster.classList.remove('collase-master');
@@ -356,10 +485,18 @@ export default {
         }
     },
 
+    /**
+     * Hàm cập nhật detail khi chọn master 
+     * @author Xuân Đào (10/05/2023)
+     */
     gridItemOnClicked(item){
       this.detailAPI = this.resources.endpoint + 'ReceiptPaymentDetail/GetAllByReId?re_id=' + item['re_id'];
     },
 
+    /**
+     * Hàm định dạng tiền
+     * @author Xuân Đào (09/05/2023)
+     */
     formatMoney(amount, decimalCount = 0, decimal = "", thousands = ".") {
       decimalCount = Math.abs(decimalCount);
       decimalCount = isNaN(decimalCount) ? 2 : decimalCount;
@@ -389,6 +526,8 @@ export default {
       confirmMessage: "",
       selectedPayment: null,
       keyword:"",
+      enableMultipleEditor: false,
+      deleteMode: 0,
     };
   },
 };

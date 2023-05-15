@@ -20,8 +20,10 @@
           class="icon export-excel-icon"
         ></div>
         <div class="create-btn">
-          <div class="ct-btn" @click="showNewPopup(0)"> Thêm </div>
-          <div class="more-icon"></div>
+          <div class="ct-btn" @click="showNewPopup(0, this.$refs.gridData.selectedData)"> Thêm </div>
+          <div class="more-icon">
+            <div class="more-icon__icon"></div>
+          </div>
         </div>
       </div>
       <div class="content-main__data">
@@ -59,7 +61,7 @@
     <MSingleActionDialog
     ref="singleDialog"
     ></MSingleActionDialog>
-    <MAccountDetail ref="accountDetail" @closeOnSuccess="closeDetailOnSuccess" :form-mode="formMode" :account="selectedAccount" @closeMe="closeDetail" v-if="showDetail" :sortedData="this.sortedData"></MAccountDetail>
+    <MAccountDetail @reloadGrid="this.gridKey++" ref="accountDetail" @closeOnSuccess="closeDetailOnSuccess" :form-mode="formMode" :account="selectedAccount" @closeMe="closeDetail" v-if="showDetail" :sortedData="this.sortedData"></MAccountDetail>
     <MCircleLoader v-if="showLoader"></MCircleLoader>
     <MConfirmDeleteDialog      
       ref="confirmDelete"
@@ -88,16 +90,19 @@ import MConfirmDeleteDialog, { deleteType } from '@/components/unit-components/M
 import { ToastType } from '@/components/base-component/MToastItem.vue';
 import MUISeting from "@/components/unit-components/MUISeting.vue";
 
+// Hành động của grid
 export const Action = {
   expand: 0,
   fold: 1,
 }
 
+// Trạng thái của tài khoản
 export const accountStatus = {
   using: 0,
   unuse: 1,
 }
 
+// Tính chất của tài khoản
 export const AccountProperty = {
   Debt: 0,
   Excess: 1,
@@ -105,6 +110,7 @@ export const AccountProperty = {
   NoBalance: 3,
 }
 
+// Hành động của dialog
 export const DialogAction = {
   Delete: 0,
   Update: 1,
@@ -155,6 +161,11 @@ export default {
 
   methods: {
 
+    /**
+     * Hàm xử lý sự kiện bàn phím 
+     * 
+     * @authod Xuân Đào (01/05/2023)
+     */
     handleKeyDown(){
       if (event.ctrlKey && event.key === '1'){
         event.preventDefault();
@@ -172,11 +183,21 @@ export default {
       }
     },
 
+    /**
+     * Hàm xử lấy mẫu ngầm định 
+     * 
+     * @authod Xuân Đào (09/05/2023)
+     */
     setDefaultUI(){
       this.UISetting = false;
       this.AccountList = accountList;
     },
 
+    /**
+     * Hàm áp dụng tùy chỉnh giao diện 
+     * 
+     * @authod Xuân Đào (09/05/2023)
+     */
     applyUI(result){
       let newUI = [];
       if (result){
@@ -191,6 +212,11 @@ export default {
       }
     },
 
+    /**
+     * Hàm thay đổi dữ liệu khi đổi vị trí cột 
+     * 
+     * @authod Xuân Đào (09/05/2023)
+     */
     columnSwapped(newIndex, oldIndex){
       let oldAccount = this.AccountList[oldIndex]
       if (oldIndex < newIndex) {
@@ -212,6 +238,11 @@ export default {
       // this.AccountList[newIndex] = temp;
     },
 
+    /**
+     * Hàm xử tìm kiếm dữ liệu 
+     * 
+     * @authod Xuân Đào (01/05/2023)
+     */
     searchOnInput(value){
       this.$refs.gridData.sortedData = this.sortedData;
       if (value.trim().length > 0){
@@ -226,6 +257,11 @@ export default {
       }, 100)
     },
 
+    /**
+     * Hàm tìm kiếm tài khoản theo keyword
+     * 
+     * @authod Xuân Đào (01/05/2023)
+     */
     searchByKeyword(keyword){
       let indexs = [];
       // Tìm kiếm theo keyword
@@ -263,6 +299,11 @@ export default {
       this.$refs.gridData.sortedData = newArray;
     },
 
+    /**
+     * Hàm cập nhật trạng thái grid
+     * @param action - Đóng / mở
+     * @authod Xuân Đào (29/04/2023)
+     */
     updateAction(action){
       if (action == Action.expand){
         this.gAction = Action.expand;
@@ -273,10 +314,20 @@ export default {
       }
     },
 
+    /**
+     * Hàm đóng / mở toàn bộ grid
+     * 
+     * @authod Xuân Đào (29/04/2023)
+     */
     gridOnAction(){
       this.$refs.gridData.foldOrExpandAll(this.gAction);
     },
 
+    /**
+     * Hàm xuất dữ liệu ra excel
+     * 
+     * @authod Xuân Đào (28/04/2023)
+     */
     async excelExport(){
       this.Loader.showLoader();
       let excelData = Object.assign({}, this.sortedData);
@@ -291,8 +342,6 @@ export default {
       }
       body += "]";
       const apiString = `${this.resources.endpoint}Account/ExcelExport?widthList=${this.$refs.gridData.getWidthList()}`;
-      /*eslint-disable no-debugger */
-      debugger
       const options = {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -306,21 +355,13 @@ export default {
       a.click();
       a.remove();
       this.Loader.closeLoader();
-      // fetch(apiString, options)
-      //   .then((res) => res.blob())
-      //   .then((data) => {
-      //     var a = document.createElement("a");
-      //     a.href = window.URL.createObjectURL(data);
-      //     a.download = "Danh_sach_tai_khoan-" + Date.now().toString();
-      //     a.click();
-      //     a.remove();
-      //     this.Loader.closeLoader();
-      //   })
-      //   .catch(err => {
-      //     console.log(err);
-      //   })
     },
 
+    /**
+     * Hàm nhân bản tài khoản
+     * 
+     * @authod Xuân Đào (28/04/2023)
+     */
     updateAccount(account){
       this.showNewPopup(formMode.duplicate, account);
     },
@@ -339,25 +380,59 @@ export default {
           this.Toast.showToastMsg(ToastType.Success,data['Message']);
           this.$refs.gridData.deleteSelectedRow();
           this.totalRecord--;
+          if (this.selectedAccount['dependency'] && this.selectedAccount['dependency'].trim().length > 0){
+            let haveChild = 0;
+            /*eslint-disable no-debugger */
+            debugger
+            for (let i=0;i<this.sortedData.length;i++){
+              if (this.selectedAccount['dependency'] == this.sortedData[i]['dependency']){
+                haveChild += 1;
+                break;
+              }
+            }
+            if (haveChild == 1){
+              this.$refs.gridData.sortedData[this.findParent(this.$refs.gridData.sortedData, this.selectedAccount['dependency'])]['haveSub'] = false;
+            }
+          }
         }
       } else {
         this.updateChildAccount();
       }
     },
 
+    /**
+     * Hàm đóng popup cảnh báo
+     * 
+     * @authod Xuân Đào (28/04/2023)
+     */
     closeDeleteDialog(){
       this.showConfirm = false;
     },
 
+    /**
+     * Hàm cập nhật trạng thái grid khi thêm mới thành công
+     * 
+     * @authod Xuân Đào (28/04/2023)
+     */
     closeDetailOnSuccess(){
       this.closeDetail();
       this.gridKey++;
     },
 
+    /**
+     * Hàm sửa khi double click grid
+     * 
+     * @authod Xuân Đào (27/04/2023)
+     */
     itemOnDbClick(item){
       this.showNewPopup(formMode.modify, item);
     },
 
+    /**
+     * Hàm hiển thị popup tài khoản
+     * 
+     * @authod Xuân Đào (27/04/2023)
+     */
     showNewPopup(mode, data){
       this.formMode = mode;
       this.selectedAccount = data;
@@ -365,16 +440,34 @@ export default {
       this.showDetail = true;
     },
 
+    /**
+     * Hàm đóng popup tài khoản
+     * 
+     * @authod Xuân Đào (27/04/2023)
+     */
     closeDetail(){
       this.showDetail = false;
     },
 
+    /**
+     * Hàm xử lý khi load xong grid
+     * 
+     * @authod Xuân Đào (27/04/2023)
+     */
     gridLoaded(){
       this.sortedData = this.$refs.gridData.sortedData;
       this.totalRecord = this.$refs.gridData.gridData[0]['total_record'];
       this.formatDisplayData();
+      if (this.$refs.searchBar.getInputValue().length > 0){
+        this.searchOnInput(this.$refs.searchBar.getInputValue());
+      }
     },
 
+    /**
+     * Hàm định dạng dữ liệu hiển thị
+     * 
+     * @authod Xuân Đào (27/04/2023)
+     */
     formatDisplayData(){
       for(let i = 0;i < this.sortedData.length; i++){
         this.sortedData[i].displayCode = "---".repeat(this.sortedData[i]['datalevel']) + " " + this.sortedData[i]['accountnumber'];
@@ -411,6 +504,12 @@ export default {
 
     },
 
+    /**
+     * Hàm yêu cầu xóa tài khoản
+     * @param data: dữ liệu
+     * @param type: kiểu xóa - single/multiple
+     * @authod Xuân Đào (27/04/2023)
+     */
     deleteRecord(data, type){
       if (type === deleteType.singleDelete) {
         this.selectedAccount = data;
@@ -448,12 +547,22 @@ export default {
       }
     },
 
+    /**
+     * Hàm tìm tài khoản cha
+     * 
+     * @authod Xuân Đào (27/04/2023)
+     */
     findParent(arr, data) {
       for (let i = 0; i < arr.length; i++) {
         if (arr[i]["accountid"] === data) return i;
       }
     },
 
+    /**
+     * Hàm chèn dữ liệu vào mảng
+     * 
+     * @authod Xuân Đào (26/04/2023)
+     */
     insertToPosition(arr, index, data) {
       let result = [];
       for (let i = 0; i < arr.length; i++) {
@@ -467,6 +576,12 @@ export default {
       return result;
     },
 
+    /**
+     * Hàm cập nhật trạng thái tài khoản
+     * @param: account - tài khoản cập nhật
+     * @param: index - chỉ số tài khoản
+     * @authod Xuân Đào (26/04/2023)
+     */
     async updateAccountStatus(account, index){
       try {
         if (account['isSub'] && account['status'] == 1){
@@ -536,6 +651,11 @@ export default {
       }
     },
 
+    /**
+     * Hàm lấy danh sách tài khoản con theo index
+     * @param index: Chỉ số tài khoản cha
+     * @authod Xuân Đào (25/04/2023)
+     */
     GetChildList(index){
       let list = [];
       let curIndex = index
@@ -546,6 +666,11 @@ export default {
       return list;
     },
 
+    /**
+     * Hàm cập nhật trạng thái các tài khoản bị ảnh hưởng
+     * 
+     * @authod Xuân Đào (26/04/2023)
+     */
     async updateChildAccount(){
       const index = this.$refs.gridData.selectedIndex;
       let childList = this.GetChildList(index);
@@ -568,6 +693,11 @@ export default {
       }
     },
 
+    /**
+     * Hàm cập nhật hàng loạt tài khoản
+     * 
+     * @authod Xuân Đào (26/04/2023)
+     */
     async updateMultipleAccount(ids, newStatus){
       try {
         /*eslint-disable no-debugger */
@@ -585,6 +715,11 @@ export default {
       }
     },
 
+    /**
+     * Hàm lưu tài khoản
+     * 
+     * @authod Xuân Đào (26/04/2023)
+     */
     async saveAccount(account){
       try {
         let queryString = (this.formMode == formMode.create || this.formMode == formMode.duplicate) ? `${this.resources.endpoint}Account`
@@ -680,10 +815,9 @@ export default {
   font-size: 13px;
   font-family: Notosans-bold;
   height: 28px;
-  width: 65px;
+  width: 64px;
   line-height: 28px;
   text-align: center;
-  border-right: solid #fff 1px;
   z-index: 2;
 }
 
@@ -694,8 +828,18 @@ export default {
 
 .more-icon{
   height: 28px;
+  width: 36px;
+  position: relative;
+}
+
+.more-icon__icon{
+  height: 20px;
   width: 35px;
-  background: url('@/assets/img/Sprites.64af8f61.svg') no-repeat -840px -353px;
+  background: url('@/assets/img/Sprites.64af8f61.svg') no-repeat -840px -357px;
+  position: absolute;
+  right: 0;
+  top: 4px;
+  border-left: solid #fff 1px;
 }
 
 .more-icon:hover{
