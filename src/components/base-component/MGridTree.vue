@@ -104,6 +104,7 @@
             </td>
           </tr>
         </tbody>
+        <div class="no-data" v-show="noData">{{ this.resources.vi.noDataGrid }}</div>
       </table>
     </div>
     <MContextMenu
@@ -249,6 +250,16 @@ export default {
       } else {
         this.$emit("updateAction", 0);
       }
+    },
+
+    sortedData: function(newVal){
+      if (newVal != newVal.length == 0 && !this.showLoading) this.noData = true;
+      else this.noData = false;
+    },
+
+    showLoading: function(){
+      if (this.showLoading) this.noData = false;
+      else this.noData = true;
     }
   },
 
@@ -270,6 +281,7 @@ export default {
       currentHideRow: 0,
       foldAll: false,
       status: '',
+      noData: false,
     };
   },
   methods: {
@@ -423,7 +435,6 @@ export default {
           el.isSub = false;
           el.haveSub = false;
           this.sortedData.push(el);
-          // this.sortedArray.addItem(el);
         } else {
           el.isSub = true;
           this.subData.push(el);
@@ -433,20 +444,11 @@ export default {
         let index = this.findParent(this.sortedData, this.subData[i]['dependency']);
         this.sortedData[index].haveSub = true;
         this.subData[i].haveSub = false;
-        this.sortedData = this.insertToPosition(this.sortedData, index, this.subData[i]);
+        let insertIndex = index;
+        while (this.sortedData[insertIndex+1] && this.sortedData[insertIndex+1]['datalevel'] > this.sortedData[index]['datalevel']) insertIndex++;
+        this.sortedData = this.insertToPosition(this.sortedData, insertIndex, this.subData[i]);
       }
       this.gridData = data;
-      // for (let i=0;i<this.gridData.length;i++){
-      //   let j = i + 1;
-      //   while (this.gridData[j] && this.gridData[i]['datalevel'] != this.gridData[j]['datalevel']){
-      //     if (this.gridData[i] && this.gridData[j] && this.gridData[i]['accountnumber'] > this.gridData[j]['accountnumber']){
-      //       let tg = this.gridData[i];
-      //       this.gridData[i] = this.gridData[j];
-      //       this.gridData[j] = tg;
-      //     }
-      //     j++;
-      //   }
-      // }
       this.$emit("loadCompleted");
       for(let i=0;i<this.gridData.length;i++){
         this.gridData[i]['created_date_display'] = this.dateFormator(this.gridData[i]['created_date']);
@@ -766,6 +768,26 @@ export default {
 };
 </script>
 <style scoped>
+
+.no-data{
+  position: absolute;
+  font-size: 13px;
+  text-align: center;
+  width: calc(100vw - 250px);
+  line-height: 36px;
+  margin-top: 10px;
+  color: #111111;
+}
+
+.no-data::before{
+  content: '';
+  display: block;
+  height: 80px;
+  width: 130px;
+  position: relative;
+  left: calc(100% - 710px);
+  background: url("@/assets/icons/nodata.svg") no-repeat;
+}
 
 .grid-title th{
   border-top: unset !important;

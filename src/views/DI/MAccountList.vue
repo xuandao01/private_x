@@ -280,10 +280,12 @@ export default {
       for(var i=0; i<this.sortedData.length; i++) {
         let keys = Object.keys(this.sortedData[i]);
         keys.forEach(key => {
-          if (this.sortedData[i][key] && this.sortedData[i][key].toString().indexOf(keyword) != -1){
-            indexs.push(i);
-            i++;
-            return;
+          if (this.sortedData[i]) {
+            if (this.sortedData[i][key] && this.sortedData[i][key].toString().indexOf(keyword) != -1){
+              indexs.push(i);
+              i++;
+              return;
+            }
           }
         })
       }

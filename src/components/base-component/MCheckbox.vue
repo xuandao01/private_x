@@ -35,6 +35,15 @@ export default {
         }
     },
 
+    watch:{
+        isCheckedByNum: function(newVal){
+            if (newVal != -1){
+            if (this.isCheckedByNum == 0) this.checked = true;
+            else this.checked = false;
+        }
+        }
+    },
+
     created(){
         if (this.isChecked)
             this.checked = this.isChecked;

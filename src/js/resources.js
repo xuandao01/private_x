@@ -171,6 +171,7 @@ let resources =  {
             paymentError: {
                 debitRequired: 'Tài khoản nợ không được để trống',
                 creditRequired: 'Tài khoản có không được để trống',
+                reRefRequired: 'Số phiếu chi không được để trống',
             }
         },
         

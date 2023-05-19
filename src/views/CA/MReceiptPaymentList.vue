@@ -466,8 +466,6 @@ export default {
      * @author Xuân Đào (10/05/2023)
      */
     gridMasterLoaded(service){
-              /*eslint-disable no-debugger */
-              debugger
         if (this.$refs.gridMaster.gridData[0]) {
           this.currentPayment = this.$refs.gridMaster.gridData[0];
           this.total_amount_master = service['optionResult'][0]['sum'];
@@ -476,15 +474,7 @@ export default {
           this.$refs.gridDetail.getApiData();
           let gridMaster = this.$refs.gridMaster.gridData;
           for (let i = 0; i< gridMaster.length;i++){
-            switch (gridMaster[i].ca_type){
-              case 0: {
-                gridMaster[i].ca_type_name = "Phiếu chi";
-                break;
-              }
-              default: {
-                gridMaster[i].ca_type_name = "Phiếu thu";
-              }
-            }
+            gridMaster[i].ca_type_name = "Phiếu chi";
           }
           this.$refs.gridMaster.gridData = gridMaster;
           const selectedList = this.$refs.gridMaster.selectedMultiple;

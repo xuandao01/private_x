@@ -1,5 +1,5 @@
 <template>
-  <div class="account-detail">
+  <div class="account-detail" :key="formKey">
     <div ref="detailMain" class="ad-main">
       <div ref="detailExpandBtn" @click="expandOnClick" class="ad-expand"></div>
       <div class="ad-title">
@@ -15,7 +15,7 @@
         <div class="ad-content">
           <div class="ad-content__row1">
             <MInput ref="inpAccountNumber" class="ad-content__row--item" titleColor="333333"
-              :input-title="this.resources.vi.accountList.data.accountNumber" :required="true"
+              :input-title="this.resources.vi.accountList.data.accountNumber" :required="true" inputType="number"
               v-model="this.currentAccount['accountnumber']" :max-length="20" :min-length="3"></MInput>
           </div>
           <div class="ad-content__row">
@@ -378,6 +378,7 @@ export default {
 
   data() {
     return {
+      formKey: 0,
       isExpanded: false,
       resources: resources,
       collase: false,
@@ -584,6 +585,22 @@ export default {
             else {
               this.$emit("reloadGrid");
               this.currentAccount = Object.assign({}, this.beforeAccount);
+              /*eslint-disable no-debugger */
+              debugger
+              let detail = document.querySelector(".account-detail");
+              if (detail){
+                let checkboxs = detail.querySelectorAll(".m-checkbox");
+                checkboxs.forEach(el => el.classList.remove("checked"));
+              }
+              this.followObject = false;
+              this.followObjectTHCP = false;
+              this.followBankAccount = false;
+              this.followConstruction = false;
+              this.followContract = false;
+              this.followExpenseItem = false;
+              this.followOrder = false;
+              this.followSellContract = false;
+              this.followStatisticalCode = false;
               this.$refs.inpProperty.selectedIndex = 0;
             }
           } else {

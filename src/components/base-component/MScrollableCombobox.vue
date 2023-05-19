@@ -27,7 +27,7 @@
             </thead>
             <tbody ref="tbody">
                 <tr @click="rowOnClick(index)" v-for="(item, index) in this.apiData" :key="index">
-                    <td :style="[item['haveSub'] ? {fontFamily: 'Notosans-bold'}:{}]" v-for="(data, inx) in this.mapData" :key="inx">{{ item[data['modelValue']] }}</td>
+                    <td :style="[{maxWidth: data['width'] + 'px'}]" v-for="(data, inx) in this.mapData" :key="inx">{{ item[data['modelValue']] }}</td>
                 </tr>
             </tbody>
         </table>
@@ -196,15 +196,21 @@ export default {
                 if (this.keyword.length > 0){
                     this.localAPI = `${this.api}1&keyword=`;
                     this.keyword = "";
+                } else {
+                    this.currentPage = 1;
+                    this.localAPI = `${this.api} + ${this.currentPage}`;
+                    this.getApiData();
                 }
                 this.setSelectedValue(this.defaultValue, this.displayModel);
             }
         },
 
         localAPI: function(){
-            this.apiData = [];
-            this.currentPage = 1;
-            this.getApiData();
+            if (this.keyword.length > 0){
+                this.apiData = [];
+                this.currentPage = 1;
+                this.getApiData();
+            }
         }
     },
 
@@ -223,8 +229,6 @@ export default {
         async getApiData(){
             try{
                 let data = await (await fetch(this.localAPI)).json();
-                /*eslint-disable no-debugger */
-                debugger
                 if (!this.apiData[0])
                     this.apiData = data.Data['data'];
                 else {
@@ -449,6 +453,12 @@ export default {
 }
 </script>
 <style scoped>
+
+    tr td {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
 
     .no-data{
         width: 100%;

@@ -896,6 +896,14 @@ export default {
         this.errMessage = `Ngày hạch toán phải lớn hơn hoặc bằng Ngày chứng từ <${this.formatDate(this.currentPayment['ca_date'])}>. Xin vui lòng kiểm tra lại`;
         return false;
       }
+
+      if (!this.currentPayment['re_ref_no']){
+        this.errMessage = this.resources.vi.paymentDetail.paymentError.reRefRequired;
+        this.$refs.singleDialog.showDialogOn(dialogType.error, this.errMessage, "Đóng");
+        this.currentElErr = this.$refs.reRefNo;
+        return false;
+      }
+
       for (let i = 0; i < this.gridData.length; i++) {
         // if (this.gridData[i].edit_mode == false) {
           if (this.gridData[i]["debit_account"].length < 3) {
@@ -1161,8 +1169,6 @@ export default {
         this.getPaymentData();
         this.savePayment(action);
       } else {
-        /*eslint-disable no-debugger */
-        debugger
         if (this.currentError != null) {
           this.$refs.singleDialog.showDialogOn(
             dialogType.info,

@@ -8,7 +8,7 @@
     </div>
     <input
       ref="mInput"
-      type="text"
+      :type="inputType"
       autocomplete="off"
       :id="id"
       v-model="this.value"
@@ -93,6 +93,12 @@ export default {
     id: {
       type: String,
       required: false,
+    },
+
+    inputType: {
+      type: String,
+      required: false,
+      default: "text"
     }
   },
 
