@@ -6,11 +6,14 @@
 <script>
 export default {
     props:{
+        // Loại button
         kind:{
             type: String,
             required: false,
             default: 'original'
         },
+
+        //
         value:{
             type: String,
             required: false,

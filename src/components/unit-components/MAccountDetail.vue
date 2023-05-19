@@ -27,7 +27,7 @@
               :required="false" :max-length="255"></MInput>
           </div>
           <div class="ad-content__row2">
-            <MScrollableCombobox :width="440" :rawData="sortedData" titleColor="333333"
+            <MScrollableCombobox :width="440" :rawData="scrollableData" titleColor="333333"
               :inputTitle="this.resources.vi.accountList.parentAcc" :required="false" :mapData="[
                   {
                     title: this.resources.vi.accountList.data.accountNumber,
@@ -51,7 +51,7 @@
           </div>
           <div class="ad-content__row">
             <MTextArea ref="inpDescription" class="ad-content__row--item" titleColor="333333"
-              :input-title="this.resources.vi.accountList.data.description" :required="false"></MTextArea>
+              :input-title="this.resources.vi.accountList.data.description" v-model="this.currentAccount['description']" :maxLength="255" :required="false"></MTextArea>
           </div>
           <div class="ad-checkbox__container">
             <MCheckbox :isCheckedByNum="this.currentAccount['accountbyexception']" @click="this.accountByException = !this.accountByException" @updateStatus="this.accountByException = !this.accountByException" ref="checkAccounting"></MCheckbox>
@@ -75,7 +75,7 @@
                 <div class="ad-collase__item--title">
                   {{ this.resources.vi.accountDetail.checkboxTitle.Object }}
                 </div>
-                <MComboboxNomal ref="comboObject" :enable="this.followObject" :data="this.resources.vi.accountDetail.comboboxData.ObjectFollow
+                <MComboboxNomal :default-value-by-text="this.currentAccount['followobjectvalue']" ref="comboObject" :enable="this.followObject" :data="this.resources.vi.accountDetail.comboboxData.ObjectFollow
                   "></MComboboxNomal>
               </div>
               <div class="ad-collase__item">
@@ -83,7 +83,7 @@
                 <div class="ad-collase__item--title">
                   {{ this.resources.vi.accountDetail.checkboxTitle.ObjectTHCP }}
                 </div>
-                <MComboboxNomal ref="comboObjectTHCP" :enable="this.followObjectTHCP" :data="this.resources.vi.accountDetail.comboboxData.AlertRequired
+                <MComboboxNomal ref="comboObjectTHCP" :default-value-by-text="this.currentAccount['followobjectthcpvalue']" :enable="this.followObjectTHCP" :data="this.resources.vi.accountDetail.comboboxData.AlertRequired
                   "></MComboboxNomal>
               </div>
               <div class="ad-collase__item">
@@ -91,7 +91,7 @@
                 <div class="ad-collase__item--title">
                   {{ this.resources.vi.accountDetail.checkboxTitle.Order }}
                 </div>
-                <MComboboxNomal ref="comboOrder" :enable="this.followOrder" :data="this.resources.vi.accountDetail.comboboxData.AlertRequired
+                <MComboboxNomal ref="comboOrder" :default-value-by-text="this.currentAccount['followordervalue']" :enable="this.followOrder" :data="this.resources.vi.accountDetail.comboboxData.AlertRequired
                   "></MComboboxNomal>
               </div>
               <div class="ad-collase__item">
@@ -102,7 +102,7 @@
                       .PurchaseContract
                   }}
                 </div>
-                <MComboboxNomal ref="comboContract" :enable="this.followContract" :data="this.resources.vi.accountDetail.comboboxData.AlertRequired
+                <MComboboxNomal :default-value-by-text="this.currentAccount['followcontractvalue']" ref="comboContract" :enable="this.followContract" :data="this.resources.vi.accountDetail.comboboxData.AlertRequired
                     "></MComboboxNomal>
               </div>
               <div class="ad-collase__item">
@@ -110,7 +110,7 @@
                 <div class="ad-collase__item--title">
                   {{ this.resources.vi.accountDetail.checkboxTitle.Unit }}
                 </div>
-                <MComboboxNomal ref="comboUnit" :enable="this.followUnit" :data="this.resources.vi.accountDetail.comboboxData.AlertRequired
+                <MComboboxNomal :default-value-by-text="this.currentAccount['followunitvalue']" ref="comboUnit" :enable="this.followUnit" :data="this.resources.vi.accountDetail.comboboxData.AlertRequired
                   "></MComboboxNomal>
               </div>
             </div>
@@ -128,7 +128,7 @@
                 <div class="ad-collase__item--title">
                   {{ this.resources.vi.accountDetail.checkboxTitle.Construct }}
                 </div>
-                <MComboboxNomal ref="comboContruction" :enable="this.followConstruction" :data="this.resources.vi.accountDetail.comboboxData.AlertRequired
+                <MComboboxNomal :default-value-by-text="this.currentAccount['followconstructionvalue']" ref="comboContruction" :enable="this.followConstruction" :data="this.resources.vi.accountDetail.comboboxData.AlertRequired
                   "></MComboboxNomal>
               </div>
               <div class="ad-collase__item">
@@ -138,7 +138,7 @@
                     this.resources.vi.accountDetail.checkboxTitle.SellContract
                   }}
                 </div>
-                <MComboboxNomal ref="comboSellContract" :enable="this.followSellContract" :data="this.resources.vi.accountDetail.comboboxData.AlertRequired
+                <MComboboxNomal :default-value-by-text="this.currentAccount['followsellcontractvalue']" ref="comboSellContract" :enable="this.followSellContract" :data="this.resources.vi.accountDetail.comboboxData.AlertRequired
                     "></MComboboxNomal>
               </div>
               <div class="ad-collase__item">
@@ -146,7 +146,7 @@
                 <div class="ad-collase__item--title">
                   {{ this.resources.vi.accountDetail.checkboxTitle.CPItem }}
                 </div>
-                <MComboboxNomal ref="comboExpenseItem" :enable="this.followExpenseItem" :data="this.resources.vi.accountDetail.comboboxData.AlertRequired
+                <MComboboxNomal :default-value-by-text="this.currentAccount['followexpenseitemvalue']" ref="comboExpenseItem" :enable="this.followExpenseItem" :data="this.resources.vi.accountDetail.comboboxData.AlertRequired
                   "></MComboboxNomal>
               </div>
               <div class="ad-collase__item">
@@ -157,7 +157,7 @@
                       .StatisticalCode
                   }}
                 </div>
-                <MComboboxNomal ref="comboStatisticalCode" :enable="this.followStatisticalCode" :data="this.resources.vi.accountDetail.comboboxData.AlertRequired
+                <MComboboxNomal :default-value-by-text="this.currentAccount['followstatisticalcodevalue']"  ref="comboStatisticalCode" :enable="this.followStatisticalCode" :data="this.resources.vi.accountDetail.comboboxData.AlertRequired
                     "></MComboboxNomal>
               </div>
             </div>
@@ -303,6 +303,29 @@ export default {
       }
     }
 
+    if (this.formMode == formMode.modify){
+      this.scrollableData = this.sortedData.slice()
+      if (this.account){
+        let index = -1;
+        for (let i=0;i<this.scrollableData.length;i++){
+          if (this.scrollableData[i]['accountnumber'] == this.account['accountnumber']){
+            index = i;
+          }
+        }
+        if (index != -1){
+          let j = index+1;
+          if (j < this.scrollableData.length){
+            while(this.scrollableData[index]['datalevel'] < this.scrollableData[j]['datalevel']){
+              this.scrollableData = this.removeItemFromArr(this.scrollableData, j);
+            }
+          }
+          this.scrollableData = this.removeItemFromArr(this.scrollableData, index);
+        }
+      }
+    } else {
+      this.scrollableData = this.sortedData.slice()
+    }
+
     switch (this.formMode) {
       case formMode.create: {
         this.formTitle = this.resources.vi.accountDetail.title.create;
@@ -319,6 +342,8 @@ export default {
         break;
       }
     }
+
+
   },
 
   mounted() {
@@ -383,6 +408,7 @@ export default {
       followStatisticalCode: false,
       followStatisticalCodeValue: null,
       accountByException: false,
+      scrollableData: [],
     }
   },
 
@@ -569,6 +595,21 @@ export default {
     },
 
     /**
+     * Hàm lấy danh sách tài khoản con theo index
+     * @param index: Chỉ số tài khoản cha
+     * @authod Xuân Đào (25/04/2023)
+     */
+    GetChildList(index){
+      let list = [];
+      let curIndex = index
+      while(this.sortedData[index + 1]['datalevel'] > this.sortedData[curIndex]['datalevel']){
+        list.push(this.sortedData[index + 1]);
+        index++;
+      }
+      return list;
+    },
+
+    /**
      * Hàm focus nhập liệu lỗi khi đóng dialog
      * @author Xuân Đào (04/05/2023)
      */
@@ -592,6 +633,13 @@ export default {
       return arr;
     },
 
+    findParentByAccountNumber(accountNumber){
+      for (let i=0;i<this.sortedData.length;i++){
+        if (this.sortedData[i]['accountnumber'] == accountNumber) return this.sortedData[i];
+      }
+      return null;
+    },
+
     /**
      * Hàm lấy dữ liệu input
      * @author Xuân Đào (04/05/2023)
@@ -599,14 +647,13 @@ export default {
     getInputData() {
       let dataLevel = 0;
       if (this.$refs.inpDependency.value){
-        let selected = this.$refs.inpDependency.getDataLevel();
-        dataLevel = parseInt(selected['datalevel']) + 1;
+        dataLevel = this.findParentByAccountNumber(this.$refs.inpDependency.value)['datalevel'] + 1;
       }
       let account = {
         accountid: "dcf2e391-29a0-4b54-b616-95a211caf4c5",
         accountname: this.$refs.inpAccountName.value,
         accountnumber: this.$refs.inpAccountNumber.value,
-        dependency: this.$refs.inpDependency.value ? this.sortedData[this.$refs.inpDependency.selectedIndex]['accountid'] : null,
+        dependency: this.$refs.inpDependency.value ? this.findParentByAccountNumber(this.$refs.inpDependency.value)['accountid'] : null,
         property: this.$refs.inpProperty.selectedIndex,
         description: this.$refs.inpDescription.value,
         status: 0,
@@ -615,22 +662,22 @@ export default {
         followObject: this.followObject ? 0 : 1,
         followObjectValue: this.followObject ? this.$refs.comboObject.comboboxData[this.$refs.comboObject.selected] : null,
         followObjectTHCP: this.followObjectTHCP ? 0 : 1,
-        followObjectTHCPValue: this.followObjectTHCP ? this.$refs.comboObjectTHCP.comboboxData[this.$refs.comboObject.selected] : null,
+        followObjectTHCPValue: this.followObjectTHCP ? this.$refs.comboObjectTHCP.comboboxData[this.$refs.comboObjectTHCP.selected] : null,
         followOrder: this.followOrder ? 0 : 1,
-        followOrderValue: this.followOrder ? this.$refs.comboOrder.comboboxData[this.$refs.comboObject.selected] : null,
+        followOrderValue: this.followOrder ? this.$refs.comboOrder.comboboxData[this.$refs.comboOrder.selected] : null,
         followContract: this.followContract ? 0 : 1,
-        followContractValue: this.followContract ? this.$refs.comboContract.comboboxData[this.$refs.comboObject.selected] : null,
+        followContractValue: this.followContract ? this.$refs.comboContract.comboboxData[this.$refs.comboContract.selected] : null,
         followUnit: this.followUnit ? 0 : 1,
-        followUnitValue: this.followUnit ? this.$refs.comboUnit.comboboxData[this.$refs.comboObject.selected] : null,
+        followUnitValue: this.followUnit ? this.$refs.comboUnit.comboboxData[this.$refs.comboUnit.selected] : null,
         followBankAccount: this.followBankAccount ? 0 : 1,
         followConstruction: this.followConstruction ? 0 : 1,
-        followConstructionValue: this.followConstruction ? this.$refs.comboContruction.comboboxData[this.$refs.comboObject.selected] : null,
+        followConstructionValue: this.followConstruction ? this.$refs.comboContruction.comboboxData[this.$refs.comboContruction.selected] : null,
         followSellContract: this.followSellContract ? 0 : 1,
-        followSellContractValue: this.followSellContract ? this.$refs.comboSellContract.comboboxData[this.$refs.comboObject.selected] : null,
+        followSellContractValue: this.followSellContract ? this.$refs.comboSellContract.comboboxData[this.$refs.comboSellContract.selected] : null,
         followExpenseItem: this.followExpenseItem ? 0 : 1,
-        followExpenseItemValue: this.followExpenseItem ? this.$refs.comboExpenseItem.comboboxData[this.$refs.comboObject.selected] : null,
+        followExpenseItemValue: this.followExpenseItem ? this.$refs.comboExpenseItem.comboboxData[this.$refs.comboExpenseItem.selected] : null,
         followStatisticalCode: this.followStatisticalCode ? 0 : 1,
-        followStatisticalCodeValue: this.followStatisticalCode ? this.$refs.comboStatisticalCode.comboboxData[this.$refs.comboObject.selected] : null,
+        followStatisticalCodeValue: this.followStatisticalCode ? this.$refs.comboStatisticalCode.comboboxData[this.$refs.comboStatisticalCode.selected] : null,
         accountByException: this.accountByException ? 0 : 1,
       }
       return account;
@@ -642,6 +689,27 @@ export default {
      */
     async saveAccount(account){
       try {
+        if (!account['dependency'] || account['dependency'].trim().length == 0){
+          account['datalevel'] = 0;
+        } else {
+          let parentAccount = this.sortedData[this.findParent(this.sortedData, account['dependency'])];
+          if (parentAccount){
+            if (account['accountnumber'].toString().substring(0, parentAccount['accountnumber'].toString().length) != parentAccount['accountnumber']){
+              this.$refs.singleDialog.showDialogOn(dialogType.success, "Số tài khoản con phải bắt đầu bằng số tài khoản tổng hợp!", "Đóng");
+              this.currentError = this.$refs.inpAccountNumber;
+              return {status: 400};
+            }
+          }
+          account['datalevel'] = parentAccount['datalevel'] + 1;
+        }
+        // if (this.findParent(this.sortedData, account['accountid'])){
+        //   let childList = this.GetChildList(this.findParent(this.sortedData, account['accountid']));
+        //   if (childList.length > 0){
+        //     /*eslint-disable no-debugger */
+        //     debugger
+        //     return;
+        //   }
+        // }
         let queryString = (this.formMode == formMode.create || this.formMode == formMode.duplicate) ? `${this.resources.endpoint}Account`
                           :`${this.resources.endpoint}Account?id=${this.currentAccount['accountid']}`;
         const options = {

@@ -19,16 +19,26 @@
 export default {
   name: "MDatePicker",
   props: {
+    // Tiêu đề datepicker
     title: {
       type: String,
       required: false,
     },
+
+    // Dữ liệu binding
     modelValue: {
       type: Date,
       required: false,
     },
+
+    // Giá trị mặc định
     defaultDate: {
       type: String,
+      required: false,
+    },
+
+    required: {
+      type: Boolean,
       required: false,
     }
   },
@@ -62,15 +72,29 @@ export default {
     }
   },
   methods: {
-
+    /**
+     * Set focus vào combobox 
+     * 
+     * @author Xuân Đào (14/05/2023)
+     * */
     setFocus(){
       this.$refs.mInput.focus();
     },
 
+     /**
+     * Set giá trị cho combobox 
+     * 
+     * @author Xuân Đào (14/05/2023)
+     * */
     setValue(value){
       this.$refs.mInput.value = value;
     },
 
+     /**
+     * Xử lý khi blur ra khỏi input 
+     * 
+     * @author Xuân Đào (14/05/2023)
+     * */
     onBlur(){
       this.$emit("valueChange", this.$refs.mInput.value);
       this.validate();

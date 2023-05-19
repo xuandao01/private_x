@@ -9,14 +9,14 @@
           <tr class="grid-title">
             <th
               class="multiple-select"
-              :class="{ 'fix-start': isFixedStart }"
+              :class="[{ 'fix-start': isFixedStart }]"
               v-if="muiltipleSelect"
             >
               <MCheckbox ref="parentCheckbox" @click="parentCheckBoxOnClick"></MCheckbox>
               <div class="rightBorder"></div>
             </th>
             <th
-              :class="item.dataType"
+              :class="[item.dataType, {'first-column': index==0}, {'last-column': index==data.length-1}]"
               v-for="(item, index) in data"
               :key="index"
               :title="item.tooltip"
@@ -34,7 +34,7 @@
           </tr>
         </thead>
         <tbody ref="tableBody" class="grid-body">
-          <MGridDataLoading v-if="showLoading"></MGridDataLoading>
+          <MGridDataLoading :numOfColumn="data.length" v-if="showLoading"></MGridDataLoading>
           <tr v-for="(item, index) in gridData" :key="index" 
           @click="itemOnClick(item, index)"
           :class="{'tr-selected': index == 0 && isFocusFirst}"
@@ -42,17 +42,19 @@
             <td
               v-if="muiltipleSelect"
               :class="{ 'fix-start': isFixedStart }"
-              v-show="showData"
+              v-show="!showLoading"
             >
               <MCheckbox @click="checkBoxOnClick(item)" ref="childCheckbox">
               </MCheckbox>
               <div class="rightBorder"></div>
             </td>
             <td
-              :class="[value.dataType]"
+              :class="[value.dataType, {'first-column': index==0}, {'last-column': index==data.length-1}]"
               v-for="(value, index) in data"
               :key="index"
-              v-show="showData"
+              v-show="!showLoading"
+              :style="[{maxWidth: value['colWidth']+'px'},{color: '#' + value['colColor']}]"
+              :title="item[value.dataField]"
               @dblclick="editOnDbClick(item)"
             >
             <!-- <input class="grid-input" :class="{'disable-editor': !canEditValue, 'enable-editor': canEditValue}" type="text" :value="item[value.dataField]"> -->
@@ -62,7 +64,7 @@
               class="editable"
               :class="{ 'fix-end': isFixedEnd }"
               v-if="editable"
-              v-show="showData"
+              v-show="!showLoading"
             >
               <div class="edit">
                 <div class="edit-text" @click="this.$emit('functionClicked', item)">{{ this.function }}</div>
@@ -77,7 +79,7 @@
             </td>
           </tr>
         </tbody>
-        <div class="no-data" v-show="noData">{{ this.resources.vi.noData }}</div>
+        <div class="no-data" v-show="noData">{{ this.resources.vi.noDataGrid }}</div>
       </table>
     </div>
     <MContextMenu
@@ -548,7 +550,10 @@ export default {
 
     editOnClick(item) {
       this.getClickedPosition(event);
-      this.$refs.context.setPosition(50, this.cursor_y + 15);
+      if (this.cursor_y < 550)
+        this.$refs.context.setPosition(50, this.cursor_y + 15);
+      else 
+        this.$refs.context.setPosition(50, this.cursor_y - 105);
       this.showContext = true;
       this.selectedData = item;
       this.selected = event.target.parentElement.parentElement.parentElement;
@@ -577,15 +582,15 @@ export default {
      * @author  Xuân Đào (12/03/2023)
      */
     dateFormator(date) {
-      const data = new Date(date);
-      if (data.toDateString() !== "Invalid Date") {
-        let dateVal = data.getDay() + 1;
-        let month = data.getMonth() + 1;
-        const year = data.getFullYear();
-        dateVal = dateVal < 10 ? "0"+dateVal:dateVal;
-        month = month < 10 ? "0"+month:month;
-        return `${dateVal}/${month}/${year}`;
-      } else return "";
+      const dateData = new Date(date);
+      const day =
+        dateData.getDate() < 10 ? "0" + dateData.getDate() : dateData.getDate();
+      const month =
+        dateData.getMonth() + 1 < 10
+          ? "0" + (dateData.getMonth() + 1)
+          : dateData.getMonth() + 1;
+      const year = dateData.getFullYear();
+      return `${day}/${month}/${year}`;
     },
 
     /**
@@ -765,6 +770,19 @@ export default {
 </script>
 <style scoped>
 
+
+.first-column{
+  border-left: unset !important;
+}
+
+.last-column{
+  border-right: unset !important;
+}
+
+.gre-main__scroll{
+  overflow-x: auto;
+}
+
 table thead tr th{
   border-top: unset !important;
   border-bottom: unset !important;
@@ -776,7 +794,18 @@ table thead tr th{
   text-align: center;
   width: calc(100vw - 200px);
   line-height: 36px;
+  margin-top: 10px;
+  color: #111111;
+}
 
+.no-data::before{
+  content: '';
+  display: block;
+  height: 80px;
+  width: 130px;
+  position: relative;
+  left: calc(100% - 730px);
+  background: url("@/assets/icons/nodata.svg") no-repeat;
 }
 
 .first-data{
@@ -790,6 +819,7 @@ table thead tr th{
 .editable {
   width: 150px;
   text-align: center;
+  border-right: unset !important;
 }
 
 .edit-text {
@@ -808,7 +838,7 @@ table thead tr th{
   background-color: #bfbfbf;
   z-index: 99;
   top: 0;
-  right: -0.5px;
+  right: 0.25px;
   position: absolute;
 }
 
@@ -822,7 +852,7 @@ table thead tr th{
   background-color: #bfbfbf;
   z-index: 999;
   top: 0;
-  left: -1px;
+  left: 0.25px;
   position: absolute;
 }
 

@@ -18,6 +18,7 @@
         @click="excelExport"
         class="icon export-excel-icon"
       ></div>
+      <div title="Tùy chỉnh giao diện" @click="UISetting = true" class="icon setup-icon"></div>
       <MOptionalButton ref="btn1" @onClick="showNewPopup(0)" :content="this.resources.vi.cashControl.actionBtn.PT"></MOptionalButton>
       <MOptionalButton ref="btn2" @onClick="showNewPopup(0)" :content="this.resources.vi.cashControl.actionBtn.PC"></MOptionalButton>
     </div>
@@ -33,12 +34,14 @@
                   dataField: 're_date',
                   dataType: 'date',
                   colWidth: '200',
+                  colColor: '111111',
                 },
                 {
                   title: resources.vi.cashControl.gridData.ca_date,
                   tooltip: resources.vi.cashControl.gridData.rp_date,
                   dataField: 'ca_date',
                   dataType: 'date',
+                  colColor: '111111',
                   colWidth: '200',
                 },
                 {
@@ -46,6 +49,7 @@
                   tooltip: resources.vi.cashControl.gridData.rp_ref_no,
                   dataField: 're_ref_no',
                   dataType: 'text',
+                  colColor: '0075c0',
                   colWidth: '150',
                 },
                 {
@@ -53,6 +57,7 @@
                   tooltip: resources.vi.cashControl.gridData.rp_description,
                   dataField: 're_description',
                   dataType: 'text',
+                  colColor: '111111',
                   colWidth: '350',
                 },
                 {
@@ -60,20 +65,31 @@
                   tooltip: resources.vi.cashControl.gridData.amount,
                   dataField: 'total_amount',
                   dataType: 'd-money',
+                  colColor: '111111',
                   colWidth: '200',
+                },
+                {
+                  title: resources.vi.cashControl.gridData.object_code,
+                  tooltip: resources.vi.cashControl.gridData.object_code,
+                  dataField: 'supplier_code',
+                  dataType: 'text',
+                  colColor: '111111',
+                  colWidth: '150',
                 },
                 {
                   title: resources.vi.cashControl.gridData.object,
                   tooltip: resources.vi.cashControl.gridData.object,
                   dataField: 'supplier_name',
                   dataType: 'text',
-                  colWidth: '150',
+                  colColor: '111111',
+                  colWidth: '200',
                 },
                 {
                   title: resources.vi.cashControl.gridData.rp_reason,
                   tooltip: resources.vi.cashControl.gridData.rp_reason,
                   dataField: 're_reason',
                   dataType: 'text',
+                  colColor: '111111',
                   colWidth: '150',
                 },
                 {
@@ -81,6 +97,7 @@
                   tooltip: resources.vi.cashControl.gridData.ca_type,
                   dataField: 'ca_type_name',
                   dataType: 'text',
+                  colColor: '111111',
                   colWidth: '150',
                 },
             ]"
@@ -129,6 +146,7 @@
                   tooltip: '',
                   dataField: 're_no',
                   dataType: 'num',
+                  colColor: '111111',
                   colWidth: '0',
                 },
                 {
@@ -136,6 +154,7 @@
                   tooltip: resources.vi.cashControl.gridDetail.rp_description,
                   dataField: 'rpd_description',
                   dataType: 'text',
+                  colColor: '111111',
                   colWidth: '150',
                 },
                 {
@@ -143,6 +162,7 @@
                   tooltip: resources.vi.cashControl.gridDetail.debit_account_tooltip,
                   dataField: 'debit_account',
                   dataType: 'text',
+                  colColor: '111111',
                   colWidth: '100',
                 },
                 {
@@ -150,6 +170,7 @@
                   tooltip: resources.vi.cashControl.gridDetail.credit_account_tooltip,
                   dataField: 'credit_account',
                   dataType: 'text',
+                  colColor: '111111',
                   colWidth: '100',
                 },
                 {
@@ -157,6 +178,7 @@
                   tooltip: resources.vi.cashControl.gridDetail.amount,
                   dataField: 'amount',
                   dataType: 'd-money',
+                  colColor: '111111',
                   colWidth: '150',
                 },
                 {
@@ -164,6 +186,7 @@
                   tooltip: resources.vi.cashControl.gridDetail.object,
                   dataField: 'supplier_code',
                   dataType: 'text',
+                  colColor: '111111',
                   colWidth: '150',
                 },
                 {
@@ -171,6 +194,7 @@
                   tooltip: resources.vi.cashControl.gridDetail.object_name,
                   dataField: 'supplier_name',
                   dataType: 'text',
+                  colColor: '111111',
                   colWidth: '350',
                 },
             ]"
@@ -186,7 +210,6 @@
           <MPagination
           :totalRecord="this.totalDetail"
           @updateAPI="updateAPIDetail"
-          
           ref="pagingDetail"
         ></MPagination>
         </div>
@@ -243,9 +266,38 @@ export default {
   },
 
   mounted(){
+    window.addEventListener("keydown", this.handleOnKeyDown);
+  },
+
+  unmounted(){
+    window.removeEventListener("keydown", this.handleOnKeyDown);
+
   },
 
   methods: {
+    handleOnKeyDown(){
+      if (event.ctrlKey && event.key === '1'){
+        event.preventDefault();
+        this.showNewPopup(PaymentFormMode.create);
+      }
+
+      if (event.ctrlKey && event.key === 'm'){
+        event.preventDefault();
+        if (this.enableMultipleEditor) {
+          this.multipleDelete();
+        }
+      }
+
+      if (event.ctrlKey && event.key === 'r') {
+        event.preventDefault();
+        this.gridKey++;
+      }
+
+      if (event.ctrlKey && event.key === 'e') {
+        event.preventDefault();
+        this.excelExport();
+      }
+    },
 
     /**
      * Hàm sửa chứng từ
@@ -285,7 +337,7 @@ export default {
     async excelExport(){
       this.Loader.showLoader();
       let keyword = this.$refs.searchBar.getInputValue();
-      let apiString = `${this.resources.endpoint}ReceiptPayment/ExcelExport?widthList=50%2C150%2C150%2C100%2C150%2C150%2C200%2C200%2C250%2C200&keyword=${keyword}`;
+      let apiString = `${this.resources.endpoint}ReceiptPayment/ExcelExport?widthList=50%2C150%2C150%2C100%2C250%2C150%2C200%2C200%2C250%2C200&keyword=${keyword}`;
       const res = await fetch(apiString);
       const data = await res.blob();
       var a = document.createElement("a");
@@ -305,6 +357,7 @@ export default {
       this.keyword = keyword;
       const pageSize = this.$refs.pagingDetail.pageSize;
       const pageNum = this.$refs.pagingDetail.currentPage;
+      this.$refs.gridDetail.gridData = [];
       this.updateMasterApi(pageSize, pageNum);
     },
 
@@ -350,6 +403,7 @@ export default {
         this.Toast.showToastMsg(ToastType.Success, data['Message']);
         this.gridKey++;
         this.showConfirm = false;
+        this.enableMultipleEditor = false;
       }
     },
 
@@ -412,38 +466,45 @@ export default {
      * @author Xuân Đào (10/05/2023)
      */
     gridMasterLoaded(service){
-        this.currentPayment = this.$refs.gridMaster.gridData[0];
-        this.total_amount_master = service['optionResult'][0]['sum'];
-        this.totalMaster = service['totalRecord'][0]['Total record'];
-        this.detailAPI = this.resources.endpoint + 'ReceiptPaymentDetail/GetAllByReId?re_id=' + this.currentPayment.re_id;
-        let gridMaster = this.$refs.gridMaster.gridData;
-        for (let i = 0; i< gridMaster.length;i++){
-          switch (gridMaster[i].ca_type){
-            case 0: {
-              gridMaster[i].ca_type_name = "Phiếu chi";
-              break;
-            }
-            default: {
-              gridMaster[i].ca_type_name = "Phiếu thu";
+              /*eslint-disable no-debugger */
+              debugger
+        if (this.$refs.gridMaster.gridData[0]) {
+          this.currentPayment = this.$refs.gridMaster.gridData[0];
+          this.total_amount_master = service['optionResult'][0]['sum'];
+          this.totalMaster = service['totalRecord'][0]['Total record'];
+          this.detailAPI = this.resources.endpoint + 'ReceiptPaymentDetail/GetAllByReId?re_id=' + this.currentPayment.re_id;
+          this.$refs.gridDetail.getApiData();
+          let gridMaster = this.$refs.gridMaster.gridData;
+          for (let i = 0; i< gridMaster.length;i++){
+            switch (gridMaster[i].ca_type){
+              case 0: {
+                gridMaster[i].ca_type_name = "Phiếu chi";
+                break;
+              }
+              default: {
+                gridMaster[i].ca_type_name = "Phiếu thu";
+              }
             }
           }
+          this.$refs.gridMaster.gridData = gridMaster;
+          const selectedList = this.$refs.gridMaster.selectedMultiple;
+          setTimeout(() => {
+            const checkboxList = document.querySelector(".grid-body").querySelectorAll(".m-checkbox");
+            const trList = document.querySelector(".grid-body").querySelectorAll("tr");
+            for (let i=0;i<checkboxList.length;i++){
+              if (selectedList.indexOf(this.$refs.gridMaster.gridData[i]['re_id']) != -1){
+                checkboxList[i].classList.add("checked");
+                trList[i].classList.add("checked-item");
+              } 
+              else {
+                checkboxList[i].classList.remove("checked");
+                trList[i].classList.remove("checked-item");
+              }
+            }
+          }, 100);
+        } else {
+          this.$refs.gridDetail.noData = true;
         }
-        this.$refs.gridMaster.gridData = gridMaster;
-        const selectedList = this.$refs.gridMaster.selectedMultiple;
-        setTimeout(() => {
-          const checkboxList = document.querySelector(".grid-body").querySelectorAll(".m-checkbox");
-          const trList = document.querySelector(".grid-body").querySelectorAll("tr");
-          for (let i=0;i<checkboxList.length;i++){
-            if (selectedList.indexOf(this.$refs.gridMaster.gridData[i]['re_id']) != -1){
-              checkboxList[i].classList.add("checked");
-              trList[i].classList.add("checked-item");
-            } 
-            else {
-              checkboxList[i].classList.remove("checked");
-              trList[i].classList.remove("checked-item");
-            }
-          }
-        }, 100);
     },
 
     /**
@@ -533,6 +594,12 @@ export default {
 };
 </script>
 <style scoped>
+
+.setup-icon{
+  padding-right: 6px;
+  cursor: pointer;
+}
+
 .rp-main {
   height: 100%;
   width: 100%;

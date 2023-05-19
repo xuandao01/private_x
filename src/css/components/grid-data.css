@@ -3,7 +3,8 @@ tr .fix-start{
     left: -1px;
     background-color: #fff;
     z-index: 3;
-    border-left: unset;
+    border-right: unset !important;
+    border-left: unset !important;
     border-radius: unset;
 }
 
@@ -11,6 +12,8 @@ tr .fix-end{
     position: sticky;
     right: -1px;
     background-color: #fff;
+    border-right: unset !important;
+    border-left: unset !important;
     z-index: 3;
 }
 
@@ -64,7 +67,10 @@ td{
     padding:0 12px;
     font-size: 13px;
     position: relative;
-    border-left: unset !important;
+    /* border-left: unset !important; */
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 .checkbox{

@@ -91,7 +91,7 @@ export default {
         fixToPosition:{
             type: Number,
             required: false,
-            default: 0,
+            default: 1,
         },
 
         displayModel:{
@@ -118,6 +118,16 @@ export default {
 
         defaultValue: {
             type: String, Number, Boolean,
+            required: false,
+        },
+
+        top: {
+            type: Number,
+            required: false,
+        },
+
+        left: {
+            type: Number,
             required: false,
         }
     },
@@ -152,7 +162,9 @@ export default {
                 this.$refs.dropdown.style.top = "4px";
                 // this.$refs.comboData.style.top = "30px";
             }
-
+            let top = this.top > 500 ? this.top - 230 : this.top;
+            if (this.top) this.$refs.comboData.style.top = top + 'px';
+            if (this.left) this.$refs.comboData.style.left = this.left + 'px';
         });
     },
 
@@ -209,22 +221,15 @@ export default {
     },
 
     methods: {
-        /**
-         * Hàm tìm kiếm dữ liệu
-         */
+
         comboOnInput: debounce(function() {
             this.localAPI = `${this.api}1&keyword=${this.$refs.mInput.value}`;
             this.keyword = this.$refs.mInput.value;
         }, 500),
 
-        /**
-         * Hàm lấy dữ liệu từ api
-         */
         async getApiData(){
             try{
                 let data = await (await fetch(this.localAPI)).json();
-                /*eslint-disable no-debugger */
-                debugger
                 if (!this.apiData[0])
                     this.apiData = data.Data['data'];
                 else {
@@ -248,9 +253,6 @@ export default {
             }
         },
 
-        /**
-         * Hàm hiển thị data
-         */
         showContent(){
             this.showData = true;
             window.addEventListener('keydown', this.handleOnKeyDown);
@@ -259,9 +261,6 @@ export default {
             }, 10);
         },
 
-        /**
-         * Hàm ẩn data
-         */
         hideContent(){
             setTimeout(() => {
                 this.showData = false;
@@ -270,9 +269,6 @@ export default {
             window.removeEventListener('keydown', this.handleOnKeyDown);
         },
 
-        /**
-         * Hàm hiện data khi click icon
-         */
         iconOnClick(){
             window.addEventListener('keydown', this.handleOnKeyDown);
             this.$refs.dropdown.focus();
@@ -282,16 +278,10 @@ export default {
             }, 10);
         },
 
-        /**
-         * Hàm ẩn data
-         */
         iconOnBlur(){
             this.hideContent();
         },
 
-        /**
-         * Hàm lấy thêm dữ liệu khi scroll
-        */
         dataOnScroll(){
 
             let scrollPosition = this.$refs.comboData.scrollTop;
@@ -300,16 +290,12 @@ export default {
             if (rangeLeft < 2) {
                 if (this.api){
                     this.currentPage++;
-                    this.localAPI = this.api + this.currentPage + "&keyword=" + this.keyword;
+                    this.localAPI = this.api + this.currentPage;
                     this.getApiData();
                 }
             }
         },
 
-        /**
-         * Hàm chọn data
-         * @param {Chỉ số} index 
-         */
         rowOnClick(index){
             this.scrollYPos = (index - this.fixPositionIndex)*36;
             this.selectedIndex = index;
@@ -318,9 +304,6 @@ export default {
             this.$emit("itemSelect", this.apiData[this.selectedIndex]);
         },
 
-        /**
-         * Hàm sự kiện bàn phím
-         */
         handleOnKeyDown(){
             if (event.key == "ArrowDown"){
                 this.showData = true;
@@ -552,8 +535,7 @@ export default {
         width: 200%;
         box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
         background-color: #fff;
-        position: absolute;
-        top: 50px;
+        position: fixed;
         z-index: 9999;
         border-radius: 4px;
         border: solid #b8b8b8e3 1px;

@@ -12,13 +12,13 @@
       <div class="content-main__header">
         <MSearchBar class="search-bar" ref="searchBar" :width="225" :placeholder="this.resources.vi.accountList.inputPlaceholder" @onSearch="this.searchOnInput"></MSearchBar>
         <div class="grid-action" @click="gridOnAction">{{ this.gridAction }}</div>
-        <div title="Tùy chỉnh giao diện" @click="UISetting = true" class="icon setup-icon"></div>
         <div @click="gridKey++" title="Tải lại (Ctrl + R)" class="icon reload-icon"></div>
         <div
-          title="Xuất ra excel (Ctrl + E)"
-          @click="excelExport"
-          class="icon export-excel-icon"
+        title="Xuất ra excel (Ctrl + E)"
+        @click="excelExport"
+        class="icon export-excel-icon"
         ></div>
+        <div title="Tùy chỉnh giao diện" @click="UISetting = true" class="icon setup-icon"></div>
         <div class="create-btn">
           <div class="ct-btn" @click="showNewPopup(0, this.$refs.gridData.selectedData)"> Thêm </div>
           <div class="more-icon">
@@ -146,8 +146,18 @@ export default {
     this.APIString =
       `${this.resources.endpoint}Account`;
     window.addEventListener("keydown", this.handleKeyDown);
+    if (localStorage.AccountUI){
+      let arr = JSON.parse(localStorage.AccountUI);
+      for (let i=0;i<arr.length;i++){
+        if (arr[i]['display']){
+          this.AccountList.push(arr[i]);
+        }
+      }
+    } else {
+      this.AccountList = accountList;
+    }
   },
-
+  
   mounted(){
     this.gridAction = this.resources.vi.accountList.expandAll
     this.sortedData = this.$refs.gridData.sortedData;
@@ -157,7 +167,12 @@ export default {
     window.removeEventListener("keydown", this.handleKeyDown);
   },
 
-  watch: {},
+  watch: {
+    gridKey: function(){
+      this.gAction = 0;
+      this.gridAction = this.resources.vi.accountList.expandAll;
+    }
+  },
 
   methods: {
 
@@ -169,7 +184,7 @@ export default {
     handleKeyDown(){
       if (event.ctrlKey && event.key === '1'){
         event.preventDefault();
-        this.showNewPopup(0);
+        this.showNewPopup(0, this.$refs.gridData.selectedData);
       }
 
       if (event.ctrlKey && event.key === 'r') {
@@ -233,9 +248,6 @@ export default {
         }
       }
       this.gridKey++;
-      // let temp = this.AccountList[oldIndex];
-      // this.AccountList[oldIndex] = this.AccountList[newIndex];
-      // this.AccountList[newIndex] = temp;
     },
 
     /**
@@ -341,7 +353,7 @@ export default {
         }
       }
       body += "]";
-      const apiString = `${this.resources.endpoint}Account/ExcelExport?widthList=${this.$refs.gridData.getWidthList()}`;
+      const apiString = `${this.resources.endpoint}Account/ExcelExport?widthList=175,250,150,250,300,200`;
       const options = {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -380,20 +392,34 @@ export default {
           this.Toast.showToastMsg(ToastType.Success,data['Message']);
           this.$refs.gridData.deleteSelectedRow();
           this.totalRecord--;
-          if (this.selectedAccount['dependency'] && this.selectedAccount['dependency'].trim().length > 0){
-            let haveChild = 0;
-            /*eslint-disable no-debugger */
-            debugger
-            for (let i=0;i<this.sortedData.length;i++){
-              if (this.selectedAccount['dependency'] == this.sortedData[i]['dependency']){
-                haveChild += 1;
-                break;
-              }
-            }
-            if (haveChild == 1){
-              this.$refs.gridData.sortedData[this.findParent(this.$refs.gridData.sortedData, this.selectedAccount['dependency'])]['haveSub'] = false;
-            }
-          }
+          if (this.selectedAccount && this.selectedAccount.isSub)
+            this.gridKey++;
+          /*eslint-disable no-debugger */
+          // debugger
+          // if (this.selectedAccount && this.selectedAccount.isSub == true){
+          //   let parentIndex = this.findParent(this.sortedData, this.selectedAccount['dependency']);
+          //   if (this.sortedData[parentIndex + 2]){
+          //     if (this.sortedData[parentIndex]['datalevel'] >= this.sortedData[parentIndex + 2]['datalevel']) {
+          //       this.gridKey++;
+          //     }
+          //   } else {
+          //     this.gridKey++;
+          //   }
+          // }
+
+          
+          // if (this.selectedAccount['dependency'] && this.selectedAccount['dependency'].trim().length > 0){
+          //   let haveChild = 0;
+          //   for (let i=0;i<this.sortedData.length;i++){
+          //     if (this.selectedAccount['dependency'] == this.sortedData[i]['dependency']){
+          //       haveChild += 1;
+          //       break;
+          //     }
+          //   }
+          //   if (haveChild == 1){
+          //     this.$refs.gridData.sortedData[this.findParent(this.$refs.gridData.sortedData, this.selectedAccount['dependency'])]['haveSub'] = false;
+          //   }
+          // }
         }
       } else {
         this.updateChildAccount();
@@ -758,7 +784,7 @@ export default {
       showConfirm: false,
       gridAction: null,
       gAction: 0,
-      AccountList: accountList,
+      AccountList: [],
       AccountListFull: accountListFull,
       UISetting: false,
       dialogAction: 0,

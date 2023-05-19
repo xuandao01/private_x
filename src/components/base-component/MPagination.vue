@@ -1,7 +1,7 @@
 <template>
     <div class="pg-main">
       <div class="part1">
-            Tổng số: <b id="numberOfRecord"> {{ totalRecord }}</b> bản ghi
+            Tổng số: <b id="numberOfRecord"> {{ totalRecordFormated }}</b> bản ghi
       </div>
       <div class="part2" v-if="allowPaging">
         <div>
@@ -48,6 +48,7 @@ export default {
             default: 0,
         },
 
+        // Có hiển thị phần phân trang hay không
         allowPaging:{
           type: Boolean,
           required: false,
@@ -60,6 +61,16 @@ export default {
     },
 
     computed:{
+
+      /**
+       * Hàm định dạng hiển thị tổng số bản ghi
+       * 
+       * @author Xuân Đào (11/05/2023)
+       */
+      totalRecordFormated(){
+        return this.formatMoney(this.totalRecord);
+      },
+
       // Tính tổng số trang
       totalPage(){
         if (this.totalRecord % this.pageSize == 0) {
@@ -112,6 +123,23 @@ export default {
     },
 
     methods: {
+
+    /**
+     * Hàm định dạng tiền
+     * @param amount: Số tiền
+     * @param decimalCount: Số lượng số sau dấu phẩy
+     * @param thousands: Ngăn cách hàng nghìn
+     * @author Xuân Đào(13/05/2023)
+     */
+     formatMoney(amount, decimalCount = 0, decimal = "", thousands = ".") {
+      decimalCount = Math.abs(decimalCount);
+      decimalCount = isNaN(decimalCount) ? 2 : decimalCount;
+      const negativeSign = amount < 0 ? "-" : "";
+      let i = parseInt(amount = Math.abs(Number(amount) || 0).toFixed(decimalCount)).toString();
+      let j = (i.length > 3) ? i.length % 3 : 0;
+      return negativeSign + (j ? i.substr(0, j) + thousands : '') + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + thousands) + (decimalCount ? decimal + Math.abs(amount - i).toFixed(decimalCount).slice(2) : "");
+    },
+
     /**
      * Quay lại trang trước
      *

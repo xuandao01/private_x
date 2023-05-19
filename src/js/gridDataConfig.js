@@ -4,7 +4,7 @@ const accountList = [
       title: resources.vi.accountList.data.accountNumber,
       dataField: 'accountnumber',
       dataType: 'text',
-      colWidth: '175',
+      colWidth: '200',
     },
     {
       title: resources.vi.accountList.data.accountName,
@@ -28,7 +28,7 @@ const accountList = [
       title: resources.vi.accountList.data.description,
       dataField: 'description',
       dataType: 'text',
-      colWidth: '300',
+      colWidth: '250',
     },
     {
       title: resources.vi.accountList.data.status,
@@ -90,10 +90,10 @@ const accountListFull = [
   },
   {
     title: resources.vi.accountList.data.createdDate,
-    dataField: 'createddate',
-    dataType: 'date',
+    dataField: 'created_date_display',
+    dataType: 'm-date',
     display: false,
-    colWidth: '200',
+    colWidth: '100',
   },
   {
     title: resources.vi.accountList.data.createdBy,
@@ -104,10 +104,10 @@ const accountListFull = [
   },
   {
     title: resources.vi.accountList.data.modifiedDate,
-    dataField: 'modifieddate',
-    dataType: 'date',
+    dataField: 'modifieddate_display',
+    dataType: 'm-date',
     display: false,
-    colWidth: '200',
+    colWidth: '100',
   },
   {
     title: resources.vi.accountList.data.modifiedBy,

@@ -43,7 +43,7 @@ export default {
   background-color: #2ca01c;
   border-radius: 25px;
   display: flex;
-  margin-right: 20px;
+  margin-right: 12px;
   cursor: pointer;
   position: relative;
 }

@@ -1,5 +1,5 @@
 <template>
-  <div class="account-detail">
+  <div class="account-detail" :key="key">
     <div ref="detailMain" class="ad-main">
       <div ref="detailExpandBtn" @click="expandOnClick" class="ad-expand"></div>
       <div class="ad-title">
@@ -35,7 +35,7 @@
       <div class="popup-main__footer">
         <div class="btn group-btn">
           <div class="btn-setdefault">
-            <button @click="this.$emit('setDefault')" title="Lấy mẫu ngầm định" id="saveAdd">
+            <button @click="setDefaultUI" title="Lấy mẫu ngầm định" id="saveAdd">
               {{ this.resources.vi.ui_setting_button.setDefault }}
             </button>
           </div>
@@ -46,7 +46,7 @@
           </div>
         </div>
         <div class="btn btn-close">
-          <button ref="lastButton" id="cancel" :title="this.resources.vi.btnAction.cancelTooltip"
+          <button ref="lastButton" @click="this.$emit('closeUISeting')" id="cancel" :title="this.resources.vi.btnAction.cancelTooltip"
             class="optionalBtn">
             {{ this.resources.vi.btnAction.cancel }}
           </button>
@@ -70,6 +70,7 @@ import MConfirmDialog from './MConfirmDialog.vue';
 import MSearchBar from '../base-component/MSearchBar.vue';
 import MCheckbox from '../base-component/MCheckbox.vue';
 import Sortable from 'sortablejs'
+import { accountListFull } from '@/js/gridDataConfig';
 
 export default {
   name: "MAccountDetail",
@@ -102,13 +103,39 @@ export default {
 
   created() {
     this.formTitle = this.resources.vi.ui_setting;
-    this.sortData = this.data;
+    if (localStorage.AccountUI){
+      this.sortData = JSON.parse(localStorage.AccountUI);
+    } else {
+      this.sortData = accountListFull;
+    }
     this.localData = this.sortData.slice();
   },
 
   mounted() {
+    this.initSortable();
     window.addEventListener('keydown', this.handleOnKeydown);
-    Sortable.create(this.$refs.sortable, {
+    
+  },
+
+  unmounted(){
+    window.removeEventListener('keydown', this.handleOnKeydown);
+  },
+
+  data() {
+    return {
+      isExpanded: false,
+      resources: resources,
+      collase: false,
+      localData: null,
+      sortData: null,
+      key: 0,
+    }
+  },
+
+  methods: {
+
+    initSortable(){
+      Sortable.create(this.$refs.sortable, {
       animation: 125,
       onEnd: (evt) => {
         if (evt.newIndex != evt.oldIndex){
@@ -129,23 +156,20 @@ export default {
         }
       }
     });
-  },
+    },
 
-  unmounted(){
-    window.removeEventListener('keydown', this.handleOnKeydown);
-  },
-
-  data() {
-    return {
-      isExpanded: false,
-      resources: resources,
-      collase: false,
-      localData: null,
-      sortData: null,
-    }
-  },
-
-  methods: {
+    /**
+     * Hàm lấy mẫu ngầm định
+     * @author Xuân Đào (13/05/2023)
+     */
+    setDefaultUI(){
+      this.sortData = accountListFull;
+      this.localData = accountListFull;
+      this.key++;
+      setTimeout(() => {
+        this.initSortable();
+      }, 200);
+    },
 
     /**
      * Hàm lưu ui đã chọn
@@ -158,6 +182,7 @@ export default {
       })
       if (activeUI > 0){
         this.$emit("saveUI", this.localData);
+        localStorage.AccountUI = JSON.stringify(this.localData);
       } else {
         this.$refs.singleDialog.showDialogOn(dialogType.error, "Cần ít nhất 1 cột dữ liệu để hiển thị vui lòng kiểm tra lại!", this.resources.vi.btnAction.confirm);
       }

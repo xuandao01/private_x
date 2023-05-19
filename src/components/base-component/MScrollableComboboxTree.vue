@@ -154,8 +154,6 @@ export default {
                         this.apiData = this.removeItemFromArr(this.apiData, index);
                         index++;
                     }
-                    /*eslint-disable no-debugger */
-                    debugger
                 }
             }
         });

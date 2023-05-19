@@ -56,6 +56,11 @@ export default {
       type: Boolean,
       required: false,
       default: false,
+    },
+
+    defaultValueByText:{
+      type: String,
+      required: false,
     }
   },
 
@@ -98,6 +103,17 @@ export default {
         break;
       }
     }
+
+    this.$nextTick(function () {
+      if (this.defaultValueByText && this.defaultValueByText.length > 0){
+        this.$refs.cbInput.value = this.defaultValueByText;
+        for (let i=0;i<this.comboboxData.length;i++){
+          if (this.comboboxData[i] == this.defaultValueByText){
+            this.selected = i;
+          }
+        }
+      }
+    })
   },
 
   data() {
@@ -111,6 +127,20 @@ export default {
 
   methods: {
 
+    /**
+     * Set blur ra khỏi combobox 
+     * 
+     * @author Xuân Đào (14/05/2023)
+     * */
+    setBlur(){
+      this.$refs.focusable.classList.remove('focused');
+    },
+
+     /**
+     * Set focus vào combobox 
+     * 
+     * @author Xuân Đào (14/05/2023)
+     * */
     setFocus(){
       this.$refs.focusable.classList.add('focused');
       this.$refs.focusable.focus();

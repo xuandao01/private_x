@@ -15,6 +15,11 @@ export default {
     },
 
     methods: {
+         /**
+         * Xử lý khi click checkbox 
+         * 
+         * @author Xuân Đào (14/05/2023)
+         * */
         checkBoxOnClick(){
             // this.checked = !this.checked;
             if (!this.isClassExist(this.$refs.checkbox.classList, 'collase')) {
@@ -25,6 +30,11 @@ export default {
             this.$emit("clicked");
         },
 
+         /**
+         * Kiểm tra check box được check hay chưa 
+         * 
+         * @author Xuân Đào (14/05/2023)
+         * */
         isClassExist(list, className) {
             for (let i = 0; i < list.length; i++) {
                 if (list[i] == className) return true;

@@ -33,9 +33,12 @@
             >
               <div v-if="data['edit_mode']">
                 <input
+                  id="gridInput"
+                  autocomplete="off"
                   v-if="item['type'] != 'combobox'"
                   @keyup="inputOnType(item['type'])"
                   @blur="inputOnInput(item['type'], inx, index)"
+                  @focus="inputOnFocus"
                   :tabindex="[item['editable'] ? '0' : '-1']"
                   :maxlength="[item['type'] == 'd-money' ? '18' : '999']"
                   :style="{ textAlign: item.align }"
@@ -47,8 +50,11 @@
                   :value="data[item['modelValue']]"
                 />
                 <MScrollableCombobox
+                  :top="item['top'] + (inx)*32"
+                  :left="item['left']"
                   :required="true"
                   class="sc-combobox"
+                  :id="'stCombobox'+index"
                   @click="this.currentElementIndex = index"
                   @itemSelect="comboboxOnSelect"
                   :defaultValue="data[item['modelValue']]"
@@ -60,7 +66,10 @@
                   :display-model="comboboxData[0]['displayModel']"
                 ></MScrollableCombobox>
                 <MScrollableCombobox
+                  :top="item['top'] + (inx)*32"
+                  :left="item['left']"
                   class="sc-combobox"
+                  id="rdCombobox"
                   @click="this.currentElementIndex = index"
                   @itemSelect="comboboxOnSelect"
                   :defaultValue="data[item['modelValue']]"
@@ -77,6 +86,7 @@
                 class="view-mode"
                 v-else
                 :style="[{ textAlign: item.align }]"
+                :title="data[item['modelValue']]"
               >
                 {{ data[item["modelValue"]] }}
               </div>
@@ -92,7 +102,7 @@
 </template>
 <script>
 import resources from "@/js/resources";
-import MScrollableCombobox from "./MScrollableCombobox.vue";
+import MScrollableCombobox from "./MScrollableComboboxForGrid.vue";
 export default {
   name: "MGridEditable",
 
@@ -163,13 +173,16 @@ export default {
       if (newVal == -1) return;
       let trList = this.$refs.tbody.children;
       if (oldVal) {
-        trList[oldVal].classList.remove("tr-selected");
+        if (trList[oldVal])
+          trList[oldVal].classList.remove("tr-selected");
       }
       setTimeout(() => {
         this.selected_index = newVal;
-        trList[newVal].classList.add("tr-selected");
-        this.selected_row = trList[newVal];
-      }, 1);
+        if (trList[newVal]){
+          trList[newVal].classList.add("tr-selected");
+          this.selected_row = trList[newVal];
+        }
+      }, 10);
     },
   },
 
@@ -183,6 +196,16 @@ export default {
   },
 
   methods: {
+
+    /**
+     * Bôi đen toàn bộ dữ liệu khi input được focus
+     * 
+     * @author Xuân Đào (12/05/2023)
+     */
+    inputOnFocus(){
+      event.target.select();
+    },
+
     /**
      * Hàm định dạng tiền
      * @author Xuân Đào(13/05/2023)
@@ -237,8 +260,22 @@ export default {
           grid.push(this.gridData[i]);
         }
       }
+      if (grid.length == 0) {
+        const newData = {
+          re_no: 1,
+          rpd_description: "Chi tien cho",
+          debit_account: "",
+          credit_account: "",
+          amount: 0,
+          supplier_code: "",
+          supplier_name: "",
+          edit_mode: false,
+        }
+        grid.push(newData);
+      }
       this.gridData = grid;
-      this.selected_index = -1;
+      this.$emit("updateSumaryAmount")
+      this.selected_index = 0;
     },
 
     // inputOnType: debounce(function(type) {
@@ -252,6 +289,12 @@ export default {
      * @author Xuân Đào(13/05/2023)
      */
     inputOnInput(type, dataIndex, modelIndex) {
+      this.$emit(
+        "updateEdittedValue",
+        event.target.value,
+        dataIndex,
+        modelIndex + 1
+      );
       if (type == "d-money") {
         this.$emit(
           "updateSumaryAmount",
@@ -260,12 +303,6 @@ export default {
           modelIndex + 1
         );
       }
-      this.$emit(
-        "updateEdittedValue",
-        event.target.value,
-        dataIndex,
-        modelIndex + 1
-      );
     },
 
     /**
@@ -478,7 +515,8 @@ tr td input {
   font-size: 13px;
   background-color: unset;
   font-family: Notosans;
-  line-height: 25px;
+  line-height: 26px;
+  height: 26px;
 }
 
 tr td .edit-mode {

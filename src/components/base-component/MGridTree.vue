@@ -18,10 +18,11 @@
               <div class="rightBorder"></div>
             </th>
             <th
-              :class="item.dataType"
+              :class="[item.dataType, {'last-row': index == data.length - 1}]"
               v-for="(item, index) in data"
               :key="index"
               :title="item.tooltip"
+
             >
               {{ item.title }}
             </th>
@@ -64,13 +65,18 @@
               v-for="(value, inx) in data"
               :key="inx"
               @dblclick="editOnDbClick(item)"
-              :class="{
+              :class="[{
                 subElm: item.isSub && inx == 0,
                 subElm2: item.isSub && inx == 0 && item['datalevel'] == 2,
-                subElm3: item.isSub && inx == 0 && item['datalevel'] >= 3,
-              }"
+                subElm3: item.isSub && inx == 0 && item['datalevel'] == 3,
+                subElm4: item.isSub && inx == 0 && item['datalevel'] == 4,
+                subElm5: item.isSub && inx == 0 && item['datalevel'] >= 5,
+              }]"
+              :style="{maxWidth: value['colWidth']+'px'}"
+              :title=" item[value.dataField] "
+            
             >
-              <div class="td-contain">
+              <div class="td-contain" :class="value.dataType" :style="{maxWidth: value['colWidth']+'px'}">
                 <MExpandCheckbox
                   @clicked="checkboxClicked(index)"
                   v-if="inx == 0"
@@ -268,6 +274,11 @@ export default {
   },
   methods: {
 
+    /**
+     * Khởi tạo việc cho phép đổi cột
+     * 
+     * @author Xuân Đào (12/05/2023)
+     */
     initSortable(){
       let ths = this.$refs.tableThead.children[0];
       Sortable.create(ths, {
@@ -324,14 +335,29 @@ export default {
       return widthList;
     },
 
+    /**
+     * Sự kiện nhân bản
+     * 
+     * @author Xuân Đào (12/05/2023)
+     */
     duplicateData(){
       this.$emit("updateRecord", this.selectedData);
     },
 
+    /**
+     * Double click vào row
+     * 
+     * @author Xuân Đào (12/05/2023)
+     */
     itemOnDbClick(item){
       this.$emit("rowDbClick", item);
     },
 
+    /**
+     * Xử lý đóng mở cây
+     * 
+     * @author Xuân Đào (12/05/2023)
+     */
     checkboxClicked(index) {
       let i = index + 1;
       let next = true;
@@ -372,6 +398,11 @@ export default {
       this.currentHideRow = c;
     },
 
+    /**
+     * Kiểm tra tồn tại của class
+     * 
+     * @author Xuân Đào (12/05/2023)
+     */
     isClassExist(list, className) {
       for (let i = 0; i < list.length; i++) {
         if (list[i] == className) return true;
@@ -379,6 +410,11 @@ export default {
       return false;
     },
 
+    /**
+     *Lấy dữ liệu từ api
+     * 
+     * @author Xuân Đào (12/05/2023)
+     */
     async getApiData() {
       let data = await (await fetch(this.api)).json();
       data.forEach((el) => {
@@ -400,16 +436,41 @@ export default {
         this.sortedData = this.insertToPosition(this.sortedData, index, this.subData[i]);
       }
       this.gridData = data;
-      this.$emit("loadCompleted")
+      // for (let i=0;i<this.gridData.length;i++){
+      //   let j = i + 1;
+      //   while (this.gridData[j] && this.gridData[i]['datalevel'] != this.gridData[j]['datalevel']){
+      //     if (this.gridData[i] && this.gridData[j] && this.gridData[i]['accountnumber'] > this.gridData[j]['accountnumber']){
+      //       let tg = this.gridData[i];
+      //       this.gridData[i] = this.gridData[j];
+      //       this.gridData[j] = tg;
+      //     }
+      //     j++;
+      //   }
+      // }
+      this.$emit("loadCompleted");
+      for(let i=0;i<this.gridData.length;i++){
+        this.gridData[i]['created_date_display'] = this.dateFormator(this.gridData[i]['created_date']);
+        this.gridData[i]['modifieddate_display'] = this.dateFormator(this.gridData[i]['modifieddate']);
+      }
       this.showLoading = false;
     },
 
+    /**
+     * Tìm kiếm phần tử cha
+     * 
+     * @author Xuân Đào (12/05/2023)
+     */
     findParent(arr, data) {
       for (let i = 0; i < arr.length; i++) {
         if (arr[i]["accountid"] === data) return i;
       }
     },
 
+    /**
+     * Chèn 1 phần tử vào 1 vị trí bất kỳ trong mảng
+     * 
+     * @author Xuân Đào (12/05/2023)
+     */
     insertToPosition(arr, index, data) {
       let result = [];
       for (let i = 0; i < arr.length; i++) {
@@ -467,7 +528,11 @@ export default {
         }
       }
       this.getClickedPosition(event);
-      this.$refs.context.setPosition(50, this.cursor_y + 15);
+      if (this.cursor_y < 500)
+        this.$refs.context.setPosition(50, this.cursor_y + 15);
+      else {
+        this.$refs.context.setPosition(50, this.cursor_y - 105);
+      }
       this.showContext = true;
       this.selectedData = item;
       if (this.selected === null){
@@ -513,16 +578,16 @@ export default {
      *
      * @author  Xuân Đào (12/03/2023)
      */
-    dateFormator(date) {
-      const data = new Date(date);
-      if (data.toDateString() !== "Invalid Date") {
-        let dateVal = data.getDay() + 1;
-        let month = data.getMonth() + 1;
-        const year = data.getFullYear();
-        dateVal = dateVal < 10 ? "0" + dateVal : dateVal;
-        month = month < 10 ? "0" + month : month;
-        return `${dateVal}/${month}/${year}`;
-      } else return "";
+     dateFormator(date) {
+      const dateData = new Date(date);
+      const day =
+        dateData.getDate() < 10 ? "0" + dateData.getDate() : dateData.getDate();
+      const month =
+        dateData.getMonth() + 1 < 10
+          ? "0" + (dateData.getMonth() + 1)
+          : dateData.getMonth() + 1;
+      const year = dateData.getFullYear();
+      return `${day}/${month}/${year}`;
     },
 
     /**
@@ -702,12 +767,39 @@ export default {
 </script>
 <style scoped>
 
+.grid-title th{
+  border-top: unset !important;
+}
+
+.last-row{
+  border-right: unset !important;
+}
+
+.m-date{
+  padding: 0 20px;
+  text-align: center;
+}
+
+.fix-end{
+  border-left: solid black 1px;
+}
+
+.date{
+  text-align: center !important;
+}
+
 .ghost-class{
   background-color: #d0d0d0 !important;
 }
 
 tr th, tr td {
   border-left: unset !important;
+}
+
+tbody td div{
+  overflow: hidden !important;
+  white-space: nowrap ;
+  text-overflow: ellipsis !important;
 }
 
 .date {
@@ -752,7 +844,7 @@ tr th, tr td {
   background-color: #d0d0d0;
   z-index: 999;
   top: 0;
-  left: -0.5px;
+  left: -0.25px;
   position: absolute;
 }
 
@@ -806,6 +898,24 @@ tr th, tr td {
   position: relative;
   height: 20px;
   width: 45px;
+  display: block;
+  float: left;
+}
+
+.subElm4::before {
+  content: "";
+  position: relative;
+  height: 20px;
+  width: 60px;
+  display: block;
+  float: left;
+}
+
+.subElm5::before {
+  content: "";
+  position: relative;
+  height: 20px;
+  width: 75px;
   display: block;
   float: left;
 }

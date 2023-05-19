@@ -1,6 +1,7 @@
 let resources =  {
     vi: {
         noData: "Không có dữ liệu để hiển thị",
+        noDataGrid: "Không có dữ liệu",
         errorMes: "Có lỗi xảy ra vui lòng liên hệ MISA!",
         companyName: {
             0: "CÔNG TY TNHH SẢN XUẤT - THƯƠNG MẠI - DỊCH VỤ - QUÝ PHÚC"
@@ -60,7 +61,7 @@ let resources =  {
         },
         btnAction:{
             cancel: "Hủy",
-            cancelTooltip: "Hủy (ESC)",
+            cancelTooltip: "Hủy",
             store: "Cất",
             storeTooltip: "Cất (Ctrl + S)",
             storeSave: "Cất và thêm",
@@ -70,7 +71,7 @@ let resources =  {
             close: "Đóng",
             no: "Không",
             saveAndClose: "Cất và đóng",
-            saveAndCloseTooltip: "Cất và đóng (Ctrl + Shift + S)",
+            saveAndCloseTooltip: "Cất và đóng (Ctrl + Q)",
         },
         actionMultiple: {
             title: 'Thực hiện hàng loạt',
@@ -260,6 +261,7 @@ let resources =  {
                 rp_description: "Diễn giải",
                 amount: "Số tiền",
                 object: "Đối tượng",
+                object_code: "Mã đối tượng",
                 rp_reason: "Lý do thu/chi",
                 ca_type: "Loại chứng từ",
             },

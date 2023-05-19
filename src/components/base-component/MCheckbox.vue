@@ -12,18 +12,22 @@ export default {
             required: false,
             default: 16,
         },
+
+        // Chiều cao checkbox
         height: {
             type: Number,
             required: false,
             default: 16,
         },
 
+        // Có check hay không
         isChecked: {
             type: Boolean,
             required: false,
             default: false,
         },
 
+        // Có check hay không dựa theo số
         isCheckedByNum: {
             type: Number,
             required: false,
@@ -115,6 +119,7 @@ export default {
         border: solid #b0b0b0 1px;
         border-radius: 2px;
         position: relative;
+        cursor: pointer;
     }
     .m-checkbox:focus{
         outline: unset;
@@ -122,7 +127,7 @@ export default {
 
     .onFocus{
         height: 20px;
-        width: 20px;
+        width: 20.75px;
         border: solid #3ae0bf 1px;
         border-radius: 2px;
         position: absolute;

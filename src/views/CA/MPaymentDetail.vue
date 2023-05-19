@@ -27,6 +27,7 @@
           </div>
         </div>
       </div>
+      <div class="pd-main__scroll">
       <div class="pd-main__content">
         <div class="info-area">
           <div class="pd-main__content--baseinfo">
@@ -82,15 +83,17 @@
                 :inputTitle="
                   this.resources.vi.cashControl.objectCombobox.objectName
                 "
+                :max-length="255"
               ></MInput>
             </div>
             <div class="pd-main__row">
               <MInput
-                v-model:modelValue="this.selectedObject['supplier_name']"
+                v-model:modelValue="this.currentPayment['re_receive']"
                 :canFocus="true"
                 :inputTitle="
                   this.resources.vi.cashControl.objectCombobox.receive
                 "
+                :max-length="255"
               ></MInput>
               <MInput
                 v-model:modelValue="this.selectedObject['address']"
@@ -98,6 +101,7 @@
                 :inputTitle="
                   this.resources.vi.cashControl.objectCombobox.address
                 "
+                :max-length="255"
               ></MInput>
             </div>
             <div class="pd-main__row">
@@ -108,6 +112,7 @@
                   this.resources.vi.cashControl.objectCombobox.pay_reason
                 "
                 @onInput="desMasterInput"
+                :max-length="255"
               ></MInput>
             </div>
             <div class="pd-main__row pd-row3">
@@ -166,6 +171,7 @@
                 :canFocus="true"
                 :title="this.resources.vi.cashControl.gridDetail.success_date"
                 @valueChange="updateReDate"
+                :required="true"
                 ref="reDate"
               ></MDatePicker>
             </div>
@@ -175,6 +181,7 @@
                 :canFocus="true"
                 :title="this.resources.vi.cashControl.gridDetail.payment_date"
                 @valueChange="updateCaDate"
+                :required="true"
                 ref="caDate"
               ></MDatePicker>
             </div>
@@ -185,6 +192,9 @@
                 :canFocus="true"
                 :inputTitle="this.resources.vi.cashControl.objectCombobox.re_no"
                 ref="reRefNo"
+                id="MInput"
+                :max-length="20"
+                :required="true"
               ></MInput>
             </div>
           </div>
@@ -209,6 +219,8 @@
                   editable: true,
                   align: 'left',
                   type: 'text',
+                  top: 200,
+                  left: 200,
                 },
                 {
                   title: 'TK nợ',
@@ -217,6 +229,8 @@
                   editable: true,
                   align: 'left',
                   type: 'combobox',
+                  top: 437,
+                  left: 433,
                 },
                 {
                   title: 'TK có',
@@ -225,6 +239,8 @@
                   editable: true,
                   align: 'left',
                   type: 'combobox',
+                  top: 437,
+                  left: 608,
                 },
                 {
                   title: 'Số tiền',
@@ -233,6 +249,8 @@
                   editable: true,
                   align: 'right',
                   type: 'd-money',
+                  top: 200,
+                  left: 200,
                 },
                 {
                   title: 'Đối tượng',
@@ -241,6 +259,8 @@
                   editable: true,
                   align: 'left',
                   type: 'combobox',
+                  top: 437,
+                  left: 700,
                 },
                 {
                   title: 'Tên đối tượng',
@@ -249,6 +269,8 @@
                   editable: false,
                   align: 'left',
                   type: 'text',
+                  top: 200,
+                  left: 200,
                 },
               ]"
               :fixStart="true"
@@ -266,10 +288,11 @@
           </div>
           <div class="btn-group" :class="{ disable: !this.editable }">
             <button class="grid-btn" @click="addRow">Thêm dòng</button>
-            <button class="grid-btn" @click="removeAll">Xóa hết dòng</button>
+            <button class="grid-btn" @click="removeAllRequest">Xóa hết dòng</button>
           </div>
         </div>
       </div>
+    </div>
       <div class="pd-footer">
         <div class="popup-main__footer">
           <div class="btn group-btn">
@@ -294,7 +317,6 @@
             </div>
             <div class="btn btn-saveAndAdd" v-if="this.formMode != 2">
               <button
-                :title="this.resources.vi.btnAction.storeSaveToolTip"
                 id="saveAdd"
                 class="pd-save__addbtn"
                 @click="optionalButtonClicked"
@@ -304,8 +326,8 @@
               <div class="dropdown-btn" tabindex="0" @focus="showOptionBtn = true" @blur="showOptionBtn = false">
                 <div class="dropdown-icon"></div>
                 <div class="btn-group__option" v-if="showOptionBtn">
-                  <div class="btn-group__option--item" @click="saveAndClose">{{ this.resources.vi.btnAction.saveAndClose }}</div>
-                  <div class="btn-group__option--item" @click="saveAndAdd" >{{ this.resources.vi.btnAction.storeSave }}</div>
+                  <div class="btn-group__option--item" :title="this.resources.vi.btnAction.saveAndCloseTooltip" @click="saveAndClose">{{ this.resources.vi.btnAction.saveAndClose }}</div>
+                  <div class="btn-group__option--item" :title="this.resources.vi.btnAction.storeSaveToolTip" @click="saveAndAdd" >{{ this.resources.vi.btnAction.storeSave }}</div>
                 </div>
               </div>
             </div>
@@ -336,10 +358,19 @@
       ref="singleDialog"
       @dialogOnClose="dialogClosed"
     ></MSingleActionDialog>
+    <MConfirmDialog
+      v-if="showConfirmChange"
+      @hideDialog="showConfirmChange = false"
+      @hideDialogPopup="this.undoData()"
+      @hideAndSave="this.saveData()"
+    ></MConfirmDialog>
+    <MConfirmDeleteDialog v-if="showConfirmMsg" :messagse="confirmMessage" @hideDeleteDialog="showConfirmMsg = false"
+          @hideAndDelete="deleteEvent"></MConfirmDeleteDialog>
   </div>
 </template>
 <script>
 import MComboboxNomal from "@/components/base-component/MComboboxNomal.vue";
+import MConfirmDialog from "@/components/unit-components/MConfirmDialog.vue";
 import MInput from "@/components/base-component/MInput.vue";
 import MScrollableCombobox from "@/components/base-component/MScrollableCombobox.vue";
 import resources from "@/js/resources";
@@ -352,9 +383,10 @@ import { paymentDetail } from "@/store/paymentDetail";
 import { PaymentFormMode } from "./MReceiptPaymentList.vue";
 import { toastControl } from "@/store/toast";
 import { ToastType } from "@/components/base-component/MToastItem.vue";
+import MConfirmDeleteDialog from "@/components/unit-components/MConfirmDeleteDialog.vue";
 
 // Dữ liệu mặc định ban đầu
-const fixData = {
+export const fixData = {
         re_no: 1,
         rpd_description: "Chi tien cho",
         debit_account: "",
@@ -378,6 +410,11 @@ export const ActionAfterSave = {
   watch: 2,
 }
 
+export const confirmDialog = {
+  delete: 0,
+  updatePayment: 1,
+}
+
 export default {
   name: "MPaymentDetail",
   components: {
@@ -387,6 +424,8 @@ export default {
     MDatePicker,
     MGridEditable,
     MSingleActionDialog,
+    MConfirmDialog,
+    MConfirmDeleteDialog
   },
 
   setup() {
@@ -427,12 +466,14 @@ export default {
   watch: {
     selectedReason: function (newVal) {
       this.gridData.forEach((el) => {
-        if (this.selectedObject) {
-          el["rpd_description"] =
-            newVal + ` ${this.selectedObject["supplier_name"]}`;
-          this.currentPayment.re_description =
-            newVal + ` ${this.selectedObject["supplier_name"]}`;
-        } else el["rpd_description"] = newVal;
+        if (this.currentPayment.re_description == el["rpd_description"] || !this.currentPayment.re_description){
+          if (this.selectedObject) {
+            el["rpd_description"] =
+              newVal + ` ${this.selectedObject["supplier_name"]}`;
+            this.currentPayment.re_description =
+              newVal + ` ${this.selectedObject["supplier_name"]}`;
+          } else el["rpd_description"] = newVal;
+        }
       });
     },
   },
@@ -459,6 +500,8 @@ export default {
         ca_date: this.dateFormator(new Date()),
       };
       this.currentCaDate = this.currentPayment["ca_date"];
+      this.beforePayment = Object.assign({}, this.currentPayment);
+      this.beforeDetail = this.gridData.slice();
     } else {
       if (
         this.formMode == PaymentFormMode.duplicate ||
@@ -534,8 +577,11 @@ export default {
   },
 
   async mounted() {
-    if (!this.editable) {
+    if (this.formMode != PaymentFormMode.watch){
       this.$refs.paymentReason.setFocus();
+      this.$refs.paymentReason.showData = false;
+    }
+    if (!this.editable) {
       let inputEl = document
         .querySelector(".pd-main")
         .querySelectorAll("input");
@@ -566,6 +612,33 @@ export default {
   },
 
   methods: {
+
+    async deleteEvent(){
+      if (this.currentDialogAction == confirmDialog.delete){
+        this.removeAll();
+        this.showConfirmMsg = false;
+      } else if (this.currentDialogAction == confirmDialog.updatePayment) {
+        this.showConfirmMsg = false;
+        await this.getNewRefNo();
+        await this.savePayment(PaymentFormMode.watch);
+      }
+    },
+
+    removeAllRequest(){
+      this.confirmMessage = "Bạn có thực sự muốn xóa tất cả các dòng đã nhập không?";
+      this.showConfirmMsg = true;
+      this.currentDialogAction = confirmDialog.delete;
+    },
+
+    saveData(){
+      this.showConfirmChange = false;
+      this.saveRequest(PaymentFormMode.watch);
+    },
+
+    undoData(){
+      this.showConfirmChange = false;
+      this.$router.go(-this.numOfRouterWasGo);
+    },
 
     /**
      * Hành động của button option khi được chọn
@@ -656,11 +729,7 @@ export default {
       const data = await res.json();
       // Vue.set(this.currentPayment,'re_ref_no',   data['Data']);
       this.currentPayment['re_ref_no'] = data['Data'];
-      // ).then((res) =>
-      //   res.json().then((data) => {
-      //     this.currentPayment['re_ref_no'] = data['Data'];
-      //   })
-      // )
+      this.beforePayment = Object.assign({}, this.currentPayment);
     },
 
     /**
@@ -671,22 +740,30 @@ export default {
       
       const res = await fetch(this.resources.endpoint + "ReceiptPayment/" + id)
       const data = await res.json();
-      this.currentPayment = data["Data"][0];
-        this.currentPayment['re_date'] = this.dateFormator(this.currentPayment['re_date']);
-        this.currentPayment['ca_date'] = this.dateFormator(this.currentPayment['ca_date']);
-        this.selectedObject = {
-          supplier_code: this.currentPayment['supplier_code'],  
-          supplier_name: this.currentPayment['supplier_name'],
-          address: this.currentPayment['address'],
-      };
+      if (data["Data"][0]){
+        this.currentPayment = data["Data"][0];
+          this.currentPayment['re_date'] = this.dateFormator(this.currentPayment['re_date']);
+          this.currentPayment['ca_date'] = this.dateFormator(this.currentPayment['ca_date']);
+          this.selectedObject = {
+            supplier_code: this.currentPayment['supplier_code'],  
+            supplier_name: this.currentPayment['supplier_name'],
+            address: this.currentPayment['address'],
+        };
+        if (!this.currentPayment['re_receive']) this.currentPayment['re_receive'] = this.currentPayment['supplier_name'];
+        this.currentPayment['re_attach'] = this.formatMoney(this.currentPayment['re_attach']);
+        this.beforePayment = Object.assign({}, this.currentPayment);
+      }
     },
 
     /**
      * Hàm cập nhật dữ liệu mô tả dưới detail khi edit trên master
      * @author Xuân Đào (08/05/2023)
      */
-    desMasterInput(input) {
-      this.gridData.forEach((el) => (el["rpd_description"] = input));
+    desMasterInput(input, oldVal) {
+      this.gridData.forEach((el) => {
+        if (el["rpd_description"] == oldVal)
+          el["rpd_description"] = input
+      });
     },
 
     /**
@@ -699,6 +776,7 @@ export default {
         this.currentCaDate = newValue;
       }
       this.currentPayment["re_date"] = newValue;
+      this.currentPayment["ca_date"] = newValue;
     },
 
     /**
@@ -755,7 +833,24 @@ export default {
         this.gridData[i] = Object.assign({re_no: i+1}, this.gridData[i]);
         this.gridData[i]['amount'] = this.formatMoney(this.gridData[i]['amount']);
       }
+      this.beforeDetail = this.gridData.slice();
       this.$refs.editableGrid.formatDataMoney();
+    },
+
+    compareArrays(array1, array2) {
+      // Check if the arrays have the same length
+      if (array1.length !== array2.length) {
+        return false;
+      }
+
+      // Iterate over the elements and compare them
+      for (var i = 0; i < array1.length; i++) {
+        if (JSON.stringify(array1[i]) !== JSON.stringify(array2[i])) {
+          return false;
+        }
+      }
+
+      return true;
     },
 
     /**
@@ -772,6 +867,8 @@ export default {
           this.currentError,
           this.currentErrorIndex
         );
+        this.$refs.editableGrid.selected_index = this.currentError;
+        this.$refs.editableGrid.currentElementIndex = this.currentErrorIndex - 1;
       }
     },
 
@@ -781,13 +878,12 @@ export default {
      * @param dataIndex: Chỉ số của data
      * @author Xuân Đào (08/05/2023)
      */
-    updateSumary(data, dataIndex) {
-      if (data) {
-        this.summary -= parseInt(
-          this.gridData[dataIndex]["amount"].toString().replaceAll(".", "")
-        );
-        this.summary += parseInt(data.replaceAll(".", ""));
-      }
+    updateSumary() {
+      this.summary = 0;
+      this.gridData = this.$refs.editableGrid.gridData;
+      this.gridData.forEach(el => {
+        this.summary += parseInt(el['amount'].toString().replaceAll('.',''));
+      })
     },
 
     /**
@@ -795,6 +891,11 @@ export default {
      * @author Xuân Đào (08/05/2023)
      */
     validate() {
+      if (this.currentPayment["re_date"] < this.currentPayment["ca_date"]) {
+        this.currentElErr = this.$refs.reDate;
+        this.errMessage = `Ngày hạch toán phải lớn hơn hoặc bằng Ngày chứng từ <${this.formatDate(this.currentPayment['ca_date'])}>. Xin vui lòng kiểm tra lại`;
+        return false;
+      }
       for (let i = 0; i < this.gridData.length; i++) {
         // if (this.gridData[i].edit_mode == false) {
           if (this.gridData[i]["debit_account"].length < 3) {
@@ -814,12 +915,24 @@ export default {
           //
         }
       }
-      if (this.currentPayment["re_date"] < this.currentCaDate) {
-        this.currentElErr = this.$refs.reDate;
-        this.errMessage = `Ngày hạch toán phải lớn hơn hoặc bằng Ngày chứng từ <${this.currentCaDate}>. Xin vui lòng kiểm tra lại`;
-        return false;
-      }
       return true;
+    },
+
+    /**
+     * Hàm định dạng dữ liệu ngày tháng thành dạng dd/mm/yyyy
+     *
+     * @author  Xuân Đào (12/03/2023)
+     */
+     formatDate(date) {
+      const dateData = new Date(date);
+      const day =
+        dateData.getDate() < 10 ? "0" + dateData.getDate() : dateData.getDate();
+      const month =
+        dateData.getMonth() + 1 < 10
+          ? "0" + (dateData.getMonth() + 1)
+          : dateData.getMonth() + 1;
+      const year = dateData.getFullYear();
+      return `${day}/${month}/${year}`;
     },
 
     /**
@@ -827,6 +940,8 @@ export default {
      * @author Xuân Đào (08/05/2023)
      */
     getPaymentData() {
+      if (this.currentPayment['re_attach'])
+        this.currentPayment['re_attach'] = this.currentPayment['re_attach'].replaceAll(".", "");
       if (this.selectedObject['supplier_id']) {
         this.currentPayment.supplier_code = this.selectedObject.supplier_code;
         this.currentPayment.supplier_name = this.selectedObject.supplier_name;
@@ -869,12 +984,20 @@ export default {
         const paymentRes = await fetch(paymentAPI, paymentOptions);
         const paymentData = await paymentRes.json();
         if (!paymentData["IsSuccess"]) {
-          this.$refs.singleDialog.showDialogOn(
-            dialogType.error,
-            paymentData["Data"][0]["UserMsg"],
-            this.resources.vi.btnAction.confirm
-          );
-          this.currentElErr = this.$refs.reRefNo;
+          if (paymentData["Data"]){
+            this.currentDialogAction = confirmDialog.updatePayment;
+            this.confirmMessage = `Số chứng từ <${this.currentPayment['re_ref_no']}> đã tồn tại. Bạn có muốn chương trình tự động tăng số chứng từ không?`;
+            this.showConfirmMsg = true;
+          } else {
+            if (this.extractNumberFromString(paymentData['errors'][Object.keys(paymentData['errors'])[0]][0])){
+            let errField = "";
+            if (Object.keys(paymentData['errors'])[0]) {
+              errField = "Số chứng từ";
+            }
+            this.$refs.singleDialog.showDialogOn(dialogType.error, errField + " phải ít hơn " + this.extractNumberFromString(paymentData['errors'][Object.keys(paymentData['errors'])[0]][0]) + " ký tự ", "Đóng");
+            this.currentElErr = this.$refs.reRefNo;
+          }
+          }
           return;
         }
         const re_id = paymentData.Data["Data"];
@@ -896,7 +1019,9 @@ export default {
             this.editable = false;
             sessionStorage.PaymentFormMode = PaymentFormMode.watch;
             this.$router.push({ name: "PaymentDetail", params: {id: re_id}});
+            this.numOfRouterWasGo++;
             this.disableEditor();
+            this.currentPayment['re_attach'] = this.formatMoney(this.currentPayment['re_attach']);
           } else if (action == ActionAfterSave.close){
             this.$router.go(-this.numOfRouterWasGo);
           } else {
@@ -907,22 +1032,32 @@ export default {
               ca_date: this.dateFormator(new Date()),
               fullname: "",
             };
-            this.$router.push({ name: "PaymentDetail", params: {id: ''}});
-            this.numOfRouterWasGo++;
             this.summary = 0;
             this.selectedObject = {
               supplier_name: "",
             };
             this.gridData = [];
-            this.gridData.push(fixData);
-           await this.getNewRefNo();
+            const newData = {
+              re_no: 1,
+              rpd_description: "Chi tien cho",
+              debit_account: "",
+              credit_account: "",
+              amount: 0,
+              supplier_code: "",
+              supplier_name: "",
+              edit_mode: false,
+            }
+            this.gridData.push(newData);
+            this.beforeDetail = this.gridData.slice();
+            await this.getNewRefNo();
             this.formMode = PaymentFormMode.create;
             this.enableEditor();
           }
           this.gridKey++;
         }
       } else if (this.formMode == PaymentFormMode.modify){
-        let apiString = this.resources.endpoint + "ReceiptPayment?id=" + this.currentPayment['re_id'];
+        this.currentPayment['re_id'] = this.$route.params.id;
+        let apiString = this.resources.endpoint + "ReceiptPayment?id=" + this.$route.params.id;
         const options = {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -931,11 +1066,12 @@ export default {
         const res = await fetch(apiString, options);
         const data = await res.json();
         if (data['IsSuccess']){
-          let detailUpdate = this.resources.endpoint + "ReceiptPaymentDetail/UpdateMultiple?re_id=" + this.currentPayment['re_id'];
+          let detailUpdate = this.resources.endpoint + "ReceiptPaymentDetail/UpdateMultiple?re_id=" + this.$route.params.id;
           const gridData = this.$refs.editableGrid.gridData;
           for(let i=0;i<gridData.length;i++){
-            gridData[i]['rp_id'] = this.currentPayment['re_id'];
-            gridData[i]['object_id'] = this.currentPayment['supplier_id']
+            gridData[i]['rp_id'] = this.$route.params.id;
+            if (!gridData[i]['object_id'])
+              gridData[i]['object_id'] = this.currentPayment['supplier_id']
             gridData[i]['credit_account'] = gridData[i]['credit_account'].toString();
             gridData[i]['debit_account'] = gridData[i]['debit_account'].toString();
           }
@@ -948,10 +1084,12 @@ export default {
           const data = await res.json();
           if (data['IsSuccess']){
             this.Toast.showToastMsg(ToastType.Success, data['Message']);
-            if (action == ActionAfterSave.watch){
+          if (action == ActionAfterSave.watch){
             this.formMode = PaymentFormMode.watch;
+            this.$refs.editableGrid.gridData.forEach(el => el['edit_mode'] = false);
             this.editable = false;
             this.disableEditor();
+            this.currentPayment['re_attach'] = this.formatMoney(this.currentPayment['re_attach']);
           } else if (action == ActionAfterSave.close){
             this.$router.go(-this.numOfRouterWasGo);
           } else {
@@ -969,16 +1107,49 @@ export default {
               supplier_name: "",
             };
             this.gridData = [];
-            this.gridData.push(fixData);
+            const newData = {
+              re_no: 1,
+              rpd_description: "Chi tien cho",
+              debit_account: "",
+              credit_account: "",
+              amount: 0,
+              supplier_code: "",
+              supplier_name: "",
+              edit_mode: false,
+            }
+            this.gridData.push(newData);
             this.getNewRefNo();
             this.formMode = PaymentFormMode.create;
             this.enableEditor();
           }
           this.gridKey++;
           }
+        } else {
+          if (this.extractNumberFromString(data['errors'][Object.keys(data['errors'])[0]][0])){
+            let errField = "";
+            if (Object.keys(data['errors'])[0]) {
+              errField = "Số chứng từ";
+            }
+            this.$refs.singleDialog.showDialogOn(dialogType.error, errField + " phải ít hơn " + this.extractNumberFromString(data['errors'][Object.keys(data['errors'])[0]][0]) + " ký tự ", "Đóng");
+            this.currentElErr = this.$refs.reRefNo;
+          }
         }
       }
       sessionStorage.paymentMode = this.formMode;
+      this.beforeDetail = this.gridData.slice();
+      this.beforePayment = Object.assign({}, this.currentPayment)
+    },
+
+    extractNumberFromString(str) {
+      var numberRegex = /\d+/;
+
+      var result = str.match(numberRegex);
+
+      if (result) {
+        return parseInt(result[0]); 
+      } else {
+        return NaN; 
+      }
     },
 
     /**
@@ -990,6 +1161,8 @@ export default {
         this.getPaymentData();
         this.savePayment(action);
       } else {
+        /*eslint-disable no-debugger */
+        debugger
         if (this.currentError != null) {
           this.$refs.singleDialog.showDialogOn(
             dialogType.info,
@@ -1001,11 +1174,7 @@ export default {
           this.gridData[this.currentError]["edit_mode"] = true;
         }
         if (this.currentElErr != null) {
-          this.$refs.singleDialog.showDialogOn(
-            dialogType.info,
-            this.errMessage,
-            resources.vi.btnAction.close
-          );
+          this.currentDialogAction = confirmDialog.updatePayment;
         }
       }
     },
@@ -1015,11 +1184,14 @@ export default {
      * @author Xuân Đào (08/05/2023)
      */
     updateEditValue(data, dataIndex, modelIndex) {
-      this.gridData[dataIndex][
-        Object.keys(this.gridData[this.$refs.editableGrid.selected_index])[
-          modelIndex
-        ]
-      ] = data;
+      if (this.$refs.editableGrid.selected_index != null){
+        if (modelIndex == 1){
+          this.gridData[dataIndex]['rpd_description'] = data;
+        } 
+        if (modelIndex == 4){
+          this.gridData[dataIndex]["amount"] = data;
+        }
+      }
     },
 
     /**
@@ -1034,16 +1206,9 @@ export default {
           this.gridData[this.$refs.editableGrid.selected_index]['credit_account'] = data["accountnumber"];
         }
       } else if (index == 5) {
-        this.gridData[this.$refs.editableGrid.selected_index][
-          Object.keys(this.gridData[this.$refs.editableGrid.selected_index])[
-            index
-          ]
-        ] = data["supplier_code"];
-        this.gridData[this.$refs.editableGrid.selected_index][
-          Object.keys(this.gridData[this.$refs.editableGrid.selected_index])[
-            index + 1
-          ]
-        ] = data["supplier_name"];
+        this.gridData[this.$refs.editableGrid.selected_index]['supplier_code'] = data["supplier_code"];
+        this.gridData[this.$refs.editableGrid.selected_index]['object_id'] = data['supplier_id'];
+        this.gridData[this.$refs.editableGrid.selected_index]['supplier_name'] = data["supplier_name"];
       }
     },
 
@@ -1055,19 +1220,63 @@ export default {
       if (event.key == "Tab") {
         if (document.activeElement.id == "cancel") {
           event.preventDefault();
-          this.$refs.inpObject.setFocus();
+          this.$refs.paymentReason.setFocus();
+          this.$refs.paymentReason.showData = false;
+        }
+        if (document.activeElement.id == "combobox-paging"){
+          this.$refs.paymentReason.setBlur();
+          this.$refs.paymentReason.showData = false;
+        }
+
+        if (document.activeElement.id == "MInput"){
+          for (let i=0;i<this.$refs.editableGrid.gridData.length;i++){
+            this.$refs.editableGrid.gridData[i].edit_mode = false;
+          }
+          this.$refs.editableGrid.gridData[0].edit_mode = true;
+          this.$refs.editableGrid.selected_index = 0;
+          this.gridTab = 0;
+          this.gridTab++;
+        } else if (document.activeElement.id == "rdCombobox") {
+          this.$refs.editableGrid.currentElementIndex = 0;
+          if (this.$refs.editableGrid.gridData[this.gridTab]){
+            for (let i=0;i<this.$refs.editableGrid.gridData.length;i++){
+              this.$refs.editableGrid.gridData[i].edit_mode = false;
+            }
+            this.$refs.editableGrid.gridData[this.gridTab].edit_mode = true;
+            this.$refs.editableGrid.selected_index = this.gridTab; 
+            this.gridTab++;
+          }
+        } else if (document.activeElement.id == "gridInput"){
+          this.$refs.editableGrid.currentElementIndex++;
+        } else if (document.activeElement.id == "stCombobox1"){
+          this.$refs.editableGrid.currentElementIndex++;
+        } else if (document.activeElement.id == "stCombobox2"){
+          this.$refs.editableGrid.currentElementIndex++;
         }
 
         if (!this.editable){
           event.preventDefault();
         }
       }
+      if (event.key == "Escape"){
+        this.$router.go(-this.numOfRouterWasGo);
+      }
 
-      if (this.formMode != PaymentFormMode.watch){
-        if (event.key == "Escape"){
-          this.$router.go(-this.numOfRouterWasGo);
-        }
-        console.log(event);
+      if (event.ctrlKey && event.key === 's'){
+        event.preventDefault();
+        if (this.formMode == PaymentFormMode.create || this.formMode == PaymentFormMode.duplicate || this.formMode == PaymentFormMode.modify)
+          this.saveRequest(PaymentFormMode.watch);
+      }
+
+      if (event.ctrlKey && event.shiftKey && event.key === 'S') {
+        event.preventDefault(); 
+        if (this.formMode == PaymentFormMode.create || this.formMode == PaymentFormMode.duplicate || this.formMode == PaymentFormMode.modify)
+          this.saveRequest(ActionAfterSave.add);
+      }
+
+      if (event.ctrlKey && event.key === 'q') {
+        event.preventDefault();
+        this.saveRequest(ActionAfterSave.close);
       }
     },
 
@@ -1078,26 +1287,25 @@ export default {
      */
     updateSelectedObject(object) {
       if (object) {
+        let reasonBefore = this.currentPayment["re_description"];
+        let supplierBefore = this.selectedObject['supplier_code'];
         this.selectedObject = Object.assign({}, object);
+        if (!reasonBefore) reasonBefore = "Chi tiền cho "
+        if (this.selectedReason) {
+          this.currentPayment["re_description"] = `${this.selectedReason} ${this.selectedObject["supplier_name"]}`;
+        }
         this.gridData.forEach((el) => {
           if (this.selectedReason) {
-            el[
-              "rpd_description"
-            ] = `${this.selectedReason} ${this.selectedObject["supplier_name"]}`;
-            this.currentPayment[
-              "re_description"
-            ] = `${this.selectedReason} ${this.selectedObject["supplier_name"]}`;
-          } else {
-            el["rpd_description"] += ` ${this.selectedObject["supplier_name"]}`;
-            this.currentPayment[
-              "re_description"
-            ] += ` ${this.selectedObject["supplier_name"]}`;
+            if (el['rpd_description'] == reasonBefore)
+              el["rpd_description"] = `${this.selectedReason} ${this.selectedObject["supplier_name"]}`;
+          }
+          if (!el['supplier_code'] || el['supplier_code'] == supplierBefore){
+            el['supplier_code'] = object['supplier_code'];
+            el['supplier_name'] = object['supplier_name'];
           }
         });
         this.selectedObject["address"] = object["address"];
-        console.log(this.selectedObject);
-        this.exampleData.supplier_code = object["supplier_code"];
-        this.exampleData.supplier_name = object["supplier_name"];
+        this.currentPayment['re_receive'] = object["supplier_name"];
       }
     },
 
@@ -1146,7 +1354,11 @@ export default {
      * @author Xuân Đào (07/05/2023)
      */
     closeOnClick() {
-      this.$router.go(-this.numOfRouterWasGo);
+      if (JSON.stringify(this.currentPayment) == JSON.stringify(this.beforePayment) && this.compareArrays(this.gridData, this.beforeDetail))
+        this.$router.go(-this.numOfRouterWasGo);
+      else {
+        this.showConfirmChange = true;
+      }
     },
 
      /**
@@ -1154,13 +1366,23 @@ export default {
      * @author Xuân Đào (07/05/2023)
      */
     addRow() {
-      let newData = Object.assign({}, this.gridData[this.gridData.length - 1]);
-      newData["re_no"] = this.gridData[this.gridData.length - 1]["re_no"] + 1;
-      newData["edit_mode"] = true;
-      newData["amount"] = 0;
+      let newData = null;
+      this.gridData = this.$refs.editableGrid.gridData;
+      if (this.gridData[this.gridData.length - 1]){
+        newData = Object.assign({}, this.gridData[this.gridData.length - 1]);
+        newData["re_no"] = this.gridData[this.gridData.length - 1]["re_no"] + 1;
+        newData["edit_mode"] = true;
+        newData["amount"] = 0;
+      } else {
+        newData = Object.assign({}, fixData);
+      }
       this.gridData.forEach((el) => (el.edit_mode = false));
       this.gridData.push(newData);
+      this.$refs.editableGrid.gridData = this.gridData;
       this.$refs.editableGrid.selected_index = this.gridData.length - 1;
+      setTimeout(() => {
+        document.querySelector('#gridInput').focus();
+      }, 50);
     },
 
      /**
@@ -1169,7 +1391,25 @@ export default {
      */
     removeAll() {
       this.gridKey++;
-      this.gridData = [this.exampleData];
+      const newData = {
+              re_no: 1,
+              rpd_description: this.selectedReason,
+              debit_account: "",
+              credit_account: "",
+              amount: 0,
+              supplier_code: "",
+              supplier_name: "",
+              edit_mode: false,
+            }
+      this.gridData = [newData];
+      setTimeout(() => {
+        this.$refs.editableGrid.selected_index = 0;
+        this.gridData[0].edit_mode = true;
+        this.updateSumary();
+      }, 50);
+      setTimeout(() => {
+        document.querySelector('#gridInput').focus();
+      }, 60);
     },
 
      /**
@@ -1208,12 +1448,14 @@ export default {
       showOptionBtn: false,
       resources: resources,
       payment_data: null,
+      beforePayment: null,
+      beforeDetail: [],
       gridData: [],
       gridKey: 0,
       summary: 0,
       exampleData: {
         re_no: 1,
-        rpd_description: "Chi tien cho",
+        rpd_description: "Chi tiền cho ",
         debit_account: "",
         credit_account: "",
         amount: 0,
@@ -1237,11 +1479,22 @@ export default {
       showConfirm: true,
       btnOptionText: "",
       numOfRouterWasGo: 1,
+      gridTab: 0,
+      showConfirmChange: false,
+      confirmMessage: "",
+      showConfirmMsg: false,
+      currentDialogAction: 0,
     };
   },
 };
 </script>
 <style scoped>
+
+.pd-main__scroll{
+  height: calc(100% - 86px);
+  overflow-y: auto;
+  overflow-x: hidden;
+}
 
 .store-option{
   margin-right: -24px;
@@ -1311,8 +1564,7 @@ export default {
 }
 
 .pd-save__addbtn:focus {
-  background-color: #2ca01c;
-  outline: solid #e0e0e0 2px;
+  background-color: #227f16;
 }
 
 .pd-savebtn:focus {
@@ -1357,6 +1609,7 @@ export default {
 }
 
 .grid-main__title {
+  padding-top: 8px;
   height: 24px;
   width: 100%;
   font-family: Notosans-bold;
@@ -1371,15 +1624,12 @@ export default {
 .grid-main {
   width: calc(100% - 48px);
   margin: 12px 24px;
-  height: 90%;
-  overflow: auto;
 }
 
 .grid-content {
   margin-top: 24px;
   width: 100%;
-  height: 387px;
-  overflow: auto;
+  min-height: 380px;
   background-color: #fff;
 }
 
@@ -1389,6 +1639,7 @@ export default {
   background-color: #555555;
   position: absolute;
   bottom: 0;
+  z-index: 9999999;
 }
 
 .pd-footer button {
@@ -1496,8 +1747,7 @@ export default {
 .pd-main__content {
   height: 245px;
   width: 100%;
-  padding: 24px;
-  margin-top: 24px;
+  padding: 12px 24px;
   display: flex;
   box-sizing: border-box;
   min-width: 800px;
@@ -1538,13 +1788,13 @@ export default {
 }
 
 .pd-header {
-  height: 36px;
+  height: 64px;
   width: 100%;
   display: flex;
 }
 
 .pd-header__left-side {
-  height: 100%;
+  height: calc(100% - 24px);
   width: calc(50% - 32px);
   display: flex;
   padding: 12px 16px;
@@ -1573,6 +1823,7 @@ export default {
   line-height: 36px;
   font-family: Notosans-bold;
   min-width: 100px;
+  max-width: 300px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

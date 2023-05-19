@@ -13,6 +13,7 @@
       id="employeeCode"
       v-model="this.value"
       class="inp-text"
+      :maxlength="maxLength"
       @focus="this.isFocus = true"
       @blur="this.validate()"
     ></textarea>
@@ -69,6 +70,11 @@ export default {
       type: Boolean,
       required: false,
       default: true,
+    },
+
+    maxLength:{
+      type: Number,
+      required: false,
     }
   },
 

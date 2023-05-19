@@ -10,10 +10,9 @@
       ref="mInput"
       type="text"
       autocomplete="off"
-      id="employeeCode"
+      :id="id"
       v-model="this.value"
       @blur="this.validate()"
-      @input="this.$emit('onInput', value)"
       @keyup="onKeyUp"
       :placeholder="placeholder"
       :title="this.errMessage"
@@ -37,7 +36,7 @@ export default {
       required: false,
     },
 
-    // Được phép trống
+    // Được phép trống hay không
     required: {
       type: Boolean,
       required: false,
@@ -89,11 +88,17 @@ export default {
     type: {
       type: String,
       required: false
+    },
+
+    id: {
+      type: String,
+      required: false,
     }
   },
 
   watch:{
-    value(newVal){
+    value(newVal, oldVal){
+      this.$emit('onInput', newVal, oldVal);
       this.$emit("update:modelValue", newVal);
     },
 
