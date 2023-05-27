@@ -954,9 +954,9 @@ export default {
         this.currentPayment.supplier_code = this.selectedObject.supplier_code;
         this.currentPayment.supplier_name = this.selectedObject.supplier_name;
         this.currentPayment.account_id = this.selectedObject.supplier_id;
-        this.gridData.forEach(
-        (el) => (el.object_id = this.selectedObject.supplier_id)
-        );
+        // this.gridData.forEach(
+        // (el) => (el.object_id = this.selectedObject.supplier_id)
+        // );
       } else {
         this.currentPayment['account_id'] = this.currentPayment['supplier_id'];
       }
@@ -1207,14 +1207,18 @@ export default {
     comboboxDataChange(index, data) {
       if (index == 2 || index == 3) {
         if (index == 2){
-          this.gridData[this.$refs.editableGrid.selected_index]['debit_account'] = data["accountnumber"];
+          if(data && this.gridData[this.$refs.editableGrid.selected_index])
+            this.gridData[this.$refs.editableGrid.selected_index]['debit_account'] = data["accountnumber"];
         } else {
-          this.gridData[this.$refs.editableGrid.selected_index]['credit_account'] = data["accountnumber"];
+          if(data && this.gridData[this.$refs.editableGrid.selected_index])
+            this.gridData[this.$refs.editableGrid.selected_index]['credit_account'] = data["accountnumber"];
         }
       } else if (index == 5) {
-        this.gridData[this.$refs.editableGrid.selected_index]['supplier_code'] = data["supplier_code"];
-        this.gridData[this.$refs.editableGrid.selected_index]['object_id'] = data['supplier_id'];
-        this.gridData[this.$refs.editableGrid.selected_index]['supplier_name'] = data["supplier_name"];
+        if(data && this.gridData[this.$refs.editableGrid.selected_index]){
+          this.gridData[this.$refs.editableGrid.selected_index]['supplier_code'] = data["supplier_code"];
+          this.gridData[this.$refs.editableGrid.selected_index]['object_id'] = data['supplier_id'];
+          this.gridData[this.$refs.editableGrid.selected_index]['supplier_name'] = data["supplier_name"];
+        }
       }
     },
 
@@ -1308,6 +1312,7 @@ export default {
           if (!el['supplier_code'] || el['supplier_code'] == supplierBefore){
             el['supplier_code'] = object['supplier_code'];
             el['supplier_name'] = object['supplier_name'];
+            el['object_id'] = object['supplier_id'];
           }
         });
         this.selectedObject["address"] = object["address"];

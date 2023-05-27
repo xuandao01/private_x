@@ -344,6 +344,10 @@ export default {
      */
     async excelExport(){
       this.Loader.showLoader();
+      if(this.$refs.searchBar.getInputValue().length > 0){
+        this.searchOnInput(this.$refs.searchBar.getInputValue());
+        this.sortedData = this.$refs.gridData.sortedData;
+      }
       let excelData = Object.assign({}, this.sortedData);
       let body = "[";
       for(let i=0;i<this.sortedData.length;i++){
