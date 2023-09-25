@@ -51,6 +51,7 @@
   import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement, Title } from 'chart.js'
   import MCircleLoader from '@/components/base-component/MCircleLoader.vue'
   import ApexCharts from 'apexcharts'
+  import resources from '@/js/resources'
   
   ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement, Title)
   
@@ -163,7 +164,7 @@
       },
   
       getStatisData(){
-        let endpoint = 'https://localhost:44381/api/Asset';
+        let endpoint = `${this.res.endpoint}Asset`;
         this.showLoader = true;
         setTimeout(async () => {
           let res = await fetch(endpoint);
@@ -373,6 +374,7 @@
         totalAsset: 0,
         showLoader: false,
         lineKey: 0,
+        res: resources,
       }
     }
   }
