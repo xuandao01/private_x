@@ -521,7 +521,6 @@ export default {
         .catch(err => {
           console.log(err);
         })
-      // const res = await (await fetch("https://localhost:7006/api/Employees/ExcelExport")).blob();
       // const link = window.URL.createObjectURL(res);
       // console.log(link);
       // new JsFileDownloader({url: link});

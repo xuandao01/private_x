@@ -54,6 +54,7 @@
 import CircleLoader from '@/components/CircleLoader.vue';
 import MSingleActionDialog, { dialogType } from '@/components/unit-components/MSingleActionDialog.vue';
 import App from '@/App.vue';
+import resources from '@/js/resources';
 export default {
     name: "MSLogin",
     extends: App,
@@ -93,7 +94,7 @@ export default {
                 this.showLoader = true;
                 let username = this.$refs.username.value;
                 let password = this.$refs.passwordCom.value;
-                let endpoint = `https://localhost:44381/api/LoginAccount`
+                let endpoint = `${this.res.endpoint}LoginAccount`
                 /*eslint-disable no-debugger */
                 debugger
                 try{
@@ -138,6 +139,7 @@ export default {
             alertMessage: '',
             rememberPassword: false,
             showLoader: false,
+            res: resources
         }
     },
 }
