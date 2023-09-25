@@ -15,7 +15,7 @@
         type="text"
         v-model="value"
       />
-      <input @click="btnClick" type="button" class="dropdown-icon" />
+      <input @click="btnClick" type="button" class="combo-icon" />
     </div>
     <div class="errMess" v-if="isError">{{ title }} không được trống</div>
     <div ref="itemList" v-show="isShow" class="m-item-list">
@@ -271,6 +271,11 @@ export default {
         return str;
     },
 
+    /**
+     * Lấy id record được chọn trong combobox
+     * 
+     * @author Xuân Đào (04/04/2023)
+     */
     getSelectedId(modelValue){
       if (!this.selectedIndex){
         for (let i = 0; i< this.data.length; i++){
@@ -283,6 +288,11 @@ export default {
       return this.data[this.selectedIndex][`${modelValue}`];
     },
 
+    /**
+     * Lấy tên combobox
+     * 
+     * @author Xuân Đào (04/04/2023)
+     */    
     getInputName(){
       return this.title;
     }
@@ -328,13 +338,14 @@ input[type="button"]:hover {
 input[type="text"] {
   width: calc(100% - 36px);
 }
-.dropdown-icon {
-  height: 24px;
-  width: 24px;
+.combo-icon {
+  height: 100% !important;
   position: absolute;
-  background: url('@/assets/img/Sprites.64af8f61.svg') no-repeat -364px -356px;
-  right: -6px;
-  top: -4px;
+  background: url('@/assets/img/Sprites.64af8f61.svg') no-repeat -358px -355px;
+  top: 0;
+  right: 0;
+  border-left: solid #b0b0b0 1px !important;
+  border-radius: 0;
 }
 .m-item-list {
   position: absolute;

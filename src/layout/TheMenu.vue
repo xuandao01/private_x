@@ -9,10 +9,11 @@
                 <div title="Menu option" class="menu-logo__option">
                     <div class="toggle-icon"></div>
                 </div>
-                <div class="menu-logo__component">
-                    <div class="logo-icon">
+                <div class="menu-logo__component" style="display: flex; color: #fff; column-gap: 8px;">
+                    <div style="width: 30px; overflow: hidden;" class="logo-icon">
                         <img src="@/assets/img/Logo_Module_TiengViet_White.66947422.svg" alt="">
                     </div>
+                    <span style="font-family: Opens-san-bold; line-height: 34px;">Tài sản</span>
                 </div>
             </div>
             <!-- Phần hiển thị danh sách các option trong menu chính -->
@@ -24,18 +25,42 @@
                 <!-- Phần hiển thị text -->
                 <div class="menu-item__context">{{ data[0] }}</div>
             </router-link>
-            <div class="menu-item">
+            <router-link to="/Asset" class="menu-item">
+                <div class="menu-item__icon">
+                    <div class="icon asset"></div>
+                </div>
+                <div class="menu-item__context">{{ data[7] }}</div>
+            </router-link>
+            <router-link to="/CA" class="menu-item">
+                <div class="menu-item__icon">
+                    <div class="icon order"></div>
+                </div>
+                <div class="menu-item__context">{{ 'Quản lý hóa đơn' }}</div>
+            </router-link>
+            <!-- <router-link to="/CA" class="menu-item">
                 <div class="menu-item__icon">
                     <div class="icon money"></div>
                 </div>
                 <div class="menu-item__context">{{ data[1] }}</div>
-            </div>
-            <div class="menu-item">
+            </router-link> -->
+            <router-link to="/Deploy" class="menu-item">
                 <div class="menu-item__icon">
                     <div class="icon s-money"></div>
                 </div>
-                <div class="menu-item__context">{{ data[2] }}</div>
-            </div>
+                <div class="menu-item__context">{{ 'Cấp phát' }}</div>
+            </router-link>
+            <router-link to="/DI/DIEmployee" class="menu-item">
+                <div class="menu-item__icon">
+                    <div class="icon employee-icon-2"></div>
+                </div>
+                <div class="menu-item__context">{{ 'Nhân viên' }}</div>
+            </router-link>
+            <router-link to="/Supplier" class="menu-item">
+                <div class="menu-item__icon">
+                    <div class="icon sell"></div>
+                </div>
+                <div class="menu-item__context">{{ 'Nhà cung cấp' }}</div>
+            </router-link>
             <div class="menu-item">
                 <div class="menu-item__icon">
                     <div class="icon buy"></div>
@@ -44,28 +69,9 @@
             </div>
             <div class="menu-item">
                 <div class="menu-item__icon">
-                    <div class="icon sell"></div>
-                </div>
-                <div class="menu-item__context">{{ data[4] }}</div>
-            </div>
-
-            <div class="menu-item">
-                <div class="menu-item__icon">
-                    <div class="icon order"></div>
-                </div>
-                <div class="menu-item__context">{{ data[5] }}</div>
-            </div>
-            <div class="menu-item">
-                <div class="menu-item__icon">
                     <div class="icon tools"></div>
                 </div>
                 <div class="menu-item__context" :title="data[6]">{{ data[6] }}</div>
-            </div>
-            <div class="menu-item">
-                <div class="menu-item__icon">
-                    <div class="icon asset"></div>
-                </div>
-                <div class="menu-item__context">{{ data[7] }}</div>
             </div>
             <div class="menu-item">
                 <div class="menu-item__icon">
@@ -81,12 +87,6 @@
             </div>
             <div class="menu-item">
                 <div class="menu-item__icon">
-                    <div class="icon tax"></div>
-                </div>
-                <div class="menu-item__context">{{ data[10] }}</div>
-            </div>
-            <div class="menu-item">
-                <div class="menu-item__icon">
                     <div class="icon synthetic"></div>
                 </div>
                 <div class="menu-item__context">{{ data[11] }}</div>
@@ -97,7 +97,7 @@
                 </div>
                 <div class="menu-item__context">{{ data[12] }}</div>
             </div>
-            <router-link to="/employee" class="menu-item">
+            <router-link to="/DI" class="menu-item">
                 <div class="menu-item__icon">
                     <div class="icon user-group"></div>
                 </div>

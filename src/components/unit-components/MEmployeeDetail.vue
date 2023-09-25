@@ -116,7 +116,7 @@
               <div class="inf-component issue-date" style="width: 170px">
                 <MDatePicker
                   :title="txtData.dateOfIssue"
-                  v-model="this.employee.identityDate"
+                  v-model="this.employee.IdentityDate"
                   ref="identityDate"
                 ></MDatePicker>
               </div>
@@ -125,6 +125,7 @@
               <MInput
                 class="position-name"
                 :inputTitle="txtData.issuedBy"
+                v-model="this.employee.IdentityPlace"
                 ref="identityPlace"
               />
             </div>
@@ -134,29 +135,30 @@
         <div class="contact-info">
           <div class="inf-area">
             <div class="inf-component">
-              <MInput :inputTitle="txtData.address" ref="inpAddress" />
+              <MInput :inputTitle="txtData.address" ref="inpAddress" v-model="employee.Address" />
             </div>
           </div>
           <div class="inf-area">
             <div class="inf-component">
-              <MInput :inputTitle="txtData.phoneNumber" ref="inpPhonenumber" :tooltip="this.res.vi.employeeDetail.phoneNumberDetail"/>
+              <MInput :inputTitle="txtData.phoneNumber" ref="inpPhonenumber" :tooltip="this.res.vi.employeeDetail.phoneNumberDetail" v-model="this.employee.PhoneNumer"/>
             </div>
             <div class="inf-component">
-              <MInput :inputTitle="txtData.landingPhone" ref="inpLandingPhone" :tooltip="this.res.vi.employeeDetail.landingPhoneDetail"/>
+              <MInput :inputTitle="txtData.landingPhone" ref="inpLandingPhone" :tooltip="this.res.vi.employeeDetail.landingPhoneDetail" v-model="this.employee.landingPhone"/>
             </div>
             <div class="inf-component">
-              <MInput inputTitle="Email" ref="inpEmail" />
+              <MInput inputTitle="Email" ref="inpEmail" v-model="this.employee.Email"/>
             </div>
           </div>
           <div class="inf-area">
             <div class="inf-component">
-              <MInput :inputTitle="txtData.bankAccount" ref="inpBankAccount" />
+              <MInput :inputTitle="txtData.bankAccount" ref="inpBankAccount" v-model="this.employee.BankAccount"/>
             </div>
             <div class="inf-component">
               <MInput
                 class="position-name"
                 :inputTitle="txtData.bankName"
                 ref="inpBankName"
+                v-model="this.employee.BankName"
               />
             </div>
             <div class="inf-component">
@@ -165,6 +167,7 @@
                 :inputTitle="txtData.bankBranch"
                 ref="inpBankBranch"
                 :tooltip="this.res.vi.employeeDetail.bankBranchDetail"
+                v-model="this.employee.BankBranch"
               />
             </div>
           </div>
@@ -174,16 +177,16 @@
       <div class="popup-main__footer">
         <div class="btn group-btn">
           <div class="btn-save">
-            <button id="save" @click="saveData" class="optionalBtn">{{ txtBtn.store }}</button>
+            <button id="save" @click="saveData" :title="this.res.vi.employeeDetailBtn.saveTooltip" class="optionalBtn">{{ txtBtn.store }}</button>
           </div>
           <div class="btn btn-saveAndAdd">
-            <button @click="this.saveData(true)" id="saveAdd">
+            <button @click="this.saveData(true)" :title="this.res.vi.employeeDetailBtn.saveAndAddTooltip" id="saveAdd">
               {{ txtBtn.storeSave }}
             </button>
           </div>
         </div>
         <div class="btn btn-close">
-          <button @keydown="cancelOnKeyDown" id="cancel" class="optionalBtn">
+          <button @keydown="cancelOnKeyDown" id="cancel" :title="this.res.vi.employeeDetailBtn.closeTooltip" class="optionalBtn">
             {{ txtBtn.cancel }}
           </button>
         </div>
@@ -193,7 +196,7 @@
       v-if="confirmDialog"
       @hideDialog="this.closeDialog()"
       @hideDialogPopup="this.undoData()"
-      @hideAndSave="this.closeSave()"
+      @hideAndSave="this.saveData()"
     ></ConfirmDialog>
     <MSingleActionDialog
     ref="singleDialog"
@@ -271,22 +274,7 @@ export default {
   },
 
   computed: {
-    /**
-     * Hàm format dữ liệu ngày thàng
-     *
-     * Author: Xuân Đào (03/03/2023)
-     */
-    dateFormater() {
-      const date = new Date(this.employee.DateOfBirth);
-      const dateVal =
-        date.getDate() < 10 ? "0" + date.getDate() : date.getDate();
-      const month =
-        date.getMonth() < 10
-          ? "0" + (date.getMonth() + 1)
-          : date.getMonth() + 1;
-      const year = date.getFullYear();
-      return `${year}-${month}-${dateVal}`;
-    },
+    
   },
 
   watch: {
@@ -300,8 +288,8 @@ export default {
 
   beforeMount() {
     if (this.actions == formAction.updateRecord) {
-
-      this.employee.DateOfBirth = this.dateFormater;
+      this.employee.DateOfBirth = this.readableDateFormater(this.employee.DateOfBirth);
+      this.employee.IdentityDate = this.readableDateFormater(this.employee.IdentityDate);
       if (this.employee.GenderName === "Không xác định")
         this.employee.GenderName = "Khác";
     }
@@ -316,6 +304,50 @@ export default {
   },
 
   methods: {
+    /**
+     * Hàm format dữ liệu ngày thàng
+     *
+     * Author: Xuân Đào (03/03/2023)
+     */
+     readableDateFormater(data) {
+      const date = new Date(data);
+      const dateVal =
+        date.getDate() < 10 ? "0" + date.getDate() : date.getDate();
+      const month =
+        date.getMonth() < 10
+          ? "0" + (date.getMonth() + 1)
+          : date.getMonth() + 1;
+      const year = date.getFullYear();
+      return `${year}-${month}-${dateVal}`;
+    },
+
+    /**
+     * Hàm format việc hiển thị ngày tháng đúng định dạng
+     * @param data dữ liệu ngày cần format
+     *
+     * Author: Xuân Đào (02/03/2023)
+     */
+     formatDate(data) {
+      const dateVal = new Date(data);
+      let date = dateVal.getDate();
+      let month = dateVal.getMonth() + 1;
+      const fyear = dateVal.getFullYear();
+      date = date < 10 ? "0" + date : date;
+      month = month < 10 ? "0" + month : month;
+      return `${date}/${month}/${fyear}`;
+    },
+
+    formatDateToDisplay(data) {
+      const dateVal = new Date(data);
+      let date = dateVal.getDate();
+      let month = dateVal.getMonth() + 1;
+      const fyear = dateVal.getFullYear();
+      date = date < 10 ? "0" + date : date;
+      month = month < 10 ? "0" + month : month;
+      return `${month}-${date}/${fyear}`;
+    },
+    
+    
     /**
      * Hàm đóng popup hiện tại
      *
@@ -360,42 +392,25 @@ export default {
      * Author: Xuân Đào (05/03/2023)
      */
     async handleKeyDown(event) {
-      // this.keyPressed = event.keyCode;
-      // // Kiểm tra trước đó đã bấm phím nào chưa
-      // if (!this.lastKeyPress) {
-      //   this.lastKeyPress = event.keyCode;
-      //   this.lastTimePress = new Date();
-      // } else {
-      //   // Kiểm tra thời gian giữa 2 lần nhấn phím
-      //   if (new Date() - this.lastTimePress < 1000) {
-      //     if (this.lastKeyPress == 17 && event.keyCode == 83) {
-      //       // ctrl + s
-      //       event.preventDefault();
-      //       this.saveData();
-      //     } else if (this.lastKeyPress == 17 && event.keyCode == 120) {
-      //       // ctrl + f9
-      //       event.preventDefault();
-      //     }
-      //   } else {
-      //     this.lastKeyPress = event.keyCode;
-      //     this.lastTimePress = new Date();
-      //   }
-      // }
       if (event.ctrlKey && event.key === 's'){
         event.preventDefault();
         this.saveData(false);
-      }
-
-      if (event.ctrlKey && event.key === 'a'){
-        event.preventDefault();
-        this.saveData(true);
       }
       
       if (event.key === 'Escape') {
         //ESC Pressed
         this.closePopup();
       }
-      
+
+      if (event.ctrlKey && event.shiftKey && event.key === 'S') {
+        event.preventDefault(); 
+        this.saveData(true);
+      }
+
+      if (event.key == "F1"){
+        event.preventDefault();
+        this.showDeveloping();
+      }
     },
 
     /**
@@ -421,7 +436,6 @@ export default {
         };
         let res = await fetch(`${this.res.endpoint}Employees`, options);
         let data = await res.json();
-        console.log(data);
         return { status: res.status, value: data, message: data['Message'] };
       } catch (err) {
         return { status: 400, value: null, message: err};
@@ -440,9 +454,10 @@ export default {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(newEmployee),
         };
+        newEmployee.DateOfBirth = this.formatDate(newEmployee.DateOfBirth);
+        newEmployee.IdentityDate = this.formatDate(newEmployee.IdentityDate)
         let res = await fetch(`${this.res.endpoint}Employees?id=${newEmployee.EmployeeId}`, options);
         let data = await res.json();
-        console.log(data);
         return { status: res.status, value: data, message: data['Message'] };
       } catch (err) {
         console.log(err);
@@ -477,34 +492,56 @@ export default {
      * Author: Xuân Đào (05/03/2023)
      */
     async saveData(reload) {
-      if (this.valueValidate()){
-        const newEmployee = this.getInputData();
-          let res = "";
-          if (this.actions == formAction.createRecord || this.actions == formAction.duplicateRecord){
-            res = await this.createRecord(newEmployee);
-          } else if (this.actions == formAction.updateRecord) {
-            res = await this.updateRecord(newEmployee);
-          }
-          if (res.status === 200 || res.status === 201) {
-            if (res['value']['IsSuccess']) {
-              this.ToastControl.showToastMsg(
-                ToastType.Success,
-                res['message']
-              );
-              this.$emit('updateData', newEmployee);
-              this.$emit("hidePopup");
-              this.closeDialog();
-              if (reload === true) {
-                this.$emit('reloadPopup');
+      this.closeDialog();
+      try{
+        if (this.valueValidate()){
+          const newEmployee = this.getInputData();
+            let res = "";
+            if (this.actions == formAction.createRecord || this.actions == formAction.duplicateRecord){
+              res = await this.createRecord(newEmployee);
+            } else if (this.actions == formAction.updateRecord) {
+              res = await this.updateRecord(newEmployee);
+            }
+            if (res.status === 200 || res.status === 201) {
+              if (res['value']['IsSuccess']) {
+                this.ToastControl.showToastMsg(
+                  ToastType.Success,
+                  res['message']
+                );
+                this.$emit('updateData', newEmployee);
+                this.$emit("hidePopup");
+                if (reload === true) {
+                  this.$emit('reloadPopup');
+                }
               }
+              else {
+                this.$refs.singleDialog.showDialogOn(dialogType.info, res['value']['Data'][0]['UserMsg'], resources.vi.btnAction.close);
+              }
+            } else {
+              let mess = "";
+              switch(Object.keys(res.value.errors)[0]){
+                case "EmployeeCode": {
+                  mess = this.res.vi.employeeDetailError.codeInvalidLength;
+                  break
+                }
+                case "FullName":{
+                  mess = this.res.vi.employeeDetailError.nameInvalidLength;
+                  break
+                }
+                case "DateOfBirth":{
+                  mess = this.res.vi.employeeDetailError.dobInvalidData;
+                  break
+                }
+                case "IdentityDate":{
+                  mess = this.res.vi.employeeDetailError.issueDateInvalid;
+                  break
+                }
+              }
+              this.$refs.singleDialog.showDialogOn(dialogType.info, mess, resources.vi.btnAction.close);
             }
-            else {
-              this.$refs.singleDialog.showDialogOn(dialogType.info, res['value']['Data'][0]['UserMsg'], resources.vi.btnAction.close);
-            }
-          } else {
-            console.log(res['Message']);
-            this.$refs.singleDialog.showDialogOn(dialogType.info, res.value.errors, resources.vi.btnAction.close);
-          }
+        }
+      } catch (ex) {
+        console.log(ex);
       }
     },
 
@@ -547,14 +584,30 @@ export default {
       this.$emit("reloadPopup");
     },
 
+    /**
+     * Hàm hiển thị popup đang phát triển
+     *
+     * @author  Xuân Đào (12/03/2023)
+     */
     showDeveloping(){
       this.$refs.singleDialog.showDialogOn(dialogType.info, resources.vi.dialogMessage.developing, resources.vi.btnAction.close)
     },
 
+    /**
+     * Hàm set focus vào ô lỗi đầu tiên khi đóng dialog
+     *
+     * @author  Xuân Đào (12/03/2023)
+     */
     dialogClosed(){
-      this.currentError.setFocus();
+      if (this.currentError)
+        this.currentError.setFocus();
     },
 
+    /**
+     * Hàm lấy mã giới tính
+     *
+     * @author  Xuân Đào (12/03/2023)
+     */
     getGenderCode(name){
       switch(name){
         case "Nam": return GenderCode.Male;
@@ -564,6 +617,11 @@ export default {
       }
     },
 
+    /**
+     * Hàm lấy dữ liệu từ popup
+     *
+     * @author  Xuân Đào (12/03/2023)
+     */
     getInputData(){
       try{
         const employee = {

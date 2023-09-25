@@ -3,12 +3,17 @@ tr .fix-start{
     left: -1px;
     background-color: #fff;
     z-index: 3;
+    border-right: unset !important;
+    border-left: unset !important;
+    border-radius: unset;
 }
 
 tr .fix-end{
     position: sticky;
     right: -1px;
     background-color: #fff;
+    border-right: unset !important;
+    border-left: unset !important;
     z-index: 3;
 }
 
@@ -32,25 +37,27 @@ tr{
     background-color: #fff;
 }
 
-tr:hover{
+tbody tr:hover{
     background-color: #f4faff !important;
     z-index: 0;
 }
 
-tr:hover td:first-child, tr:hover td:last-child{
+tbody tr:hover + td, tbody tr:hover .fix-end, tbody tr:hover .fix-start{
     background-color: #f4faff !important;
     z-index: 3;
 } 
 
 th{
-    background-color: #f4f5f6 !important;
+    background-color: #e5e8ec !important;
     text-align: left;
-    padding-left: 12px;
+    padding: 0 12px;
     position: sticky;
     font-size: 13px;
     top: -1px;
     z-index: 2;
     font-family: Opens-san-bold;
+    user-select: none;
+    cursor: pointer;
 }
 th:first-child, th:last-child{
     z-index: 5;
@@ -60,6 +67,10 @@ td{
     padding:0 12px;
     font-size: 13px;
     position: relative;
+    /* border-left: unset !important; */
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 .checkbox{
@@ -68,7 +79,6 @@ td{
 }
 
 .grid-viewer {
-    height: calc(100% - 64px);
     border-bottom: solid #e0e0e0 1px;
 }
 
@@ -91,7 +101,7 @@ width: 100%;
 
 th,
 td {
-border: solid #e0e0e0 1px;
+border: solid #bfbfbf 1px;
 }
 
 .content-main__footer{
@@ -108,7 +118,28 @@ border: solid #e0e0e0 1px;
     z-index: 6;
 }
 
-.tr-selected, .tr-selected td:first-child, .tr-selected td:last-child{
+.tr-selected, .tr-selected + td, .tr-selected .fix-start, .tr-selected .fix-end{
     background-color: #e5f3ff;
     z-index: 3;
+}
+
+.date input{
+    text-align: center;
+    padding:0;
+}
+
+.d-money{
+    text-align: right;
+    padding-right: 12px;
+}
+
+.number{
+    width: 50px !important;
+    position: sticky;
+    left: 0;
+}
+
+.d-money input{
+    text-align: right;
+    padding:0;
 }

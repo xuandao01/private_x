@@ -128,7 +128,7 @@ export default {
         content: '';
         position: absolute;
         top: 3px;
-        left: 3.5px;
+        left: 3px;
         border-radius: 50%;
         background-color: #2ca01c;
         width: 12px;

@@ -19,7 +19,7 @@
 @import url(../css/components/router.css);
 body{
     margin: 0px;
-    background-color: #E0E0E0;
+    background-color: #eceef1;
 }
 @font-face {
     font-family: Notosans;
@@ -28,6 +28,10 @@ body{
 @font-face {
     font-family: Notosans-semibold;
     src: url("../assets/fonts/notosans-semibold.df3e6dc4.woff2");
+}
+@font-face {
+    font-family: Notosans-bold;
+    src: url("../assets/fonts/notosans-bold.3ede5aff.woff2");
 }
 @font-face {
     font-family: Roboto;
@@ -53,6 +57,25 @@ body{
     font-family: OpenSans_Condensed;
     src: url("../assets/fonts/Open_Sans/static/OpenSans_Condensed/OpenSans_Condensed-Regular.ttf");
 }
+@font-face {
+    font-family: Poppins;
+    src: url("@/assets/fonts/Poppins/Poppins-Regular.ttf");
+}
+
+@font-face {
+    font-family: Poppins-bold;
+    src: url("@/assets/fonts/Poppins/Poppins-Bold.ttf");
+}
+
+@font-face {
+    font-family: Poppins-italic;
+    src: url("@/assets/fonts/Poppins/Poppins-Italic.ttf");
+}
+
+@font-face {
+    font-family: Poppins-semibold;
+    src: url("@/assets/fonts/Poppins/Poppins-SemiBold.ttf");
+}
 *{
     font-family: Notosans;
     margin: 0;
@@ -72,14 +95,29 @@ a{
     padding: 0 ;
 }
 
+.align-right{
+    text-align: right;
+    padding: 0 ;
+}
+
+.disable input{
+    background-color: #f0f0f0 !important;
+  }
+
 ::-webkit-scrollbar {
     width: 0.5em;
     height: 0.5em;
-    z-index: 99999;
+    z-index: 99999999;
 }
 ::-webkit-scrollbar-track-piece {
-    background-color: #fff;
+    background-color: #e0e0e0;
 }
 ::-webkit-scrollbar-thumb {
-    background-color: #E6E6E6;
+    background-color: #a3a3a3;
+}
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }

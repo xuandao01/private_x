@@ -1,5 +1,5 @@
 <template>
-  <div class="input-component" :class="{ unfocus: !isFocus }">
+  <div class="input-component" :class="{ unfocus: !isFocus }" ref="inputComponent">
     <input
       ref="searchBar"
       @focus="inputOnFocus"
@@ -7,7 +7,7 @@
       @keyup="inputOnSearch"
       type="text"
       class="search"
-      placeholder="Tìm kiếm"
+      :placeholder="this.placeholder"
     />
     <div class="icon search-icon"></div>
   </div>
@@ -16,6 +16,24 @@
 import debounce from 'lodash/debounce'
 export default {
   name: "MSearchBar",
+
+  props:{
+    width: {
+      type: Number,
+      required: false,
+    },
+
+    placeholder:{
+      type: String,
+      required: false,
+      default: "Tìm kiếm"
+    }
+  },
+
+  mounted(){
+    this.$refs.inputComponent.style.width = this.width + "px";
+  },
+
   data() {
     return {
       isFocus: false,
@@ -23,6 +41,11 @@ export default {
   },
 
   methods: {
+
+    getInputValue(){
+      return this.$refs.searchBar.value;
+    },
+
     /**
      * Khi focus vào input
      *
@@ -41,11 +64,19 @@ export default {
       this.isFocus = false;
     },
 
+    /**
+     * Hàm debounce tìm kiếm sau 0.5s không nhập liệu
+     *
+     * @author  Xuân Đào (12/03/2023)
+     */
     inputOnSearch: debounce(function() {
       this.$emit('onSearch', this.$refs.searchBar.value);
     }, 500),
   },
 };
 </script>
-<style lang="">
+<style scoped>
+  input::placeholder{
+    font-size: 12px;
+  }
 </style>

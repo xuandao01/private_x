@@ -1,5 +1,5 @@
 <template>
-    <div class="container">
+    <div class="lds-container">
         <div class="lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
     </div>
 </template>
@@ -9,14 +9,14 @@ export default {
 }
 </script>
 <style scoped>
-    .container{
+    .lds-container{
         height: 100vh;
         width: 100%;
         position: fixed;
         top: 0;
         left: 0;
         z-index: 9999;
-        background-color: #54545441;
+        /* background-color: #54545441; */
     }
     .lds-roller {
         display: inline-block;

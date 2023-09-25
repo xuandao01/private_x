@@ -80,10 +80,10 @@ export default {
   height: 40px;
   width: 350px;
   background-color: #fff;
-  box-shadow: 2px 2px 2px 2px rgba(10, 10, 10, 0.178);
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
   position: fixed;
   right: 0px;
-  bottom: 10px;
+  top: 50px;
   animation-name: showToast;
   animation-duration: 1s;
   animation-fill-mode: forwards;

@@ -3,18 +3,22 @@
 <template>
   <div class="inf-component com1">
     <div class="text-area">
-      <span class="bold-text" :title="tooltip">{{ inputTitle }}</span>
+      <span ref="inpText" class="bold-text" :title="tooltip">{{ inputTitle }}</span>
       <a v-if="required"> *</a>
     </div>
     <input
       ref="mInput"
-      type="text"
+      :type="inputType"
       autocomplete="off"
-      id="employeeCode"
+      :id="id"
       v-model="this.value"
       @blur="this.validate()"
+      @keyup="onKeyUp"
+      :placeholder="placeholder"
+      :title="this.errMessage"
+      :maxlength="this.maximumLength"
     />
-    <div v-if="isError" class="errMes">{{ inputTitle }} không được trống</div>
+    <!-- <div v-if="isError" class="errMes">{{ inputTitle }} không được trống</div> -->
   </div>
 </template>
 <script>
@@ -32,7 +36,7 @@ export default {
       required: false,
     },
 
-    // Được phép trống
+    // Được phép trống hay không
     required: {
       type: Boolean,
       required: false,
@@ -49,26 +53,118 @@ export default {
     tooltip:{
       type: String,
       required: false
+    },
+
+    titleColor: {
+      type: String,
+      required: false,
+      dafault: "000"
+    },
+
+    placeholder:{
+      type: String,
+      required: false,
+    },
+
+    textAlign:{
+      type: String,
+      required: false,
+    },
+    maxLength:{
+      type: Number,
+      required: false,
+    },
+
+    maximumLength:{
+      type: Number,
+      required: false,
+    },
+
+    minLength:{
+      type: Number,
+      required: false,
+    },
+
+    type: {
+      type: String,
+      required: false
+    },
+
+    id: {
+      type: String,
+      required: false,
+    },
+
+    inputType: {
+      type: String,
+      required: false,
+      default: "text"
     }
   },
 
   watch:{
-    value(newVal){
+    value(newVal, oldVal){
+      this.$emit('onInput', newVal, oldVal);
       this.$emit("update:modelValue", newVal);
+    },
+
+    modelValue(newVal) {
+      this.value = newVal;
     }
   },
 
-  created() {
+  created(){
     this.value = this.modelValue;
   },
 
   mounted() {
     this.$nextTick(() => {
       // this.focus();
+      this.$refs.inpText.style.color = `#${this.titleColor}`;
+      if (this.textAlign){
+        this.$refs.mInput.style.textAlign = this.textAlign;
+      }
     });
   },
 
   methods: {
+
+    /**
+     * Hàm set focus vào input
+     * 
+     * @author Xuân Đào (05/03/2023)
+     */
+    onKeyUp(){
+      if (this.type && this.type == 'd-money'){
+        event.target.value = this.formatMoney(event.target.value.replaceAll('.',''));
+      }
+    },
+
+    /**
+     * Hàm định dạng tiền
+     * @author Xuân Đào(13/05/2023)
+     */
+     formatMoney(amount, decimalCount = 0, decimal = ",", thousands = ".") {
+      decimalCount = Math.abs(decimalCount);
+      decimalCount = isNaN(decimalCount) ? 2 : decimalCount;
+      const negativeSign = amount < 0 ? "-" : "";
+      let i = parseInt(
+        (amount = Math.abs(Number(amount) || 0).toFixed(decimalCount))
+      ).toString();
+      let j = i.length > 3 ? i.length % 3 : 0;
+      return (
+        negativeSign +
+        (j ? i.substr(0, j) + thousands : "") +
+        i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + thousands) +
+        (decimalCount
+          ? decimal +
+            Math.abs(amount - i)
+              .toFixed(decimalCount)
+              .slice(2)
+          : "")
+      );
+    },
+
     /**
      * Hàm set focus vào input
      * 
@@ -80,9 +176,10 @@ export default {
     /**
      * Hàm hiển thị thông báo lỗi nếu có
      */
-    showErr(){
+    showErr(errMes){
       this.isError = true;
       this.$refs.mInput.classList.add("input-err");
+      this.errMessage = errMes;
     },
     /**
      * Hàm xoá thông báo lỗi nếu có
@@ -90,18 +187,42 @@ export default {
     hideErr(){
       this.$refs.mInput.classList.remove("input-err");
       this.isError = false;
+      this.errMessage = "";
     },
     /**Hàm thực hiện validate nếu cần */
     validate(){
-      if (!this.required) return;
-      const value = this.$refs.mInput.value;
-      if (value.trim() == "" || value == null || value == undefined){
-        this.showErr();
-      } else {
-        this.hideErr();
+      let value = "";
+      if(this.$refs.mInput){
+        value = this.$refs.mInput.value;
+        if ((value.trim() == "" || value == null || value == undefined) && this.required){
+          this.showErr(this.inputTitle + " không được để trống!");
+          return;
+        } else {
+          this.hideErr();
+        }
+        
+        if (this.maxLength && value.length > this.maxLength){
+          this.showErr(`${this.inputTitle} không được vượt quá ${this.maxLength} ký tự`);
+          return;
+        } else {
+          this.hideErr();
+        }
+
+        if (this.maxLength && value.length < this.minLength){
+          this.showErr(`${this.inputTitle} không được ít hơn ${this.minLength} ký tự`);
+          return;
+        } else {
+          this.hideErr();
+        }
       }
+
     },
 
+    /**
+     * Hàm lấy tên input
+     *
+     * @author  Xuân Đào (12/03/2023)
+     */
     getInputName(){
       return this.inputTitle;
     }
@@ -110,7 +231,8 @@ export default {
   data() {
     return {
       value: null,
-      isError: false
+      isError: false,
+      errMessage: "",
     };
   },
 };
@@ -130,11 +252,13 @@ a {
 
 .com1 {
   width: 150px;
+  flex: 1;
 }
 .errMes{
   font-size: 13px;
   color: red;
 }
+
 .input-err{
     border-color: #E81E1E !important;
 }

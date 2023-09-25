@@ -1,12 +1,21 @@
 <template>
   <tr v-for="n in 5" :key="n">
-    <td v-for="n in 14" :key="n">
+    <td v-for="n in this.numOfColumn" :key="n">
       <div class="loading"></div>
     </td>
   </tr>
 </template>
 <script>
-export default {};
+export default {
+  name: "MGridLoader",
+  props:{
+    numOfColumn:{
+      type: Number,
+      required: false,
+      default: 10,
+    }
+  }
+};
 </script>
 <style scoped>
 .loading {
