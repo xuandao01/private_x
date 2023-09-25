@@ -57,8 +57,15 @@
               :title="item[value.dataField]"
               @dblclick="editOnDbClick(item)"
             >
-            <!-- <input class="grid-input" :class="{'disable-editor': !canEditValue, 'enable-editor': canEditValue}" type="text" :value="item[value.dataField]"> -->
-            {{ item[value.dataField] }}
+            <div v-if="value['dataType'] == 'asset-status'">
+              <div class="asset-status status-1" v-if="item[value.dataField] == 0">Đang sử dụng</div>
+              <div class="asset-status status-2" v-if="item[value.dataField] == 1">Chưa sử dụng</div>
+              <div class="asset-status status-3" v-if="item[value.dataField] == 2">Đang sửa chữa</div>
+              <div class="asset-status status-4" v-if="item[value.dataField] == 3">Đã hư hỏng</div>
+            </div>
+            <div v-else>
+              {{ item[value.dataField] }}
+            </div>
             </td>
             <td
               class="editable"
@@ -67,7 +74,7 @@
               v-show="!showLoading"
             >
               <div class="edit">
-                <div class="edit-text" @click="this.$emit('functionClicked', item)">{{ this.function }}</div>
+                <div class="edit-text" @click="this.$emit('dbClicked', item)">{{ this.function }}</div>
                 <div
                   tabindex="0"
                   class="edit-icon"
@@ -262,7 +269,7 @@ export default {
      * @author Xuân Đào(13/05/2023)
      */
     ModifyEvent(){
-      this.$emit("modifyEvent", this.selectedData);
+      this.$emit("dbClicked", this.selectedData);
     },
 
     // getWidthList(){
@@ -451,7 +458,7 @@ export default {
     },
 
     getSelectedList(){
-      return this.SelectedList.selectedItemList;
+      return this.selectedMultiple;
     },
 
     /**
@@ -880,6 +887,32 @@ table thead tr th{
 
 .date{
   text-align: center;
+}
+
+.asset-status{
+  height: 30px;
+  width: 150px;
+  text-align: center;
+  font-family: Notosans-semibold;
+  line-height: 30px;
+}
+
+.status-1{
+  color: #2ca01c;
+}
+.status-2{
+  color: #00d8ff;
+}
+.status-3{
+  color: #fcba03;
+}
+.status-4{
+  color: #dd1b16;
+}
+
+tbody tr td > div{
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 </style>

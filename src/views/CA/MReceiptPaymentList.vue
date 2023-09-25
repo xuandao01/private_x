@@ -19,8 +19,8 @@
         class="icon export-excel-icon"
       ></div>
       <div title="Tùy chỉnh giao diện" @click="UISetting = true" class="icon setup-icon"></div>
-      <MOptionalButton ref="btn1" @onClick="showNewPopup(0)" :content="this.resources.vi.cashControl.actionBtn.PT"></MOptionalButton>
-      <MOptionalButton ref="btn2" @onClick="showNewPopup(0)" :content="this.resources.vi.cashControl.actionBtn.PC"></MOptionalButton>
+      <MOptionalButton ref="btn1" @onClick="showNewPopup(0)" content="P. xuất"></MOptionalButton>
+      <MOptionalButton ref="btn2" @onClick="showNewPopup(0)" content="P. nhập"></MOptionalButton>
     </div>
     <div ref="reMaster" class="content-main_master">
         <div class="content-main__data">

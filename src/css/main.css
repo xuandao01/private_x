@@ -57,6 +57,25 @@ body{
     font-family: OpenSans_Condensed;
     src: url("../assets/fonts/Open_Sans/static/OpenSans_Condensed/OpenSans_Condensed-Regular.ttf");
 }
+@font-face {
+    font-family: Poppins;
+    src: url("@/assets/fonts/Poppins/Poppins-Regular.ttf");
+}
+
+@font-face {
+    font-family: Poppins-bold;
+    src: url("@/assets/fonts/Poppins/Poppins-Bold.ttf");
+}
+
+@font-face {
+    font-family: Poppins-italic;
+    src: url("@/assets/fonts/Poppins/Poppins-Italic.ttf");
+}
+
+@font-face {
+    font-family: Poppins-semibold;
+    src: url("@/assets/fonts/Poppins/Poppins-SemiBold.ttf");
+}
 *{
     font-family: Notosans;
     margin: 0;

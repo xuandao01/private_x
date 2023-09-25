@@ -119,7 +119,7 @@ let resources =  {
 
             report:{
                 title: "BÁO CÁO",
-                main: ['Bảng kê số dư theo ngày', 'Dòng tiền', 'S03a1-DN: Sổ nhật ký thu tiền', 'Sổ kế toán chi tiết quỹ tiền mặt', 'S03a2-DN: Sổ nhật ký chi tiền'],
+                main: ['Danh sách tài sản', 'Báo cáo cấp phát tài sản', 'S03a1-DN: Sổ nhật ký thu tiền', 'Hóa đơn mua tài sản', 'Danh sách tài sản hư hỏng'],
                 footer: "Tất cả báo cáo",
             }
         },
@@ -322,7 +322,7 @@ let resources =  {
         errorMes: "Oops, something went wrong contact MISA!"
     },
 
-    endpoint: "https://localhost:44381/api/"
+    endpoint: "https://equipmentsys.azurewebsites.net/api/"
 }
 
 export default resources

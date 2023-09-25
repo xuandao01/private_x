@@ -207,6 +207,12 @@
     background: url("../../assets/img/Sprites.64af8f61.svg") no-repeat -986px -202px;
 }
 
+.employee-icon-2{
+    width: 22px;
+	height: 20px;
+    background: url("../../assets/img/Sprites.64af8f61.svg") no-repeat -633px -1631px;
+}
+
 .account-icon{
     width: 21px !important;
 	height: 22px !important;

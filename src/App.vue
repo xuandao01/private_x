@@ -40,6 +40,15 @@ export default {
     }
   },
 
+  created(){
+    let me = this;
+    if ((typeof sessionStorage.token == 'undefined' || !sessionStorage.token) && (typeof localStorage.token == 'undefined' || !localStorage.token)) {
+      me.$router.push('/login');
+    } else {
+      me.$router.push('/');
+    }
+  },
+
   methods: {
     
   },
