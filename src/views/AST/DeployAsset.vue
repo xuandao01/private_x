@@ -56,19 +56,11 @@
           ></MPagination>
         </div>
       </div>
-      <MEmployeeDetail
+      <MDeployDetail
         ref="empDetail"
         v-if="isShowPopup"
-        @hidePopup="closePopup"
-        :employeeSelected="this.selectedEmployee"
-        @enableToast="showToastMessage"
-        @refreshData="reloadData"
-        @updateData="updateGridData"
-        @reloadPopup="reloadEmployeeDetail"
-        :action="this.action"
-        :title="this.popupTitle"
-        :key="popupKey"
-      ></MEmployeeDetail>
+        @hide="isShowPopup = false"
+      ></MDeployDetail>
       <MDeleteConfirmDialog
         ref="confirmDelete"
         v-if="deleteDialog"
@@ -100,7 +92,7 @@
   <script>
   import MDeleteConfirmDialog, { deleteType } from "@/components/unit-components/MConfirmDeleteDialog.vue";
   import { toastControl } from "@/store/toast";
-  import MEmployeeDetail, { formAction } from "@/components/unit-components/MEmployeeDetail.vue";
+  import { formAction } from "@/components/unit-components/MEmployeeDetail.vue";
   import { ToastType } from "@/components/base-component/MToastItem.vue";
   import MPagination from "@/components/base-component/MPagination.vue";
   import MSearchBar from "@/components/base-component/MSearchBar.vue";
@@ -108,6 +100,7 @@
   import resources from "@/js/resources";
   import MSingleActionDialog, { dialogType } from "@/components/unit-components/MSingleActionDialog.vue";
   import MCircleLoader from "@/components/base-component/MCircleLoader.vue";
+  import MDeployDetail from "./DeployDetail.vue";
   import { loader } from '@/store/loader';
   
   export default {
@@ -123,7 +116,7 @@
     },
     components: {
       MDeleteConfirmDialog,
-      MEmployeeDetail,
+      MDeployDetail,
       MPagination,
       MSearchBar,
       MActionMultiple,

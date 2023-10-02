@@ -11,7 +11,7 @@
                 </div>
                 <div class="menu-logo__component" style="display: flex; color: #fff; column-gap: 8px;">
                     <div style="width: 30px; overflow: hidden;" class="logo-icon">
-                        <img src="@/assets/img/Logo_Module_TiengViet_White.66947422.svg" alt="">
+                        <img src="@/assets/img/Logo.png" alt="">
                     </div>
                     <span style="font-family: Opens-san-bold; line-height: 34px;">Tài sản</span>
                 </div>
