@@ -482,15 +482,13 @@
        */
       async excelExport() {
         this.Loader.showLoader();
-        let api = `${this.res.endpoint}Asset/ExcelExport?widthList=${this.$refs.gridData.widthList.toString()}`;
-        if (this.keyWord)
-          api = `${this.res.endpoint}Asset/ExcelExport?widthList=${this.$refs.gridData.widthList.toString()}&keyWord=${this.keyWord}`;
+        let api = `${this.res.endpoint}Asset/Excel?title=Tài sản`;
         fetch(api)
           .then((res) => res.blob())
           .then((data) => {
             var a = document.createElement("a");
             a.href = window.URL.createObjectURL(data);
-            a.download = "Danh_sach_nhan_vien-" + Date.now().toString();
+            a.download = "Danh_sach_tai_san-" + Date.now().toString();
             a.click();
             a.remove();
             this.Loader.closeLoader();

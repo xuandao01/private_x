@@ -456,15 +456,13 @@
        */
       async excelExport() {
         this.Loader.showLoader();
-        let api = `${this.res.endpoint}Supplier/ExcelExport?widthList=${this.$refs.gridData.widthList.toString()}`;
-        if (this.keyWord)
-          api = `${this.res.endpoint}Supplier/ExcelExport?widthList=${this.$refs.gridData.widthList.toString()}&keyWord=${this.keyWord}`;
+        let api = `${this.res.endpoint}Supplier/Excel?title=Nhà cung cấp`;
         fetch(api)
           .then((res) => res.blob())
           .then((data) => {
             var a = document.createElement("a");
             a.href = window.URL.createObjectURL(data);
-            a.download = "Danh_sach_nhan_vien-" + Date.now().toString();
+            a.download = "Danh_sach_nha_cung_cap-" + Date.now().toString();
             a.click();
             a.remove();
             this.Loader.closeLoader();

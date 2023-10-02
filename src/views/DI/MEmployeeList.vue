@@ -505,9 +505,7 @@ export default {
      */
     async excelExport() {
       this.Loader.showLoader();
-      let api = `${this.res.endpoint}Employees/ExcelExport?widthList=${this.$refs.gridData.widthList.toString()}`;
-      if (this.keyWord)
-        api = `${this.res.endpoint}Employees/ExcelExport?widthList=${this.$refs.gridData.widthList.toString()}&keyWord=${this.keyWord}`;
+      let api = `${this.res.endpoint}Employees/Excel?title=Danh sách nhân viên`;
       fetch(api)
         .then((res) => res.blob())
         .then((data) => {

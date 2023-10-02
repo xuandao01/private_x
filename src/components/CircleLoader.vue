@@ -16,6 +16,7 @@ export default {
     position: fixed;
     top: 0;
     left: 0;
+    z-index: 99999;
 }
 .pulsing-2 {
   margin: calc((100vh - 30px)/2) auto;
