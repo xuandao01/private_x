@@ -7,7 +7,7 @@
             <template #footer>
             <span class="dialog-footer">
                 <el-button type="primary" @click="centerDialogVisible = false">
-                Confirm
+                Confirmmm
                 </el-button>
             </span>
             </template>
