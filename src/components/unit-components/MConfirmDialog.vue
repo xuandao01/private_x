@@ -121,7 +121,9 @@ export default {
   width: 100%;
   background-color: rgba(82, 82, 82, 0.5);
   position: fixed;
-  z-index: 3;
+  z-index: 99;
+  top: 0;
+  left: 0;
 }
 
 .dialog-content {
@@ -164,7 +166,6 @@ export default {
 }
 
 .dialog-message__title {
-  height: 26px;
   font-size: 16px;
   width: 100%;
   font-weight: 400;

@@ -57,6 +57,25 @@ body{
     font-family: OpenSans_Condensed;
     src: url("../assets/fonts/Open_Sans/static/OpenSans_Condensed/OpenSans_Condensed-Regular.ttf");
 }
+@font-face {
+    font-family: Poppins;
+    src: url("@/assets/fonts/Poppins/Poppins-Regular.ttf");
+}
+
+@font-face {
+    font-family: Poppins-bold;
+    src: url("@/assets/fonts/Poppins/Poppins-Bold.ttf");
+}
+
+@font-face {
+    font-family: Poppins-italic;
+    src: url("@/assets/fonts/Poppins/Poppins-Italic.ttf");
+}
+
+@font-face {
+    font-family: Poppins-semibold;
+    src: url("@/assets/fonts/Poppins/Poppins-SemiBold.ttf");
+}
 *{
     font-family: Notosans;
     margin: 0;
@@ -81,14 +100,24 @@ a{
     padding: 0 ;
 }
 
+.disable input{
+    background-color: #f0f0f0 !important;
+  }
+
 ::-webkit-scrollbar {
     width: 0.5em;
     height: 0.5em;
     z-index: 99999999;
 }
 ::-webkit-scrollbar-track-piece {
-    background-color: #efefef;
+    background-color: #e0e0e0;
 }
 ::-webkit-scrollbar-thumb {
-    background-color: #b2b1b1;
+    background-color: #a3a3a3;
+}
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }

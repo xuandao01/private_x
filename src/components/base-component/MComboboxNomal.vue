@@ -7,15 +7,16 @@
     @focus="comboboxOnFocus"
     @blur="comboboxOnBlur"
     @keydown="comboboxOnKeyDown"
+    ref="focusable"
   >
-    <input ref="cbInput" type="text" class="selected" v-model="comboboxData[selected]" />
+    <input ref="cbInput" type="text" class="selected" tabindex="-1" v-model="comboboxData[selected]" />
     <div class="icon dropdown-icon" @click="iconOnClick"></div>
     <div ref="cbMain" class="combo-item-list" v-show="showData">
       <div
         :class="{ 'seleted-item': selected == index }"
         class="combo-item"
         @click="itemOnClick(index)"
-        v-for="(item, index) in data"
+        v-for="(item, index) in comboboxData"
         :key="index"
       >
         {{ item }}
@@ -49,18 +50,40 @@ export default {
       type: String,
       required: false,
       default: "Down",
+    },
+
+    display_list_no:{
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+
+    defaultValueByText:{
+      type: String,
+      required: false,
     }
   },
 
   created() {
     this.selected = this.defaultValue;
-    this.comboboxData = this.data;
+    if (this.display_list_no){
+      for(let i=0;i<this.data.length;i++) this.comboboxData.push(`${i+1}. ${this.data[i]}`);
+    } else {
+      this.comboboxData = this.data;
+    }
     this.isEnable = this.enable;
+  },
+
+  watch:{
+    enable: function(newVal){
+      if(!newVal) this.selected = -1;
+      else this.selected = 0;
+    }
   },
 
   mounted(){
 
-    if(!this.isEnable) this.$refs.cbInput.value = "";
+    if(!this.enable) this.$refs.cbInput.value = ""; 
 
     switch(this.displayDirection){
       case "Down":{
@@ -80,18 +103,49 @@ export default {
         break;
       }
     }
+
+    this.$nextTick(function () {
+      if (this.defaultValueByText && this.defaultValueByText.length > 0){
+        this.$refs.cbInput.value = this.defaultValueByText;
+        for (let i=0;i<this.comboboxData.length;i++){
+          if (this.comboboxData[i] == this.defaultValueByText){
+            this.selected = i;
+          }
+        }
+      }
+    })
   },
 
   data() {
     return {
       selected: null,
-      comboboxData: null,
+      comboboxData: [],
       showData: false,
       isEnable: false,
     };
   },
 
   methods: {
+
+    /**
+     * Set blur ra khỏi combobox 
+     * 
+     * @author Xuân Đào (14/05/2023)
+     * */
+    setBlur(){
+      this.$refs.focusable.classList.remove('focused');
+    },
+
+     /**
+     * Set focus vào combobox 
+     * 
+     * @author Xuân Đào (14/05/2023)
+     * */
+    setFocus(){
+      this.$refs.focusable.classList.add('focused');
+      this.$refs.focusable.focus();
+    },
+
     /**
      * Xự kiện click vào item trong combobox
      * 
@@ -131,14 +185,15 @@ export default {
       if (event.key == "ArrowUp") {
         if (this.selected == 0) this.selected = this.comboboxData.length - 1;
         else this.selected--;
+        this.showData = true;
       } else if (event.key == "ArrowDown") {
         if (this.selected == this.comboboxData.length - 1) this.selected = 0;
         else this.selected++;
+        this.showData = true;
       } else if (event.key == "Enter") {
         this.$emit("changeVal", this.selected);
         this.showData = false;
       } else if (event.key == "Tab") {
-        event.preventDefault();
         this.$emit("changeVal", this.selected);
         this.showData = false;
       }
@@ -150,8 +205,9 @@ export default {
      * @author Xuân Đào (04/04/2023)
      */
     iconOnClick(){
-      if(this.isEnable)
-        this.showData = true;
+      if(this.enable){
+        this.showData = !this.showData;
+      }
     },
   },
 };
@@ -160,6 +216,7 @@ export default {
 
 .disabled{
   background-color: #eff0f2;
+  cursor: not-allowed;
 }
 
 input {
@@ -177,18 +234,32 @@ input {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border: #e0e0e0 1px solid;
+  border: #b0b0b0 1px solid;
+  border-radius: 2px;
   position: relative;
   outline: unset;
 }
 
+.combobox-nomal:focus{
+  border: #50b83c solid 1px;
+}
+
+.disabled .dropdown-icon{
+  cursor: not-allowed;
+}
+
 .dropdown-icon {
+  cursor: pointer;
   margin-top: 15px;
+  position: absolute;
+  right: 0;
 }
 
 .selected {
   line-height: 26px;
-  margin-left: 12px;
+  margin: 0;
+  width: 100%;
+  padding-left: 12px;
 }
 
 .combo-item-list {
@@ -196,6 +267,7 @@ input {
   position: absolute;
   background-color: #fff;
   border: solid #b0b0b0 1px;
+  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
   z-index: 99;
 }
 
@@ -238,8 +310,8 @@ input {
 }
 
 .seleted-item {
-  background-color: #50b83c;
-  color: #fff;
+  background-color: #50b83c !important;
+  color: #fff !important;
 }
 
 .focused {

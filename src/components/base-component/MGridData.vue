@@ -9,14 +9,14 @@
           <tr class="grid-title">
             <th
               class="multiple-select"
-              :class="{ 'fix-start': isFixedStart }"
+              :class="[{ 'fix-start': isFixedStart }]"
               v-if="muiltipleSelect"
             >
               <MCheckbox ref="parentCheckbox" @click="parentCheckBoxOnClick"></MCheckbox>
               <div class="rightBorder"></div>
             </th>
             <th
-              :class="item.dataType"
+              :class="[item.dataType, {'first-column': index==0}, {'last-column': index==data.length-1}]"
               v-for="(item, index) in data"
               :key="index"
               :title="item.tooltip"
@@ -33,8 +33,8 @@
             </th>
           </tr>
         </thead>
-        <tbody ref="tableBody">
-          <MGridDataLoading v-if="showLoading"></MGridDataLoading>
+        <tbody ref="tableBody" class="grid-body">
+          <MGridDataLoading :numOfColumn="data.length" v-if="showLoading"></MGridDataLoading>
           <tr v-for="(item, index) in gridData" :key="index" 
           @click="itemOnClick(item, index)"
           :class="{'tr-selected': index == 0 && isFocusFirst}"
@@ -42,30 +42,39 @@
             <td
               v-if="muiltipleSelect"
               :class="{ 'fix-start': isFixedStart }"
-              v-show="showData"
+              v-show="!showLoading"
             >
-              <MCheckbox @click="checkBoxOnClick(item)">
+              <MCheckbox @click="checkBoxOnClick(item)" ref="childCheckbox">
               </MCheckbox>
               <div class="rightBorder"></div>
             </td>
             <td
-              :class="[value.dataType] "
+              :class="[value.dataType, {'first-column': index==0}, {'last-column': index==data.length-1}]"
               v-for="(value, index) in data"
               :key="index"
-              v-show="showData"
+              v-show="!showLoading"
+              :style="[{maxWidth: value['colWidth']+'px'},{color: '#' + value['colColor']}]"
+              :title="item[value.dataField]"
               @dblclick="editOnDbClick(item)"
             >
-            <!-- <input class="grid-input" :class="{'disable-editor': !canEditValue, 'enable-editor': canEditValue}" type="text" :value="item[value.dataField]"> -->
-            {{ item[value.dataField] }}
+            <div v-if="value['dataType'] == 'asset-status'">
+              <div class="asset-status status-1" v-if="item[value.dataField] == 0">Đang sử dụng</div>
+              <div class="asset-status status-2" v-if="item[value.dataField] == 1">Chưa sử dụng</div>
+              <div class="asset-status status-3" v-if="item[value.dataField] == 2">Đang sửa chữa</div>
+              <div class="asset-status status-4" v-if="item[value.dataField] == 3">Đã hư hỏng</div>
+            </div>
+            <div v-else>
+              {{ item[value.dataField] }}
+            </div>
             </td>
             <td
               class="editable"
               :class="{ 'fix-end': isFixedEnd }"
               v-if="editable"
-              v-show="showData"
+              v-show="!showLoading"
             >
               <div class="edit">
-                <div class="edit-text" @click="editOnDbClick(item)">Sửa</div>
+                <div class="edit-text" @click="this.$emit('dbClicked', item)">{{ this.function }}</div>
                 <div
                   tabindex="0"
                   class="edit-icon"
@@ -77,12 +86,17 @@
             </td>
           </tr>
         </tbody>
+        <div class="no-data" v-show="noData">{{ this.resources.vi.noDataGrid }}</div>
       </table>
     </div>
     <MContextMenu
       ref="context"
-      @deleteEvent="deleteRowData"
-      @duplicateEvent="duplicateData"
+      slot1="Sửa"
+      slot2="Xóa"
+      slot3 ="Nhân bản"
+      @action1="ModifyEvent"
+      @action2="DeleteEvent"
+      @action3="DuplicateEvent"
       v-show="showContext"
     ></MContextMenu>
   </div>
@@ -94,6 +108,8 @@ import MCheckbox from "./MCheckbox.vue";
 import { deleteType } from '../unit-components/MConfirmDeleteDialog.vue';
 import { multipleSelectedData } from "@/store/multipleDeleteEmployee";
 import { loader } from "@/store/loader";
+import Sortable from "sortablejs"
+import resources from "@/js/resources";
 
 export default {
   name: "MGridData",
@@ -155,18 +171,24 @@ export default {
       default: false,
     },
 
-    canEditValue: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
-
     isFocusFirst:{
       type: Boolean,
       requried: false,
       default: false,
+    },
+
+    function: {
+      type: String,
+      required: false,
+      default: "Sửa"
+    },
+
+    recordId: {
+      type: String,
+      required: false,
     }
   },
+
   /**
    * Lấy dữ liệu từ api và đổ vào data
    *
@@ -174,6 +196,7 @@ export default {
    */
   created() {
     this.getApiData();
+
   },
 
   /**
@@ -210,9 +233,8 @@ export default {
       }
     }
     this.$refs.gridViewer.style.minWidth = totalWidth + "px";
-    //
-    /*eslint-disable no-debugger */
-    // debugger
+    // this.initSortable();
+    this.resizableGrid(this.$refs.gridTable.children[0]);
   },
 
   watch: {
@@ -235,10 +257,70 @@ export default {
       selectedMultiple: [],
       selectedMultipleRow: [],
       widthList:[],
+      serviceResult: null,
+      resources: resources,
+      noData: false,
     };
   },
   methods: {
 
+    /**
+     * Hàm emit sửa dữ liệu
+     * @author Xuân Đào(13/05/2023)
+     */
+    ModifyEvent(){
+      this.$emit("dbClicked", this.selectedData);
+    },
+
+    // getWidthList(){
+    //   let wList = "";
+    //   for(let i=0;i<this.data.length;i++){
+    //     if (i == 0) wList += this.data[i]['colWidth'];
+    //   }
+    // },
+
+    /**
+     * Hàm emit xóa dữ liệu
+     * @author Xuân Đào(13/05/2023)
+     */
+    DeleteEvent(){
+      this.$emit("deleteEvent", this.selectedData);
+    },
+
+    /**
+     * Hàm emit nhân bản dữ liệu
+     * @author Xuân Đào(13/05/2023)
+     */
+    DuplicateEvent(){
+      this.$emit("duplicateEvent", this.selectedData);
+    },
+
+    /**
+     * Hàm khởi tạo cho phép thay đổi vị trí cột hiển thị
+     * @author Xuân Đào(13/05/2023)
+     */
+    initSortable(){
+      let ths = this.$refs.tableThead.children[0];
+      Sortable.create(ths, {
+        draggable: 'th',
+        onEnd: (evt) => {
+          if (evt.oldIndex != evt.newIndex)
+            this.$emit("columnSwapped", evt.newIndex, evt.oldIndex);
+        },
+        animation: 0,
+        filter: ".editable",
+        ghostClass: 'ghost-class',  
+        onMove: function (e) { return e.related.className.indexOf('static') === -1;  }
+      })
+    },
+
+    /**
+     * Hàm định dạng tiền
+     * @param amount: Số tiền
+     * @param decimalCount: Số lượng số sau dấu phẩy
+     * @param thousands: Ngăn cách hàng nghìn
+     * @author Xuân Đào(13/05/2023)
+     */
     formatMoney(amount, decimalCount = 0, decimal = "", thousands = ".") {
       decimalCount = Math.abs(decimalCount);
       decimalCount = isNaN(decimalCount) ? 2 : decimalCount;
@@ -248,20 +330,27 @@ export default {
       return negativeSign + (j ? i.substr(0, j) + thousands : '') + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + thousands) + (decimalCount ? decimal + Math.abs(amount - i).toFixed(decimalCount).slice(2) : "");
     },
 
+    /**
+     * Hàm lấy dữ liệu từ api
+     * @author Xuân Đào(13/05/2023)
+     */
     async getApiData(){
     if(this.api){
       this.showLoading = true;
       try {
         let data = await (await fetch(this.api)).json();
-        this.gridData = data.data;
+        this.serviceResult = data.Data;
+        // if (!serviceData) serviceData = data['data'];
+        this.gridData = this.serviceResult['data'];
         if (this.gridData[0]){
-          let total_record = this.gridData[0]['total_record'];
+          this.noData = false;
+          let total_record = this.serviceResult['totalRecord'][0]['Total record'];
           this.$emit('refresh', total_record);
           for(let i=0;i<this.data.length;i++){
             if (this.data[i]['dataType'] === 'date'){
               for(let j=0;j<this.gridData.length;j++){
                 this.gridData[j][this.data[i]['dataField']] = this.dateFormator(this.gridData[j][this.data[i]['dataField']]);
-                this.gridData[j].re_no = j;
+                this.gridData[j].re_no = j+1;
               }
             }
             if (this.data[i]['dataType'] === 'd-money'){
@@ -271,9 +360,9 @@ export default {
             }
           }
           for(let j=0;j<this.gridData.length;j++){
-            this.gridData[j].re_no = j;
+            this.gridData[j].re_no = j+1;
           }
-        }
+        } else this.noData = true;
         this.showLoading = false;
         this.gridOnLoaded();
         this.apiString = this.api;
@@ -283,8 +372,12 @@ export default {
     }
     },
 
+    /**
+     * Hàm emit load xong dữ liệu
+     * @author Xuân Đào(13/05/2023)
+     */
     gridOnLoaded(){
-      this.$emit("loadCompleted");
+      this.$emit("loadCompleted", this.serviceResult);
       if (this.isFocusFirst){
         this.selected = this.$refs.tableBody.children[0];
         this.selected.classList.add("tr-selected");
@@ -348,7 +441,7 @@ export default {
           data[i].children[0].children[0].classList.add("checked");
           if (!this.selectedMultipleRow.includes(data[i])){
             this.selectedMultipleRow.push(data[i]);
-            this.SelectedList.addItem(this.gridData[i]);
+            this.selectedMultiple.push(this.gridData[i][this.recordId])
           }
         }
       } else {
@@ -357,7 +450,7 @@ export default {
           data[i].children[0].children[0].classList.remove("checked");
           if (this.selectedMultipleRow.includes(data[i])){
             this.selectedMultipleRow = this.removeItemFromArr(this.selectedMultipleRow, this.selectedMultipleRow.indexOf(data[i]));
-            this.SelectedList.selectedItemList = [];
+            this.selectedMultiple = [];
           }
         }
       }
@@ -365,7 +458,7 @@ export default {
     },
 
     getSelectedList(){
-      return this.SelectedList.selectedItemList;
+      return this.selectedMultiple;
     },
 
     /**
@@ -397,12 +490,12 @@ export default {
      */
     checkBoxOnClick(item) {
       let targetEl = event.target.parentElement.parentElement
-      if (this.SelectedList.selectedItemList.includes(item)) {
-        this.selectedMultipleRow = this.removeItemFromArr(this.selectedMultipleRow, this.SelectedList.selectedItemList.indexOf(item));
-        this.SelectedList.removeItemFromList(this.SelectedList.selectedItemList.indexOf(item));
+      if (this.selectedMultiple.includes(item[this.recordId])) {
+        this.selectedMultipleRow = this.removeItemFromArr(this.selectedMultipleRow, this.selectedMultiple.indexOf(item[this.recordId]));
+        this.selectedMultiple = this.removeItemFromArr(this.selectedMultiple, this.selectedMultiple.indexOf(item[this.recordId]));
         targetEl.classList.remove("checked-item");
       } else {
-        this.SelectedList.addItem(item);
+        this.selectedMultiple.push(item[this.recordId]);
         this.selectedMultipleRow[this.selectedMultipleRow.length] = targetEl;
         targetEl.classList.add("checked-item");
       }
@@ -464,7 +557,10 @@ export default {
 
     editOnClick(item) {
       this.getClickedPosition(event);
-      this.$refs.context.setPosition(50, this.cursor_y + 15);
+      if (this.cursor_y < 550)
+        this.$refs.context.setPosition(50, this.cursor_y + 15);
+      else 
+        this.$refs.context.setPosition(50, this.cursor_y - 105);
       this.showContext = true;
       this.selectedData = item;
       this.selected = event.target.parentElement.parentElement.parentElement;
@@ -476,8 +572,7 @@ export default {
      * @author  Xuân Đào (14/03/2023x)
      */
     itemOnClick(item, index) {
-      /*eslint-disable no-debugger */
-      // debugger
+      if (event.target.classList[0] == 'edit-text') return;
       this.$refs.tableBody.children[0].classList.remove("tr-selected");
       if (this.selected === null) this.selected = this.$refs.tableBody.children[index];
       else {
@@ -494,15 +589,15 @@ export default {
      * @author  Xuân Đào (12/03/2023)
      */
     dateFormator(date) {
-      const data = new Date(date);
-      if (data.toDateString() !== "Invalid Date") {
-        let dateVal = data.getDay() + 1;
-        let month = data.getMonth() + 1;
-        const year = data.getFullYear();
-        dateVal = dateVal < 10 ? "0"+dateVal:dateVal;
-        month = month < 10 ? "0"+month:month;
-        return `${dateVal}/${month}/${year}`;
-      } else return "";
+      const dateData = new Date(date);
+      const day =
+        dateData.getDate() < 10 ? "0" + dateData.getDate() : dateData.getDate();
+      const month =
+        dateData.getMonth() + 1 < 10
+          ? "0" + (dateData.getMonth() + 1)
+          : dateData.getMonth() + 1;
+      const year = dateData.getFullYear();
+      return `${day}/${month}/${year}`;
     },
 
     /**
@@ -589,11 +684,136 @@ export default {
      */
     getRemainingRow(){
       return this.$refs.tableBody.children.length;
-    }
+    },
+
+    resizableGrid(table) {
+      var row = table.getElementsByTagName('tr')[0],
+      cols = row ? row.children : undefined;
+      if (!cols) return;
+      
+      table.style.overflow = 'hidden';
+      
+      var tableHeight = table.offsetHeight;
+      
+      for (var i=0;i<cols.length;i++){
+        var div = createDiv(tableHeight);
+        cols[i].appendChild(div);
+        setListeners(div);
+      }
+
+      function setListeners(div){
+        var pageX,curCol,nxtCol,curColWidth,nxtColWidth;
+
+        div.addEventListener('mousedown', function (e) {
+        curCol = e.target.parentElement;
+        nxtCol = curCol.nextElementSibling;
+        pageX = e.pageX; 
+      
+        var padding = paddingDiff(curCol);
+      
+        curColWidth = curCol.offsetWidth - padding;
+        if (nxtCol)
+          nxtColWidth = nxtCol.offsetWidth - padding;
+        });
+
+        div.addEventListener('mouseover', function (e) {
+        e.target.style.borderRight = '2px solid transparent';
+        })
+
+        div.addEventListener('mouseout', function (e) {
+        e.target.style.borderRight = '';
+        })
+
+        document.addEventListener('mousemove', function (e) {
+        if (curCol) {
+          var diffX = e.pageX - pageX;
+      
+          if (nxtCol)
+          nxtCol.style.width = (nxtColWidth - (diffX))+'px';
+
+          curCol.style.width = (curColWidth + diffX)+'px';
+        }
+        });
+
+        document.addEventListener('mouseup', function () { 
+        curCol = undefined;
+        nxtCol = undefined;
+        pageX = undefined;
+        nxtColWidth = undefined;
+        curColWidth = undefined
+        });
+      }
+      
+      function createDiv(height){
+        var div = document.createElement('div');
+        div.style.top = 0;
+        div.style.right = 0;
+        div.style.width = '5px';
+        div.style.position = 'absolute';
+        div.style.cursor = 'col-resize';
+        div.style.userSelect = 'none';
+        div.style.height = height + 'px';
+        return div;
+      }
+      
+      function paddingDiff(col){
+      
+        if (getStyleVal(col,'box-sizing') == 'border-box'){
+        return 0;
+        }
+      
+        var padLeft = getStyleVal(col,'padding-left');
+        var padRight = getStyleVal(col,'padding-right');
+        return (parseInt(padLeft) + parseInt(padRight));
+
+      }
+
+      function getStyleVal(elm,css){
+        return (window.getComputedStyle(elm, null).getPropertyValue(css))
+      }
+      },
   },
 };
 </script>
 <style scoped>
+
+
+.first-column{
+  border-left: unset !important;
+}
+
+.last-column{
+  border-right: unset !important;
+}
+
+.gre-main__scroll{
+  overflow-x: auto;
+}
+
+table thead tr th{
+  border-top: unset !important;
+  border-bottom: unset !important;
+}
+
+.no-data{
+  position: absolute;
+  font-size: 13px;
+  text-align: center;
+  width: calc(100vw - 200px);
+  line-height: 36px;
+  margin-top: 10px;
+  color: #111111;
+}
+
+.no-data::before{
+  content: '';
+  display: block;
+  height: 80px;
+  width: 130px;
+  position: relative;
+  left: calc(100% - 730px);
+  background: url("@/assets/icons/nodata.svg") no-repeat;
+}
 
 .first-data{
   border-left: unset;
@@ -606,6 +826,7 @@ export default {
 .editable {
   width: 150px;
   text-align: center;
+  border-right: unset !important;
 }
 
 .edit-text {
@@ -624,7 +845,7 @@ export default {
   background-color: #bfbfbf;
   z-index: 99;
   top: 0;
-  right: -1px;
+  right: 0.25px;
   position: absolute;
 }
 
@@ -638,7 +859,7 @@ export default {
   background-color: #bfbfbf;
   z-index: 999;
   top: 0;
-  left: -0.5px;
+  left: 0.25px;
   position: absolute;
 }
 
@@ -662,6 +883,36 @@ export default {
   background-color: unset;
   font-size: 14px;
   font-family: Notosans;
+}
+
+.date{
+  text-align: center;
+}
+
+.asset-status{
+  height: 30px;
+  width: 150px;
+  text-align: center;
+  font-family: Notosans-semibold;
+  line-height: 30px;
+}
+
+.status-1{
+  color: #2ca01c;
+}
+.status-2{
+  color: #00d8ff;
+}
+.status-3{
+  color: #fcba03;
+}
+.status-4{
+  color: #dd1b16;
+}
+
+tbody tr td > div{
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 </style>

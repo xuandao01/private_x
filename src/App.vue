@@ -15,9 +15,10 @@ import TheMenu from './layout/TheMenu.vue'
 import MToastItem from '../src/components/base-component/MToastItem.vue'
 import resources from './js/resources'
 import { toastControl } from './store/toast.js'
-import MCircleLoader from './components/base-component/MCircleLoader.vue'
+import MCircleLoader from './components/CircleLoader.vue'
 import { loader } from './store/loader'
 import { multipleSelectedData } from './store/multipleDeleteEmployee'
+import { paymentDetail } from './store/paymentDetail'
 
 export default {
   name: 'App',
@@ -26,15 +27,25 @@ export default {
     TheMenu,
     TheContent,
     MToastItem,
-    MCircleLoader
+    MCircleLoader,
   },
 
   setup(){
     const ToastControl = toastControl();
     const Loader = loader();
     const SelectedList = multipleSelectedData();
+    const PaymentDetail = paymentDetail();
     return {
-      ToastControl, Loader, SelectedList
+      ToastControl, Loader, SelectedList, PaymentDetail
+    }
+  },
+
+  created(){
+    let me = this;
+    if ((typeof sessionStorage.token == 'undefined' || !sessionStorage.token) && (typeof localStorage.token == 'undefined' || !localStorage.token)) {
+      me.$router.push('/login');
+    } else {
+      me.$router.push('/');
     }
   },
 

@@ -505,9 +505,7 @@ export default {
      */
     async excelExport() {
       this.Loader.showLoader();
-      let api = `${this.res.endpoint}Employees/ExcelExport?widthList=${this.$refs.gridData.widthList.toString()}`;
-      if (this.keyWord)
-        api = `${this.res.endpoint}Employees/ExcelExport?widthList=${this.$refs.gridData.widthList.toString()}&keyWord=${this.keyWord}`;
+      let api = `${this.res.endpoint}Employees/Excel?title=Danh sách nhân viên`;
       fetch(api)
         .then((res) => res.blob())
         .then((data) => {
@@ -521,7 +519,6 @@ export default {
         .catch(err => {
           console.log(err);
         })
-      // const res = await (await fetch("https://localhost:7006/api/Employees/ExcelExport")).blob();
       // const link = window.URL.createObjectURL(res);
       // console.log(link);
       // new JsFileDownloader({url: link});
@@ -613,6 +610,7 @@ export default {
   display: flex;
   font-size: 13px;
   height: 22px;
+  max-width: 200px;
   line-height: 20px;
   align-items: center;
   column-gap: 4px;

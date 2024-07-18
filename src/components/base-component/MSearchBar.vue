@@ -41,6 +41,11 @@ export default {
   },
 
   methods: {
+
+    getInputValue(){
+      return this.$refs.searchBar.value;
+    },
+
     /**
      * Khi focus vào input
      *

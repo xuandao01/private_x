@@ -13,6 +13,8 @@
       id="employeeCode"
       v-model="this.value"
       class="inp-text"
+      :maxlength="maxLength"
+      @focus="this.isFocus = true"
       @blur="this.validate()"
     ></textarea>
     <div v-if="isError" class="errMes">{{ inputTitle }} không được trống</div>
@@ -68,6 +70,11 @@ export default {
       type: Boolean,
       required: false,
       default: true,
+    },
+
+    maxLength:{
+      type: Number,
+      required: false,
     }
   },
 
@@ -114,6 +121,7 @@ export default {
     },
     /**Hàm thực hiện validate nếu cần */
     validate(){
+      this.isFocus = false;
       if (!this.required) return;
       let value = "";
       if(this.$refs.mInput){
@@ -139,7 +147,8 @@ export default {
   data() {
     return {
       value: null,
-      isError: false
+      isError: false,
+      isFocus: false,
     };
   },
 };

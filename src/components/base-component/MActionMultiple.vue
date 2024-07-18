@@ -13,17 +13,18 @@ import resources from '@/js/resources';
 export default {
 
     props:{
-        enable: {
-          type: Boolean,
-          required: false,
-          default: false,
-        },
+      // Cho phép sửa hay khônt
+      enable: {
+        type: Boolean,
+        required: false,
+        default: false,
+      },
     },
 
     data() {
         return {
-            showAction: false,
-            res: resources
+          showAction: false,
+          res: resources
         }
     },
 
@@ -45,7 +46,7 @@ export default {
          * @author Xuân Đào (04/04/2023)
          */
         multipleDelete(){
-          this.$emit('delete');
+          this.$emit('deleteMultiple');
           // this.showAction = false;
         }
     },
@@ -116,6 +117,7 @@ export default {
     border-color: #757575;
     color: #757575;
     background-color: inherit;
+    cursor: not-allowed;
   }
 
   .disable .action-multiple__icon{

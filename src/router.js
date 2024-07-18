@@ -9,6 +9,7 @@ import Dashboard from '@/components/unit-components/MDashboard.vue'
 import CashControl from '@/views/CA/MCashControl.vue'
 import AuditList from '@/views/CA/MAuditList.vue'
 import MonetaryFlow from '@/views/CA/MMonetaryFlow.vue'
+import MPaymentDetail from '@/views/CA/MPaymentDetail.vue'
 const routers = [
     {path: "/DI", component: MDIControl, children:[
         {
@@ -30,8 +31,15 @@ const routers = [
             component: CashProgress,
         },
         {
-            path: 'ReceiptPayment',
+            path: '/CA/ReceiptPayment',
             component: ReceiptPayment,
+            // children:[
+            //     {
+            //         path: '/CA/ReceiptPayment/Detail/:id?',
+            //         name: 'PaymentDetail',
+            //         component: MPaymentDetail,
+            //     },
+            // ]
         },
         {
             path: 'AuditList',
@@ -43,7 +51,53 @@ const routers = [
         },
         
     ]},
-    {path: "/", component: Dashboard}
+    {
+        path: '/CA/ReceiptPayment/Detail/:id?',
+        name: 'PaymentDetail',
+        component: MPaymentDetail,
+        props: true,
+    },
+    {path: "/", component: Dashboard},
+    {
+        path: '/asset',
+        name: 'asset',
+        // route level code-splitting
+        // this generates a separate chunk (about.[hash].js) for this route
+        // which is lazy-loaded when the route is visited.
+        component: () => import(/* webpackChunkName: "about" */ '@/views/AST/AssetList.vue')
+    },
+    {
+        path: '/Supplier',
+        name: 'Supplier',
+        // route level code-splitting
+        // this generates a separate chunk (about.[hash].js) for this route
+        // which is lazy-loaded when the route is visited.
+        component: () => import(/* webpackChunkName: "about" */ '@/views/AST/SupplierList.vue')
+    },
+    {
+        path: '/Deploy',
+        name: 'Deploy',
+        // route level code-splitting
+        // this generates a separate chunk (about.[hash].js) for this route
+        // which is lazy-loaded when the route is visited.
+        component: () => import(/* webpackChunkName: "about" */ '@/views/AST/DeployAsset.vue')
+    },
+    {
+        path: '/Login',
+        name: 'Login',
+        // route level code-splitting
+        // this generates a separate chunk (about.[hash].js) for this route
+        // which is lazy-loaded when the route is visited.
+        component: () => import(/* webpackChunkName: "about" */ '@/views/Login/LoginPage.vue')
+    },
+    {
+        path: '/Signin',
+        name: 'Signin',
+        // route level code-splitting
+        // this generates a separate chunk (about.[hash].js) for this route
+        // which is lazy-loaded when the route is visited.
+        component: () => import(/* webpackChunkName: "about" */ '@/views/Login/SigninPage.vue')
+    },
 ]
 
 export const router = createRouter({

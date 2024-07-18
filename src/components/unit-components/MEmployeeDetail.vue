@@ -336,6 +336,17 @@ export default {
       month = month < 10 ? "0" + month : month;
       return `${date}/${month}/${fyear}`;
     },
+
+    formatDateToDisplay(data) {
+      const dateVal = new Date(data);
+      let date = dateVal.getDate();
+      let month = dateVal.getMonth() + 1;
+      const fyear = dateVal.getFullYear();
+      date = date < 10 ? "0" + date : date;
+      month = month < 10 ? "0" + month : month;
+      return `${month}-${date}/${fyear}`;
+    },
+    
     
     /**
      * Hàm đóng popup hiện tại

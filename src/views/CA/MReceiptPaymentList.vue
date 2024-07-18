@@ -5,11 +5,11 @@
         <m-action-multiple
         class="action-multiple"
         :enable="enableMultipleEditor"
-        @delete="multipleDelete"
+        @deleteMultiple="multipleDelete"
         ></m-action-multiple>
-      <m-search-bar></m-search-bar>
+      <m-search-bar @onSearch="onSearch" ref="searchBar"></m-search-bar>
       <div
-        @click="renewData"
+        @click="this.gridKey++"
         title="Tải lại (Ctrl + R)"
         class="icon reload-icon"
       ></div>
@@ -18,15 +18,9 @@
         @click="excelExport"
         class="icon export-excel-icon"
       ></div>
-      <div class="create-btn">
-        <div class="ct-btn" @click="showNewPopup">{{ this.resources.vi.cashControl.actionBtn.PT }}</div>
-        <div class="more-icon"></div>
-      </div>
-
-      <div class="create-btn">
-        <div class="ct-btn" @click="showNewPopup">{{ this.resources.vi.cashControl.actionBtn.PC }}</div>
-        <div class="more-icon"></div>
-      </div>
+      <div title="Tùy chỉnh giao diện" @click="UISetting = true" class="icon setup-icon"></div>
+      <MOptionalButton ref="btn1" @onClick="showNewPopup(0)" content="P. xuất"></MOptionalButton>
+      <MOptionalButton ref="btn2" @onClick="showNewPopup(0)" content="P. nhập"></MOptionalButton>
     </div>
     <div ref="reMaster" class="content-main_master">
         <div class="content-main__data">
@@ -40,12 +34,22 @@
                   dataField: 're_date',
                   dataType: 'date',
                   colWidth: '200',
+                  colColor: '111111',
+                },
+                {
+                  title: resources.vi.cashControl.gridData.ca_date,
+                  tooltip: resources.vi.cashControl.gridData.rp_date,
+                  dataField: 'ca_date',
+                  dataType: 'date',
+                  colColor: '111111',
+                  colWidth: '200',
                 },
                 {
                   title: resources.vi.cashControl.gridData.rp_ref_no,
                   tooltip: resources.vi.cashControl.gridData.rp_ref_no,
                   dataField: 're_ref_no',
                   dataType: 'text',
+                  colColor: '0075c0',
                   colWidth: '150',
                 },
                 {
@@ -53,6 +57,7 @@
                   tooltip: resources.vi.cashControl.gridData.rp_description,
                   dataField: 're_description',
                   dataType: 'text',
+                  colColor: '111111',
                   colWidth: '350',
                 },
                 {
@@ -60,27 +65,39 @@
                   tooltip: resources.vi.cashControl.gridData.amount,
                   dataField: 'total_amount',
                   dataType: 'd-money',
+                  colColor: '111111',
                   colWidth: '200',
+                },
+                {
+                  title: resources.vi.cashControl.gridData.object_code,
+                  tooltip: resources.vi.cashControl.gridData.object_code,
+                  dataField: 'supplier_code',
+                  dataType: 'text',
+                  colColor: '111111',
+                  colWidth: '150',
                 },
                 {
                   title: resources.vi.cashControl.gridData.object,
                   tooltip: resources.vi.cashControl.gridData.object,
                   dataField: 'supplier_name',
                   dataType: 'text',
-                  colWidth: '150',
+                  colColor: '111111',
+                  colWidth: '200',
                 },
                 {
                   title: resources.vi.cashControl.gridData.rp_reason,
                   tooltip: resources.vi.cashControl.gridData.rp_reason,
                   dataField: 're_reason',
                   dataType: 'text',
+                  colColor: '111111',
                   colWidth: '150',
                 },
                 {
                   title: resources.vi.cashControl.gridData.ca_type,
                   tooltip: resources.vi.cashControl.gridData.ca_type,
-                  dataField: 'ca_type',
+                  dataField: 'ca_type_name',
                   dataType: 'text',
+                  colColor: '111111',
                   colWidth: '150',
                 },
             ]"
@@ -89,9 +106,17 @@
             :muiltiple-select="true"
             :editable="true"
             :key="gridKey"
+            recordId="re_id"
             @loadCompleted = "gridMasterLoaded"
             @gridItemClicked = "gridItemOnClicked"
+            @functionClicked = "watchPayment"
+            @duplicateEvent="duplicateEvent"
+            @deleteEvent="showConfirmDelete"
+            @modifyEvent="modifyPayment"
+            @dbClicked="watchPayment"
+            @selectMultiple="updateSelected"
             :isFocusFirst="true"
+            function="Xem"
             ></MGridData>
         </div>
         <div class="re-pagination">
@@ -121,13 +146,15 @@
                   tooltip: '',
                   dataField: 're_no',
                   dataType: 'num',
-                  colWidth: '30',
+                  colColor: '111111',
+                  colWidth: '0',
                 },
                 {
                   title: resources.vi.cashControl.gridDetail.rp_description,
                   tooltip: resources.vi.cashControl.gridDetail.rp_description,
                   dataField: 'rpd_description',
                   dataType: 'text',
+                  colColor: '111111',
                   colWidth: '150',
                 },
                 {
@@ -135,6 +162,7 @@
                   tooltip: resources.vi.cashControl.gridDetail.debit_account_tooltip,
                   dataField: 'debit_account',
                   dataType: 'text',
+                  colColor: '111111',
                   colWidth: '100',
                 },
                 {
@@ -142,6 +170,7 @@
                   tooltip: resources.vi.cashControl.gridDetail.credit_account_tooltip,
                   dataField: 'credit_account',
                   dataType: 'text',
+                  colColor: '111111',
                   colWidth: '100',
                 },
                 {
@@ -149,6 +178,7 @@
                   tooltip: resources.vi.cashControl.gridDetail.amount,
                   dataField: 'amount',
                   dataType: 'd-money',
+                  colColor: '111111',
                   colWidth: '150',
                 },
                 {
@@ -156,6 +186,7 @@
                   tooltip: resources.vi.cashControl.gridDetail.object,
                   dataField: 'supplier_code',
                   dataType: 'text',
+                  colColor: '111111',
                   colWidth: '150',
                 },
                 {
@@ -163,11 +194,10 @@
                   tooltip: resources.vi.cashControl.gridDetail.object_name,
                   dataField: 'supplier_name',
                   dataType: 'text',
+                  colColor: '111111',
                   colWidth: '350',
                 },
             ]"
-            :isFixedEnd="true"
-            :editable="true"
             :key="gridKey"
             @loadCompleted = "gridDetailLoaded"
             ></MGridData>
@@ -184,62 +214,306 @@
         ></MPagination>
         </div>
     </div>
-    <MPaymentDetail @closeDetail="closeDetail" v-if="showDetail"></MPaymentDetail>
+    <!-- <MPaymentDetail :formMode="detailMode" :payment="detailPayment" @closeDetail="closeDetail" v-if="showDetail"></MPaymentDetail> -->
   </div>
+  <MConfirmDeleteDialog v-if="showConfirm" :messagse="confirmMessage" @hideDeleteDialog="showConfirm = false"
+          @hideAndDelete="deleteEvent"></MConfirmDeleteDialog>
 </template>
 <script>
+
+// Trạng thái của form
+export const PaymentFormMode = {
+  create: 0,
+  modify: 1,
+  watch: 2,
+  duplicate: 3,
+}
+
+// Mode xóa dữ liệu
+export const DeleteMode = {
+  singleDelete: 0,
+  multipleDelete: 1,
+}
+
 import resources from "@/js/resources";
 import MSearchBar from '@/components/base-component/MSearchBar.vue';
 import MActionMultiple from "@/components/base-component/MActionMultiple.vue";
 import MGridData from "@/components/base-component/MGridData.vue";
 import MPagination from "@/components/base-component/MPagination.vue";
-import MPaymentDetail from '@/views/CA/MPaymentDetail.vue'
+// import MPaymentDetail from '@/views/CA/MPaymentDetail.vue';
+import MOptionalButton from "@/components/base-component/MOptionalButton.vue";
+import { paymentDetail } from "@/store/paymentDetail";
+import { toastControl } from '@/store/toast';
+import { ToastType } from '@/components/base-component/MToastItem.vue';
+import MConfirmDeleteDialog from "@/components/unit-components/MConfirmDeleteDialog.vue";
+import { loader } from '@/store/loader';
  
 export default {
-  components: { MSearchBar, MActionMultiple, MGridData, MPagination, MPaymentDetail },
+  components: { MSearchBar, MActionMultiple, MGridData, MPagination, MOptionalButton, MConfirmDeleteDialog },
   name: "MReceiptPaymentList",
 
+  setup() {
+    const PaymentDetail = paymentDetail();
+    const Toast = toastControl();
+    const Loader = loader();
+    return {
+      PaymentDetail, Toast, Loader
+    };
+  },
+
   created(){
-    this.APIString = this.resources.endpoint + 'ReceiptPayment/Filter?pageSize=20&pageNumber=1';
+    this.APIString = this.resources.endpoint + 'ReceiptPayment/Filter?pageSize=20&pageNumber=1&keyWord=';
   },
 
   mounted(){
+    window.addEventListener("keydown", this.handleOnKeyDown);
+  },
+
+  unmounted(){
+    window.removeEventListener("keydown", this.handleOnKeyDown);
+
   },
 
   methods: {
+    handleOnKeyDown(){
+      if (event.ctrlKey && event.key === '1'){
+        event.preventDefault();
+        this.showNewPopup(PaymentFormMode.create);
+      }
 
+      if (event.ctrlKey && event.key === 'm'){
+        event.preventDefault();
+        if (this.enableMultipleEditor) {
+          this.multipleDelete();
+        }
+      }
+
+      if (event.ctrlKey && event.key === 'r') {
+        event.preventDefault();
+        this.gridKey++;
+      }
+
+      if (event.ctrlKey && event.key === 'e') {
+        event.preventDefault();
+        this.excelExport();
+      }
+    },
+
+    /**
+     * Hàm sửa chứng từ
+     * @param payment: Chứng từ
+     * @author Xuân Đào (12/05/2023)
+     */
+    modifyPayment(payment){
+      this.showNewPopup(PaymentFormMode.modify, payment)
+    },
+    
+    /**
+     * Hàm xóa hàng loạt chứng từ
+     * @param payment: Chứng từ
+     * @author Xuân Đào (12/05/2023)
+     */
+    multipleDelete(){
+      this.deleteMode = DeleteMode.multipleDelete;
+      this.confirmMessage = this.resources.vi.actionMultiple.deleteMultipleConfirm;
+      this.showConfirm = true;
+    },
+
+    /**
+     * Hàm cập nhật trạng thái cho button xóa nhiều
+     * @param payment: Chứng từ
+     * @author Xuân Đào (12/05/2023)
+     */
+    updateSelected(length){
+      if (length > 1) this.enableMultipleEditor = true;
+      else this.enableMultipleEditor = false;
+    },
+
+    /**
+     * Hàm xuất excel chứng từ
+     * @param payment: Chứng từ
+     * @author Xuân Đào (12/05/2023)
+     */
+    async excelExport(){
+      this.Loader.showLoader();
+      let keyword = this.$refs.searchBar.getInputValue();
+      let apiString = `${this.resources.endpoint}ReceiptPayment/ExcelExport?widthList=50%2C150%2C150%2C100%2C250%2C150%2C200%2C200%2C250%2C200&keyword=${keyword}`;
+      const res = await fetch(apiString);
+      const data = await res.blob();
+      var a = document.createElement("a");
+      a.href = window.URL.createObjectURL(data);
+      a.download = "Thu_chi_tien_mat-" + Date.now().toString();
+      a.click();
+      a.remove();
+      this.Loader.closeLoader();
+    },
+
+    /**
+     * Hàm tìm kiếm chứng từ
+     * @param payment: Chứng từ
+     * @author Xuân Đào (12/05/2023)
+     */
+    onSearch(keyword){
+      this.keyword = keyword;
+      const pageSize = this.$refs.pagingDetail.pageSize;
+      const pageNum = this.$refs.pagingDetail.currentPage;
+      this.$refs.gridDetail.gridData = [];
+      this.updateMasterApi(pageSize, pageNum);
+    },
+
+    /**
+     * Hàm hiển thị xác nhận xóa chứng từ
+     * @param payment: Chứng từ
+     * @author Xuân Đào (11/05/2023)
+     */
+    showConfirmDelete(payment){
+      this.confirmMessage = "Bạn có muốn xóa chứng từ <" + payment['re_ref_no'] + "> đã chọn không?";
+      this.selectedPayment = payment;
+      this.deleteMode = DeleteMode.singleDelete;
+      this.showConfirm = true;
+    },
+
+    /**
+     * Hàm xóa chứng từ
+     * @param payment: Chứng từ
+     * @author Xuân Đào (11/05/2023)
+     */
+    async deleteEvent(){
+      if (this.deleteMode == DeleteMode.singleDelete){
+        let apiString = this.resources.endpoint + "ReceiptPayment/FullDelete?id=" + this.selectedPayment['re_id'];
+        const options = {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+        };
+        const res = await fetch(apiString, options);
+        const data = await res.json();
+        this.Toast.showToastMsg(ToastType.Success, data['Message']);
+        this.gridKey++;
+        this.showConfirm = false;
+      } else if (this.deleteMode == DeleteMode.multipleDelete){
+        let apiString = this.resources.endpoint + "ReceiptPayment/DeleteMultiple";
+        const idList = this.$refs.gridMaster.selectedMultiple;
+        const options = {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(idList),
+        };
+        const res = await fetch(apiString, options);
+        const data = await res.json();
+        this.Toast.showToastMsg(ToastType.Success, data['Message']);
+        this.gridKey++;
+        this.showConfirm = false;
+        this.enableMultipleEditor = false;
+      }
+    },
+
+    /**
+     * Hàm nhân bản chứng từ
+     * @param payment: Chứng từ
+     * @author Xuân Đào (11/05/2023)
+     */
+    duplicateEvent(payment){
+      this.showNewPopup(PaymentFormMode.duplicate, payment)
+    },
+
+    /**
+     * Hàm xem chứng từ
+     * @param item: Chứng từ
+     * @author Xuân Đào (11/05/2023)
+     */
+    watchPayment(item){
+      this.showNewPopup(PaymentFormMode.watch, item);
+    },
+
+    /**
+     * Hàm cập nhật api detail
+     * @author Xuân Đào (11/05/2023)
+     */
     updateAPIDetail(){
-      //
+      // this.APIString = this.resources.endpoint + `ReceiptPayment/Filter?pageSize=${pageSize}&pageNumber=${pageNum}`;
     },
 
+    /**
+     * Hàm cập nhật api master
+     * @param pageSize: Số bản ghi/trang
+     * @param pageNum: Trang hiện tại
+     * @author Xuân Đào (11/05/2023)
+     */
     updateMasterApi(pageSize, pageNum){
-      this.APIString = this.resources.endpoint + `ReceiptPayment/Filter?pageSize=${pageSize}&pageNumber=${pageNum}`;
-      console.log(this.APIString);
+      this.APIString = this.resources.endpoint + `ReceiptPayment/Filter?pageSize=${pageSize}&pageNumber=${pageNum}&keyWord=${this.keyword}`;
     },
 
-    showNewPopup(){
-      this.showDetail = true;
+    /**
+     * Hàm đi tới màn chi tiết chứng từ
+     * @param payment: Chứng từ
+     * @param formMode: hành động của form
+     * @author Xuân Đào (10/05/2023)
+     */
+    async showNewPopup(formMode, payment){
+      let id = "";
+      if (formMode != PaymentFormMode.create && formMode != PaymentFormMode.duplicate){
+        id = payment['re_id'];
+      }
+      sessionStorage.paymentMode = formMode;
+      if (formMode == PaymentFormMode.duplicate)
+        sessionStorage.currentPaymentId = payment['re_id'];
+      this.$router.push({ name: "PaymentDetail", params: {id: id, data: 2}});
     },
 
-    closeDetail(){
-      this.showDetail = false;
+    /**
+     * Hàm xử lý dữ liệu khi grid load xong
+     * @param servie: Chứng từ
+     * @author Xuân Đào (10/05/2023)
+     */
+    gridMasterLoaded(service){
+        if (this.$refs.gridMaster.gridData[0]) {
+          this.currentPayment = this.$refs.gridMaster.gridData[0];
+          this.total_amount_master = service['optionResult'][0]['sum'];
+          this.totalMaster = service['totalRecord'][0]['Total record'];
+          this.detailAPI = this.resources.endpoint + 'ReceiptPaymentDetail/GetAllByReId?re_id=' + this.currentPayment.re_id;
+          this.$refs.gridDetail.getApiData();
+          let gridMaster = this.$refs.gridMaster.gridData;
+          for (let i = 0; i< gridMaster.length;i++){
+            gridMaster[i].ca_type_name = "Phiếu chi";
+          }
+          this.$refs.gridMaster.gridData = gridMaster;
+          const selectedList = this.$refs.gridMaster.selectedMultiple;
+          setTimeout(() => {
+            const checkboxList = document.querySelector(".grid-body").querySelectorAll(".m-checkbox");
+            const trList = document.querySelector(".grid-body").querySelectorAll("tr");
+            for (let i=0;i<checkboxList.length;i++){
+              if (selectedList.indexOf(this.$refs.gridMaster.gridData[i]['re_id']) != -1){
+                checkboxList[i].classList.add("checked");
+                trList[i].classList.add("checked-item");
+              } 
+              else {
+                checkboxList[i].classList.remove("checked");
+                trList[i].classList.remove("checked-item");
+              }
+            }
+          }, 100);
+        } else {
+          this.$refs.gridDetail.noData = true;
+        }
     },
 
-    gridMasterLoaded(){
-        this.currentPayment = this.$refs.gridMaster.gridData[0];
-        this.total_amount_master = this.$refs.gridMaster.gridData[0]['summary'];
-        this.totalMaster = this.$refs.gridMaster.gridData[0]['total_record'];
-        this.detailAPI = this.resources.endpoint + 'ReceiptPaymentDetail/GetAllByReId?re_id=' + this.currentPayment.re_id;
-    },
-
-    gridDetailLoaded(){ 
+    /**
+     * Hàm đi tới màn chi tiết chứng từ
+     * @param payment: Chứng từ
+     * @author Xuân Đào (10/05/2023)
+     */
+    gridDetailLoaded(service){ 
       if (this.$refs.gridDetail.gridData[0]){
-        this.total_amount_detail = this.$refs.gridDetail.gridData[0]['total_amount'];
-        this.totalDetail = this.$refs.gridDetail.gridData[0]['total_record'];
+        this.total_amount_detail = service['summary'][0]['Total amount'];
+        this.totalDetail = service['totalRecord'][0]['Total record'];
       }
       else this.total_amount_detail = 0;
     },
 
+    /**
+     * Hàm thu gọn detail
+     * @author Xuân Đào (10/05/2023)
+     */
     collaseDetail(){
         if (!this.collased){
             this.$refs.reMaster.classList.remove('collase-master');
@@ -262,11 +536,18 @@ export default {
         }
     },
 
+    /**
+     * Hàm cập nhật detail khi chọn master 
+     * @author Xuân Đào (10/05/2023)
+     */
     gridItemOnClicked(item){
       this.detailAPI = this.resources.endpoint + 'ReceiptPaymentDetail/GetAllByReId?re_id=' + item['re_id'];
-      console.log(this.detailAPI);
     },
 
+    /**
+     * Hàm định dạng tiền
+     * @author Xuân Đào (09/05/2023)
+     */
     formatMoney(amount, decimalCount = 0, decimal = "", thousands = ".") {
       decimalCount = Math.abs(decimalCount);
       decimalCount = isNaN(decimalCount) ? 2 : decimalCount;
@@ -290,47 +571,30 @@ export default {
       totalMaster: 0,
       totalDetail: 0,
       showDetail: false,
+      detailPayment: null,
+      detailMode: 0,
+      showConfirm: false,
+      confirmMessage: "",
+      selectedPayment: null,
+      keyword:"",
+      enableMultipleEditor: false,
+      deleteMode: 0,
     };
   },
 };
 </script>
 <style scoped>
+
+.setup-icon{
+  padding-right: 6px;
+  cursor: pointer;
+}
+
 .rp-main {
   height: 100%;
   width: 100%;
   background-color: #fff;
   position: relative;
-}
-
-.create-btn {
-  height: 28px;
-  width: 115px;
-  background-color: #2ca01c;
-  border-radius: 25px;
-  display: flex;
-  margin-right: 20px;
-  cursor: pointer;
-}
-
-.ct-btn {
-  color: #fff;
-  font-size: 13px;
-  font-family: Notosans-bold;
-  height: 22px;
-  margin-top: 3px;
-  width: 50px;
-  line-height: 22px;
-  margin-left: 15px;
-  border-right: solid #fff 1px;
-  width: 65px;
-}
-
-.more-icon {
-  margin-top: 3px;
-  margin-left: 6px;
-  height: 22px;
-  width: 22px;
-  background: url("@/assets/img/Sprites.64af8f61.svg") no-repeat -846px -356px;
 }
 
 .search-bar {
@@ -436,7 +700,7 @@ export default {
   font-size: 13px;
   line-height: 28px;
   position: absolute;
-  right: 607px;
+  right: 420px;
 }
 
 .total_amount{

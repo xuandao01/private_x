@@ -2,15 +2,40 @@
 
 <template>
   <div ref="main" class="edit-menu">
-    <div class="edit-menu__item item1" @click="duplicateAction">{{ resources.vi.contextMenuAction.duplicate }}</div>
-    <div class="edit-menu__item item2 deleteRecord" @click="deleteAction">{{ resources.vi.contextMenuAction.delete }}</div>
-    <div class="edit-menu__item item3">{{ resources.vi.contextMenuAction.unuse }}</div>
+    <div class="edit-menu__item item1" v-if="this.slot1" @click="this.$emit('action1')">{{ this.slot1 }}</div>
+    <div class="edit-menu__item item2" v-if="this.slot2" @click="this.$emit('action2')">{{ this.slot2 }}</div>
+    <div class="edit-menu__item item3" v-if="this.slot3" @click="this.$emit('action3')">{{ this.slot3}}</div>
+    <div class="edit-menu__item item4" v-if="this.slot4" @click="this.$emit('action4')">{{ this.slot4 }}</div>
   </div>
 </template>
 <script>
 import resources from '@/js/resources';
 export default {
   name:"MContextMenu",
+
+  props:{
+
+    slot1: {
+      type: String,
+      required: false,
+    },
+
+    slot2: {
+      type: String,
+      required: false,
+    },
+
+    slot3: {
+      type: String,
+      required: false,
+    },
+
+    slot4:{
+      type: String,
+      required: false,
+    }
+  },
+
   methods: {
     /**
      * Hàm set vị trí hiển thị cho context menu
@@ -23,25 +48,8 @@ export default {
       y = y > 800 ? y -= 154 : y;
       this.$refs.main.style.top = y + "px";
     },
-
-    /**
-     * Xự kiện xóa
-     * 
-     * @author Xuân Đào (04/04/2023)
-     */
-    deleteAction(){
-      this.$emit("deleteEvent");
-    },
-
-    /**
-     * Xự kiện nhân bản
-     * 
-     * @author Xuân Đào (04/04/2023)
-     */
-    duplicateAction(){
-      this.$emit("duplicateEvent");
-    }
   },
+
   data() {
     return {
       showContext: false,

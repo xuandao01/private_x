@@ -4,6 +4,5 @@
 }
 
 .router-link-active .menu-item__context{
-    font-family: opens-sans-bold;
-    font-weight: 600;
+    font-family: Notosans-bold !important;
 }

@@ -14,9 +14,9 @@
                 </div>
                 <div class="mess-line"></div>
                 <div class="dialog-bottom">
-                    <button ref="leftBtn" class="btn-optional" id="cancelBtn" @click="this.closeConfirmDialog()">{{ txtBtn.no }}</button>
+                    <button ref="leftBtn" class="btn-optional" id="cancelBtn" @click="closeConfirmDialog">{{ txtBtn.no }}</button>
                     <div class="btn-group">
-                        <button ref="rightBtn" class="btn-default" id="confirmBtn" @click="this.closeAndDelete" >{{ txtBtn.yes }}</button>
+                        <button ref="rightBtn" class="btn-default" id="confirmBtn" @click="closeAndDelete" >{{ txtBtn.yes }}</button>
                     </div>
                 </div>
             </div>
@@ -27,8 +27,8 @@
 import resources from '@/js/resources';
 
 export const deleteType = {
-  singleDelete: 1,
-  multipleDelete: 2,
+  singleDelete: 0,
+  multipleDelete: 1,
 }
 
 export default {
@@ -106,7 +106,7 @@ export default {
   width: 100%;
   background-color: rgba(82, 82, 82, 0.5);
   position: fixed;
-  z-index: 999;
+  z-index: 999999;
   top: 0;
   left: 0;
 }
@@ -151,7 +151,6 @@ export default {
 }
 
 .dialog-message__title {
-  height: 26px;
   font-size: 14px;
   width: 100%;
   font-weight: 400;

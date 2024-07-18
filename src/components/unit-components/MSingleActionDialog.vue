@@ -172,7 +172,6 @@ export default {
 }
 
 .dialog-message__title {
-  height: 26px;
   width: 100%;
   font-weight: 400;
   display: flex;
@@ -185,6 +184,7 @@ export default {
 .dialog-message__title .title{
   font-size: 14px;
   margin-left: 12px;
+  color: #111111;
 }
 
 .dialog-message__title .icon {

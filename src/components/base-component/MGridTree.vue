@@ -3,7 +3,7 @@
 <template>
   <div class="grid-viewer" ref="gridViewer" @click="getClickedPosition">
     <div class="grid-viewer__scroll">
-      <table class="grid-table" ref="gridTable">
+      <table class="grid-table table" ref="gridTable" v-columns-resizable>
         <thead ref="tableThead">
           <tr class="grid-title">
             <th
@@ -18,10 +18,11 @@
               <div class="rightBorder"></div>
             </th>
             <th
-              :class="item.dataType"
+              :class="[item.dataType, {'last-row': index == data.length - 1}]"
               v-for="(item, index) in data"
               :key="index"
               :title="item.tooltip"
+
             >
               {{ item.title }}
             </th>
@@ -50,6 +51,7 @@
               haveSub: item.haveSub,
             }"
             @click="itemOnClick(item, index)"
+            @dblclick="itemOnDbClick(item)"
           >
             <td
               v-if="muiltipleSelect"
@@ -63,13 +65,18 @@
               v-for="(value, inx) in data"
               :key="inx"
               @dblclick="editOnDbClick(item)"
-              :class="{
+              :class="[{
                 subElm: item.isSub && inx == 0,
-                subElm2: item.isSub && inx == 0 && item['DataLevel'] == 2,
-                subElm3: item.isSub && inx == 0 && item['DataLevel'] >= 3,
-              }"
+                subElm2: item.isSub && inx == 0 && item['datalevel'] == 2,
+                subElm3: item.isSub && inx == 0 && item['datalevel'] == 3,
+                subElm4: item.isSub && inx == 0 && item['datalevel'] == 4,
+                subElm5: item.isSub && inx == 0 && item['datalevel'] >= 5,
+              }]"
+              :style="{maxWidth: value['colWidth']+'px'}"
+              :title=" item[value.dataField] "
+            
             >
-              <div class="td-contain">
+              <div class="td-contain" :class="value.dataType" :style="{maxWidth: value['colWidth']+'px'}">
                 <MExpandCheckbox
                   @clicked="checkboxClicked(index)"
                   v-if="inx == 0"
@@ -85,11 +92,11 @@
               v-show="showData"
             >
               <div class="edit">
-                <div class="edit-text" @click="editOnDbClick(item)">Sửa</div>
+                <div class="edit-text" @click="itemOnDbClick(item)">Sửa</div>
                 <div
                   tabindex="0"
                   class="edit-icon"
-                  @click="editOnClick(item)"
+                  @click="editOnClick(item, index)"
                   @blur="editOnBlur"
                 ></div>
               </div>
@@ -97,12 +104,17 @@
             </td>
           </tr>
         </tbody>
+        <div class="no-data" v-show="noData">{{ this.resources.vi.noDataGrid }}</div>
       </table>
     </div>
     <MContextMenu
       ref="context"
-      @deleteEvent="deleteRowData"
-      @duplicateEvent="duplicateData"
+      slot1="Nhân bản"
+      slot2="Xóa"
+      @action2="deleteRowData"
+      @action1="duplicateData"
+      @action3="this.$emit('updateStatus', this.selectedData, this.selectedIndex)"
+      :slot3="this.status"
       v-show="showContext"
     ></MContextMenu>
   </div>
@@ -114,11 +126,9 @@ import MCheckbox from "./MCheckbox.vue";
 import { deleteType } from "../unit-components/MConfirmDeleteDialog.vue";
 import MExpandCheckbox from "./MExpandCheckbox.vue";
 import { sortedArray } from "@/store/sortedData";
-import {
-  AccountProperty,
-  accountStatus,
-} from "@/views/DI/MAccountList.vue";
 import resources from "@/js/resources.js";
+import { Action } from '@/views/DI/MAccountList.vue';
+import Sortable from "sortablejs";
 
 export default {
   name: "MGridData",
@@ -228,7 +238,29 @@ export default {
       }
     }
     this.$refs.gridViewer.style.minWidth = totalWidth + "px";
-    //
+    this.resizableGrid(this.$refs.tableThead);
+    this.initSortable();
+    this.currentHideRow = this.subData.length;
+  },
+
+  watch:{
+    currentHideRow: function(newVal){
+      if (newVal < this.subData.length){
+        this.$emit("updateAction", 1);
+      } else {
+        this.$emit("updateAction", 0);
+      }
+    },
+
+    sortedData: function(newVal){
+      if (newVal != newVal.length == 0 && !this.showLoading) this.noData = true;
+      else this.noData = false;
+    },
+
+    showLoading: function(){
+      if (this.showLoading) this.noData = false;
+      else this.noData = true;
+    }
   },
 
   data() {
@@ -241,13 +273,103 @@ export default {
       showData: true,
       selected: null,
       selectedData: null,
+      selectedIndex:null,
       apiString: null,
       sortedData: [],
       rootData: [],
       subData: [],
+      currentHideRow: 0,
+      foldAll: false,
+      status: '',
+      noData: false,
     };
   },
   methods: {
+
+    /**
+     * Khởi tạo việc cho phép đổi cột
+     * 
+     * @author Xuân Đào (12/05/2023)
+     */
+    initSortable(){
+      let ths = this.$refs.tableThead.children[0];
+      Sortable.create(ths, {
+        draggable: 'th',
+        onEnd: (evt) => {
+          if (evt.oldIndex != evt.newIndex)
+            this.$emit("columnSwapped", evt.newIndex, evt.oldIndex);
+        },
+        animation: 125,
+        filter: ".editable",
+        ghostClass: 'ghost-class',  
+        onMove: function (e) { return e.related.className.indexOf('static') === -1;  }
+      })
+
+      // let els = this.$refs.tableBody.children;
+      // for (let i=0;i<els.length;i++){
+      //   new Sortable(els[i], {
+      //     group: 'nested',
+      //     animation: 150,
+      //     fallbackOnBody: true,
+      //     swapThreshold: 0.65
+      //   });
+      // }
+    },
+
+    foldOrExpandAll(action){
+      const arrElement = this.$refs.tableBody.children;
+      if (action == Action.expand){
+        for (let i=0;i<arrElement.length;i++){
+          arrElement[i].classList.remove("subElement");
+          arrElement[i].children[0].firstChild.firstChild.classList.add("collase");
+        }
+        this.currentHideRow = -1;
+      } else {
+        for (let i=0;i<arrElement.length;i++){
+          if (this.sortedData[i]['datalevel'] > 0) {
+            arrElement[i].classList.add("subElement");
+          }
+          arrElement[i].children[0].firstChild.firstChild.classList.remove("collase");
+        }
+        this.currentHideRow = this.subData;
+      }
+    },
+
+    getWidthList(){
+      let widthList = "";
+      for(let i=0;i<this.data.length;i++){
+        if (i == 0){
+          widthList += this.data[i]['colWidth'];
+        } else {
+          widthList += ','+this.data[i]['colWidth'];
+        }
+      }
+      return widthList;
+    },
+
+    /**
+     * Sự kiện nhân bản
+     * 
+     * @author Xuân Đào (12/05/2023)
+     */
+    duplicateData(){
+      this.$emit("updateRecord", this.selectedData);
+    },
+
+    /**
+     * Double click vào row
+     * 
+     * @author Xuân Đào (12/05/2023)
+     */
+    itemOnDbClick(item){
+      this.$emit("rowDbClick", item);
+    },
+
+    /**
+     * Xử lý đóng mở cây
+     * 
+     * @author Xuân Đào (12/05/2023)
+     */
     checkboxClicked(index) {
       let i = index + 1;
       let next = true;
@@ -261,22 +383,38 @@ export default {
       
       while (next) {
         if (actionMode == mode.expand){
-          if (this.sortedData[index]["DataLevel"] === this.sortedData[i]["DataLevel"] - 1) {
+          if (this.sortedData[index]["datalevel"] === this.sortedData[i]["datalevel"] - 1) {
             arrElement[i].classList.remove("subElement");
           }
         } else {
-          if (this.sortedData[index]["DataLevel"] < this.sortedData[i]["DataLevel"]) {
+          if (this.sortedData[index]["datalevel"] < this.sortedData[i]["datalevel"]) {
             arrElement[i].classList.add("subElement");
             arrElement[i].children[0].firstChild.firstChild.classList.remove("collase");
           }
         }
-        if (this.sortedData[index]["DataLevel"] === this.sortedData[i]["DataLevel"]) {
+        if (this.sortedData[index]["datalevel"] >= this.sortedData[i]["datalevel"]) {
             next = false;
         }
         i++;
       }
+      let c = 0;
+      for (let i=0;i<arrElement.length;i++){
+        let clist = arrElement[i].classList;
+        clist.forEach(clas =>{
+          if (clas === "subElement"){
+            c++;
+          }
+        })
+      }
+
+      this.currentHideRow = c;
     },
 
+    /**
+     * Kiểm tra tồn tại của class
+     * 
+     * @author Xuân Đào (12/05/2023)
+     */
     isClassExist(list, className) {
       for (let i = 0; i < list.length; i++) {
         if (list[i] == className) return true;
@@ -284,78 +422,62 @@ export default {
       return false;
     },
 
+    /**
+     *Lấy dữ liệu từ api
+     * 
+     * @author Xuân Đào (12/05/2023)
+     */
     async getApiData() {
       let data = await (await fetch(this.api)).json();
       data.forEach((el) => {
-        switch (el["status"]) {
-          case accountStatus.using: {
-            el.statusname = this.resources.vi.accountList.status.using;
-            break;
-          }
-          case accountStatus.unuse: {
-            el.statusname = this.resources.vi.accountList.status.unuse;
-            break;
-          }
-        }
-        switch (el["property"]) {
-          case AccountProperty.Debt: {
-            el.propertyname = this.resources.vi.accountList.props.Debt;
-            break;
-          }
-          case AccountProperty.Excess: {
-            el.propertyname = this.resources.vi.accountList.props.Excess;
-            break;
-          }
-          case AccountProperty.Hermaphrodite: {
-            el.propertyname = this.resources.vi.accountList.props.Hermaphrodite;
-            break;
-          }
-          case AccountProperty.NoBalance: {
-            el.propertyname = this.resources.vi.accountList.props.NoBalance;
-            break;
-          }
-        }
-        if (!el["dependency"]) {
+        if (!el["dependency"] || el["dependency"].trim() == '') {
           this.rootData.push(el);
           el.isSub = false;
           el.haveSub = false;
-          el.DataLevel = 0;
           this.sortedData.push(el);
-          // this.sortedArray.addItem(el);
         } else {
+          el.isSub = true;
           this.subData.push(el);
         }
       });
-
-      this.subData.forEach((el) => {
-        let index = this.findParent(this.sortedData, el["dependency"]);
-        /*eslint-disable no-debugger */
-        // debugger
+      for(let i=0;i<this.subData.length;i++){
+        let index = this.findParent(this.sortedData, this.subData[i]['dependency']);
         this.sortedData[index].haveSub = true;
-        el.haveSub = false;
-        el.isSub = true;
-        el.DataLevel = this.sortedData[index].DataLevel + 1;
-        this.sortedData = this.insertToPosition(this.sortedData, index, el);
-      });
-
+        this.subData[i].haveSub = false;
+        let insertIndex = index;
+        while (this.sortedData[insertIndex+1] && this.sortedData[insertIndex+1]['datalevel'] > this.sortedData[index]['datalevel']) insertIndex++;
+        this.sortedData = this.insertToPosition(this.sortedData, insertIndex, this.subData[i]);
+      }
       this.gridData = data;
-      this.$emit("loadCompleted")
+      this.$emit("loadCompleted");
+      for(let i=0;i<this.gridData.length;i++){
+        this.gridData[i]['created_date_display'] = this.dateFormator(this.gridData[i]['created_date']);
+        this.gridData[i]['modifieddate_display'] = this.dateFormator(this.gridData[i]['modifieddate']);
+      }
       this.showLoading = false;
     },
 
+    /**
+     * Tìm kiếm phần tử cha
+     * 
+     * @author Xuân Đào (12/05/2023)
+     */
     findParent(arr, data) {
       for (let i = 0; i < arr.length; i++) {
         if (arr[i]["accountid"] === data) return i;
       }
     },
 
+    /**
+     * Chèn 1 phần tử vào 1 vị trí bất kỳ trong mảng
+     * 
+     * @author Xuân Đào (12/05/2023)
+     */
     insertToPosition(arr, index, data) {
       let result = [];
       for (let i = 0; i < arr.length; i++) {
-        if (i != index) {
-          result.push(arr[i]);
-        } else {
-          result.push(arr[i]);
+        result.push(arr[i]);
+        if (i == index) {
           result.push(data);
         }
       }
@@ -396,12 +518,41 @@ export default {
      * @author Xuân Đào (20/03/2023)
      */
 
-    editOnClick(item) {
+    editOnClick(item, index) {
+      let trList = this.$refs.tableBody.children;
+      switch(item['status']){
+        case 0: {
+          this.status= 'Ngừng sử dụng';
+          break;
+        }
+        case 1: {
+          this.status= 'Sử dụng';
+        }
+      }
       this.getClickedPosition(event);
-      this.$refs.context.setPosition(50, this.cursor_y + 15);
+      if (this.cursor_y < 500)
+        this.$refs.context.setPosition(50, this.cursor_y + 15);
+      else {
+        this.$refs.context.setPosition(50, this.cursor_y - 105);
+      }
       this.showContext = true;
       this.selectedData = item;
-      this.selected = event.target.parentElement.parentElement.parentElement;
+      if (this.selected === null){
+        this.selected = trList[index];
+        this.selected.classList.add("tr-selected");
+      } 
+      else {
+        this.selected.classList.remove("tr-selected");
+        this.selected = trList[index];
+        this.selected.classList.add("tr-selected");
+      }
+      this.selectedIndex = index;
+    },
+
+    deleteSelectedRow(){
+      // let trList = this.$refs.tableBody.children;
+      // trList[this.selectedIndex].remove();
+      this.sortedData = this.removeItemFromArr(this.sortedData, this.selectedIndex);
     },
 
     /**
@@ -429,16 +580,16 @@ export default {
      *
      * @author  Xuân Đào (12/03/2023)
      */
-    dateFormator(date) {
-      const data = new Date(date);
-      if (data.toDateString() !== "Invalid Date") {
-        let dateVal = data.getDay() + 1;
-        let month = data.getMonth() + 1;
-        const year = data.getFullYear();
-        dateVal = dateVal < 10 ? "0" + dateVal : dateVal;
-        month = month < 10 ? "0" + month : month;
-        return `${dateVal}/${month}/${year}`;
-      } else return "";
+     dateFormator(date) {
+      const dateData = new Date(date);
+      const day =
+        dateData.getDate() < 10 ? "0" + dateData.getDate() : dateData.getDate();
+      const month =
+        dateData.getMonth() + 1 < 10
+          ? "0" + (dateData.getMonth() + 1)
+          : dateData.getMonth() + 1;
+      const year = dateData.getFullYear();
+      return `${day}/${month}/${year}`;
     },
 
     /**
@@ -526,10 +677,153 @@ export default {
     getRemainingRow() {
       return this.$refs.tableBody.children.length;
     },
+
+    resizableGrid(table) {
+      var row = table.getElementsByTagName('tr')[0],
+      cols = row ? row.children : undefined;
+      if (!cols) return;
+      
+      table.style.overflow = 'hidden';
+      
+      var tableHeight = table.offsetHeight;
+      
+      for (var i=0;i<cols.length;i++){
+        var div = createDiv(tableHeight);
+        cols[i].appendChild(div);
+        setListeners(div);
+      }
+
+      function setListeners(div){
+        var pageX,curCol,nxtCol,curColWidth,nxtColWidth;
+
+        div.addEventListener('mousedown', function (e) {
+        curCol = e.target.parentElement;
+        nxtCol = curCol.nextElementSibling;
+        pageX = e.pageX; 
+      
+        var padding = paddingDiff(curCol);
+      
+        curColWidth = curCol.offsetWidth - padding;
+        if (nxtCol)
+          nxtColWidth = nxtCol.offsetWidth - padding;
+        });
+
+        div.addEventListener('mouseover', function (e) {
+        e.target.style.borderRight = '2px solid transparent';
+        })
+
+        div.addEventListener('mouseout', function (e) {
+        e.target.style.borderRight = '';
+        })
+
+        document.addEventListener('mousemove', function (e) {
+        if (curCol) {
+          var diffX = e.pageX - pageX;
+      
+          if (nxtCol)
+          nxtCol.style.width = (nxtColWidth - (diffX))+'px';
+
+          curCol.style.width = (curColWidth + diffX)+'px';
+        }
+        });
+
+        document.addEventListener('mouseup', function () { 
+        curCol = undefined;
+        nxtCol = undefined;
+        pageX = undefined;
+        nxtColWidth = undefined;
+        curColWidth = undefined
+        });
+      }
+      
+      function createDiv(height){
+        var div = document.createElement('div');
+        div.style.top = 0;
+        div.style.right = 0;
+        div.style.width = '5px';
+        div.style.position = 'absolute';
+        div.style.cursor = 'col-resize';
+        div.style.userSelect = 'none';
+        div.style.height = height + 'px';
+        return div;
+      }
+      
+      function paddingDiff(col){
+      
+        if (getStyleVal(col,'box-sizing') == 'border-box'){
+        return 0;
+        }
+      
+        var padLeft = getStyleVal(col,'padding-left');
+        var padRight = getStyleVal(col,'padding-right');
+        return (parseInt(padLeft) + parseInt(padRight));
+
+      }
+
+      function getStyleVal(elm,css){
+        return (window.getComputedStyle(elm, null).getPropertyValue(css))
+      }
+      },
   },
 };
 </script>
 <style scoped>
+
+.no-data{
+  position: absolute;
+  font-size: 13px;
+  text-align: center;
+  width: calc(100vw - 250px);
+  line-height: 36px;
+  margin-top: 10px;
+  color: #111111;
+}
+
+.no-data::before{
+  content: '';
+  display: block;
+  height: 80px;
+  width: 130px;
+  position: relative;
+  left: calc(100% - 710px);
+  background: url("@/assets/icons/nodata.svg") no-repeat;
+}
+
+.grid-title th{
+  border-top: unset !important;
+}
+
+.last-row{
+  border-right: unset !important;
+}
+
+.m-date{
+  padding: 0 20px;
+  text-align: center;
+}
+
+.fix-end{
+  border-left: solid black 1px;
+}
+
+.date{
+  text-align: center !important;
+}
+
+.ghost-class{
+  background-color: #d0d0d0 !important;
+}
+
+tr th, tr td {
+  border-left: unset !important;
+}
+
+tbody td div{
+  overflow: hidden !important;
+  white-space: nowrap ;
+  text-overflow: ellipsis !important;
+}
+
 .date {
   text-align: center;
   padding: 0;
@@ -572,7 +866,7 @@ export default {
   background-color: #d0d0d0;
   z-index: 999;
   top: 0;
-  left: -1px;
+  left: -0.25px;
   position: absolute;
 }
 
@@ -626,6 +920,24 @@ export default {
   position: relative;
   height: 20px;
   width: 45px;
+  display: block;
+  float: left;
+}
+
+.subElm4::before {
+  content: "";
+  position: relative;
+  height: 20px;
+  width: 60px;
+  display: block;
+  float: left;
+}
+
+.subElm5::before {
+  content: "";
+  position: relative;
+  height: 20px;
+  width: 75px;
   display: block;
   float: left;
 }
